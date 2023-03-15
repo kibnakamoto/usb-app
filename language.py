@@ -1,9 +1,3 @@
-keyboard_layout_mac_fr.py   keyboard_layout_win_da.py   keyboard_layout_win_it.py   keycode_mac_fr.py           keycode_win_de.py           keycode_win_po.py           
-keyboard_layout_us_dvo.py   keyboard_layout_win_de.py   keyboard_layout_win_po.py   keycode_win_br.py           keycode_win_es.py           keycode_win_sw.py           
-keyboard_layout_win_br.py   keyboard_layout_win_es.py   keyboard_layout_win_sw.py   keycode_win_cz1.py          keycode_win_fr.py           keycode_win_tr.py           
-keyboard_layout_win_cz1.py  keyboard_layout_win_fr.py   keyboard_layout_win_tr.py   keycode_win_cz.py           keycode_win_hu.py           keycode_win_uk.py           
-keyboard_layout_win_cz.py   keyboard_layout_win_hu.py   keyboard_layout_win_uk.py   keycode_win_da.py           keycode_win_it.py           
-
 import ducky
 
 # raise error when language is not supported
