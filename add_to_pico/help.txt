@@ -1,0 +1,5 @@
+add lib folder contents to lib folder in pico
+add root folder contents to root folder in pico
+
+
+lib/lib has keyboard stuff. Make a GUI that imports whichever one a user wants
