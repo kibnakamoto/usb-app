@@ -30,31 +30,11 @@ ITEXT_COLORS = () # 12 colors
 ######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller
 ######## TODO: add settings submenu for changing the colors of input text
 
-class MainWindow(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.__initUi()
-
-    def __initUi(self):
-        self.__te = QTextEdit()
-        self.__te.textChanged.connect(self.__line_widget_line_count_changed)
-        self.__lineWidget = LineNumberWidget(self.__te)
-
-        lay = QHBoxLayout()
-        lay.addWidget(self.__lineWidget)
-        lay.addWidget(self.__te)
-
-        self.setLayout(lay)
-
-    def __line_widget_line_count_changed(self):
-        if self.__lineWidget:
-            n = int(self.__te.document().lineCount())
-            self.__lineWidget.changeLineCount(n)
-
 # Subclass QMainWindow to customize your application's main window
-class IDE(QMainWindow):
+class IDE(QMainWindow, QWidget):
     def __init__(self, screensize:QRect): # size of physical screen
         super().__init__()
+        super(QWidget, self).__init__()
 
         # geometry of screensize
         self.left = screensize.left()
@@ -170,16 +150,19 @@ class IDE(QMainWindow):
         view_menu.addAction(quit_act)
 
         # add codespace to write code
-        self.codespace = QTextEdit(self)
+        self.wg = QWidget(self)
+        self.codespace = QTextEdit(self.wg)
         self.codespace.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
         self.codespace.move(self.adjw(6), self.adjh(10)-self.adjh(200))
+        self.wg.move(self.adjw(6), self.adjh(10)-self.adjh(200))
         self.codespace.textChanged.connect(self.__line_widget_line_count_changed)
         self.line = LineNumberWidget(self.codespace)
 
-        lay = QHBoxLayout()
-        lay.addWidget(self.line)
-        lay.addWidget(self.codespace)
-        self.setLayout(lay)
+        # set layout
+        layout = QHBoxLayout()
+        layout.addWidget(self.line)
+        layout.addWidget(self.codespace)
+        self.wg.setLayout(layout)
 
         text = self.codespace.toPlainText()
 
@@ -193,6 +176,7 @@ class IDE(QMainWindow):
         w = size.width()
         h = size.height()
         self.codespace.resize(w-self.window_size.width()//6, h-self.window_size.height()//10)
+        self.wg.resize(w-self.window_size.width()//6, h-self.window_size.height()//10)
 
         self.setStatusBar(QStatusBar(self))
 
