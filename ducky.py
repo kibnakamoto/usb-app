@@ -1,8 +1,8 @@
 # GUI and compiler of duckyscript on a raspberry pi pico (w)
 
 import sys
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QToolBar, QAction, QStatusBar, QMenu, QLineEdit
+from PyQt5.QtCore import QSize, Qt, QRect
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QToolBar, QAction, QStatusBar, QMenu, QLineEdit, QVBoxLayout
 from PyQt5.QtGui import QIcon
 
 import language
@@ -32,8 +32,20 @@ ITEXT_COLORS = () # 12 colors
 
 # Subclass QMainWindow to customize your application's main window
 class IDE(QMainWindow):
-    def __init__(self):
+    def __init__(self, screensize:QRect): # size of physical screen
         super().__init__()
+
+        # geometry of screensize
+        self.left = screensize.left()
+        self.top = screensize.top()
+        self.width = screensize.width()
+        self.height = screensize.height()
+        self.left = self.left+self.width//3
+        self.top = self.top+self.height//5
+        self.width = self.width//2
+        self.height = self.height//2
+
+        self.setGeometry(self.left, self.top, self.width, self.height)
 
         # icons
         self.black_bk_pngs = {
@@ -134,9 +146,13 @@ class IDE(QMainWindow):
         view_menu.addAction(cut_act)
 
 
-        # add textspace to write code
+        # add codespace to write code
         codespace = QLineEdit()
-        codespace.setText("Write Duckyscript Here...")
+        codespace.resize(400,400)
+        codespace.move(20, 20)
+
+        # get code written
+        code = codespace.text()
 
         self.setStatusBar(QStatusBar(self))
 
@@ -168,13 +184,9 @@ class IDE(QMainWindow):
     def upload(self):
         pass
 
-    # view submenu. CTRL Z, CTRL C, CTRL V, etc.
-    def view(self):
-        pass
-
 app = QApplication(sys.argv)
 
-window = IDE()
+window = IDE(screensize=app.primaryScreen().availableGeometry())
 window.show()
 
 app.exec()
