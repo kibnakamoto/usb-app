@@ -2,13 +2,14 @@
 
 import sys
 from PyQt5.QtCore import QSize, Qt, QRect
-from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QToolBar, QAction, QStatusBar, QMenu, QLineEdit, QVBoxLayout
-from PyQt5.QtGui import QIcon
+from PyQt5.QtWidgets import QMainWindow, QApplication, QLabel, QToolBar, QAction, QStatusBar, QMenu, QTextEdit, QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit
+from PyQt5.QtGui import QIcon, QColor, QPainter, QTextFormat
+from pyqt_line_number_widget import LineNumberWidget
 
 import language
 
 target_os = "" # windows or mac
-keyboard_lang = "uk" # target keyboard language, default is uk
+keyboard_lang = "us" # target keyboard language, default is us
 
 # Initialize Duckyscript keywords to color code the ones written to the textbox
 DUCKYSCRIPT_COMMENT = "REM"
@@ -28,7 +29,27 @@ ITEXT_COLORS = () # 12 colors
 
 ######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller
 ######## TODO: add settings submenu for changing the colors of input text
-######## TODO: make a line parser
+
+class MainWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.__initUi()
+
+    def __initUi(self):
+        self.__te = QTextEdit()
+        self.__te.textChanged.connect(self.__line_widget_line_count_changed)
+        self.__lineWidget = LineNumberWidget(self.__te)
+
+        lay = QHBoxLayout()
+        lay.addWidget(self.__lineWidget)
+        lay.addWidget(self.__te)
+
+        self.setLayout(lay)
+
+    def __line_widget_line_count_changed(self):
+        if self.__lineWidget:
+            n = int(self.__te.document().lineCount())
+            self.__lineWidget.changeLineCount(n)
 
 # Subclass QMainWindow to customize your application's main window
 class IDE(QMainWindow):
@@ -46,6 +67,7 @@ class IDE(QMainWindow):
         self.height = self.height//2
 
         self.setGeometry(self.left, self.top, self.width, self.height)
+        self.window_size = self.size()
 
         # icons
         self.black_bk_pngs = {
@@ -128,7 +150,6 @@ class IDE(QMainWindow):
             button_action = QAction(QIcon(lst[0]), action, self)
             button_action.setStatusTip(lst[1])
             button_action.triggered.connect(lst[2]) # lst[2] is the method added in the previous step
-            button_action.setCheckable(True)
 
             # add buttons to toolbar
             toolbar.addAction(button_action)
@@ -138,23 +159,50 @@ class IDE(QMainWindow):
         copy_act = QAction('&Copy', self)
         paste_act = QAction('&Paste', self)
         cut_act = QAction('&Cut', self)
+        quit_act = QAction('&Quit', self)
         copy_act.setShortcut("Ctrl+C")
         paste_act.setShortcut("Ctrl+V")
         cut_act.setShortcut("Ctrl+X")
+        quit_act.setShortcut("CTRL+Q")
         view_menu.addAction(copy_act)
         view_menu.addAction(paste_act)
         view_menu.addAction(cut_act)
-
+        view_menu.addAction(quit_act)
 
         # add codespace to write code
-        codespace = QLineEdit()
-        codespace.resize(400,400)
-        codespace.move(20, 20)
+        self.codespace = QTextEdit(self)
+        self.codespace.setSizePolicy(QSizePolicy.MinimumExpanding, QSizePolicy.MinimumExpanding)
+        self.codespace.move(self.adjw(6), self.adjh(10)-self.adjh(200))
+        self.codespace.textChanged.connect(self.__line_widget_line_count_changed)
+        self.line = LineNumberWidget(self.codespace)
 
-        # get code written
-        code = codespace.text()
+        lay = QHBoxLayout()
+        lay.addWidget(self.line)
+        lay.addWidget(self.codespace)
+        self.setLayout(lay)
+
+        text = self.codespace.toPlainText()
+
+    def __line_widget_line_count_changed(self):
+        if self.line:
+            n = int(self.codespace.document().lineCount())
+            self.line.changeLineCount(n)
+   
+    def resizeEvent(self, event):
+        size = self.size()
+        w = size.width()
+        h = size.height()
+        self.codespace.resize(w-self.window_size.width()//6, h-self.window_size.height()//10)
 
         self.setStatusBar(QStatusBar(self))
+
+    # adjust an integer to the height of the application
+    def adjh(self, num:int) -> int:
+        return self.size().height()//num
+    
+    # adjust an integer to the width of the application
+    def adjw(self, num:int) -> int:
+        return self.size().width()//num
 
     def compile_duckyscript(self):
         pass
@@ -185,8 +233,7 @@ class IDE(QMainWindow):
         pass
 
 app = QApplication(sys.argv)
-
 window = IDE(screensize=app.primaryScreen().availableGeometry())
-window.show()
 
+window.show()
 app.exec()
