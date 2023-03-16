@@ -9,12 +9,18 @@ def set_lang(target_os:str, keyboard_lang:str) -> None:
         if keyboard_lang == "fr":
            from add_to_pico.lib.lib.keyboard_layout_mac_fr import KeyboardLayout
            from add_to_pico.lib.lib.keycode_mac_fr import Keycode
+        elif keyboard_lang == "us":
+            from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS as KeyboardLayout
+            from adafruit_hid.keycode import Keycode
         else:
             raise LanguageNotFoundError("No other languages supported for mac")
     elif target_os == "windows":
         if keyboard_lang == "uk":
            from add_to_pico.lib.lib.keyboard_layout_win_uk import KeyboardLayout
            from add_to_pico.lib.lib.keycode_win_uk import Keycode
+        elif keyboard_lang == "us":
+            from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS as KeyboardLayout
+            from adafruit_hid.keycode import Keycode
         elif keyboard_lang == "br":
             from add_to_pico.lib.lib.keyboard_layout_win_br import KeyboardLayout
             from add_to_pico.lib.lib.keycode_win_br import Keycode
