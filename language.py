@@ -4,6 +4,9 @@ import ducky
 class LanguageNotFoundError(ModuleNotFoundError):
     pass
 
+LANGUAGES_MAC = ("fr", "us")
+LANGUAGES_WIN = ('br', 'cz', 'cz1', 'da', 'de', 'es', 'fr', 'hu', 'it', 'po', 'sw', 'tr', 'uk', 'us')
+
 def set_lang(target_os:str, keyboard_lang:str) -> None:
     if target_os == "mac":
         if keyboard_lang == "fr":
