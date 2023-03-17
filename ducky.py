@@ -13,19 +13,19 @@ target_os = "" # windows or mac
 keyboard_lang = "us" # target keyboard language, default is us
 
 # Initialize Duckyscript keywords to color code the ones written to the textbox
-DUCKYSCRIPT_COMMENT = tuple("REM")
+DUCKYSCRIPT_COMMENT = ("REM")
 DUCKYSCRIPT_STARTING_KEYWORDS = ("DELAY", "STRING", "PRINT", "IMPORT", "DEFAULT_DELAY", "DEFAULTDELAY", "LED")
 DUCKYSCRIPT_F_KEYS = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12")
 DUCKYSCRIPT_SHORTCUT_KEYS = ("ALT", "CTRL", "CONTROL", "SHIFT", "SPACE", "ENTER", "BACKSPACE", "TAB",
                              "CAPSLOCK", "ESC", "ESCAPE")
-DUCKYSCRIPT_ARROWS = ("UP" "UPARROW", "DOWN", "DOWNARROW", "LEFT", "LEFTARROW", "RIGHT", "RIGHTARROW")
+DUCKYSCRIPT_ARROWS = ("UP", "UPARROW", "DOWN", "DOWNARROW", "LEFT", "LEFTARROW", "RIGHT", "RIGHTARROW")
 DUCKYSCRIPT_WINDOWS = ("WINDOWS", "GUI")
 DUCKYSCRIPT_CHARS = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q",
                      "R", "S", "T", "U", "V", "W", "X", "Y", "Z")
 DUCKYSCRIPT_UNCOMMON = ("APP", "MENU", "BREAK", "PAUSE", "DELETE", "END", "HOME", "INSERT", "NUMLOCK",
                         "PAGEUP", "PAGEDOWN", "PRINTSCREEN", "SCROLLLOCK")
 ITEXT_COLORS_LIGHT = ((94,148,81), (220,11,11), (255,128,0), (0,204,204), (204,204,0), (0,0,204), (255,127,80), (46,199,199), (84,107,107), (32,32,32)) # 12 colors
-ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,255,255), (62,62,236), (255,102,102), (133,193,187), (212,212,212), (250,250,250)) # 12 colors
+ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,255,255), (62,62,236), (255,102,102), (133,193,187), (212,21,212), (250,250,250)) # 12 colors
 
 # COLORS for (COMMENT, starting_keywords, fkeys, shortcut_keys, arrows, windows, chars, uncommon, numbers, text)
 
@@ -37,14 +37,13 @@ class Setup(QMainWindow):
         super().__init__()
 
 
+# Syntax Highlighter for Duckyscript
 class SyntaxHighlighter(QSyntaxHighlighter):
 
-    def __init__(self, parent, keyword_patterns, color, color_str, color_num):
+    def __init__(self, parent, all_keys, colors, color_str, color_num):
         super().__init__(parent)
 
-        self.keyword_format = QTextCharFormat()
-        self.keyword_format.setForeground(QColor(color))
-        self.keyword_format.setFontWeight(QFont.Bold)
+        self.colors = colors
 
         self.string_format = QTextCharFormat()
         self.string_format.setForeground(QColor(color_str))
@@ -52,35 +51,44 @@ class SyntaxHighlighter(QSyntaxHighlighter):
         self.num_format = QTextCharFormat()
         self.num_format.setForeground(QColor(color_num))
 
-        self.keyword_pattern = keyword_patterns
+        self.keyword_pattern = all_keys
 
     def highlightBlock(self, text):
         words = text.split(' ')
-        expression = QRegExp("\\btext\\b")
-        index = expression.indexIn(text)
-        while index >= 0:
-            length = expression.matchedLength()
-            self.setFormat(index, length, QColor(255, 0, 0))
-            index = expression.indexIn(text, index + length)
-
-        for pattern in self.keyword_pattern:
-            pattern = re.compile(f"\b{pattern}\b")
-            for match in pattern.finditer(text):
-                print(match.start())
-           #  if pattern in words:
-           #      frmt = self.keyword_format
-           #      start = text.find(pattern)
-           #      end = start + len(pattern)
-           #      for i in range(len(pattern)):
-           #          self.setFormat(start+i, end-start, frmt)
-                # raise Exception(text)
-           #  else:
-           #      if bool(re.match(r'^[-+]?\d+\.?\d*$', text)): # if isdigit
-           #          frmt = self.num_format
-           #          self.setFormat(start, end-start, frmt)
-           #      else:
-           #          frmt = self.string_format
-        
+        fi = 0
+        for keys in self.keyword_pattern:
+            for pattern in keys:
+                if words[0] == "REM": # if comment
+                    for i in range(len(text)):
+                        self.setFormat(i, len(text), QColor(self.colors[0][0], self.colors[0][1], self.colors[0][2]))
+                else:
+                    expression = QRegExp(f"\\b{pattern}\\b")
+                    self.keyword_format = QTextCharFormat()
+                    self.keyword_format.setForeground(QColor(self.colors[fi][0], self.colors[fi][1],
+                                                             self.colors[fi][2]))
+                    self.keyword_format.setFontWeight(QFont.Bold)
+                    wordi = 0
+                    for t in words:
+                        if t == pattern and t == words[0]:
+                            index = expression.indexIn(t)
+                            while index >= 0:
+                                length = expression.matchedLength()
+                                self.setFormat(index, length, self.keyword_format)
+                                index = expression.indexIn(text, index + length)
+                        else:
+                            lengths = 0 # previous lengths
+                            for i in range(wordi):
+                                lengths += len(words[i])
+                            num = QRegExp("\\b\\d+\\b")
+                            indexn = num.indexIn(t)+lengths+1
+                            if wordi == 0:
+                                indexn -= 1
+                            while indexn >= 0:
+                                length = num.matchedLength()
+                                self.setFormat(indexn, length, self.num_format)
+                                indexn = num.indexIn(text, indexn + length)
+                        wordi += 1
+            fi+=1
 
 # Subclass QMainWindow to customize your application's main window
 class IDE(QMainWindow, QWidget):
@@ -225,9 +233,9 @@ class IDE(QMainWindow, QWidget):
         self.wg.move(self.adjw(6), self.adjh(10)-self.adjh(200))
         self.codespace.textChanged.connect(self.__line_widget_line_count_changed)
         self.line = LineNumberWidget(self.codespace)
-        palette = self.codespace.palette()
-        palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
-        self.codespace.setPalette(palette)
+        code_palette = self.codespace.palette()
+        code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
+        self.codespace.setPalette(code_palette)
         self.codespace.setStyleSheet("background-color: #000000;");
 
         # set layout
@@ -259,19 +267,15 @@ class IDE(QMainWindow, QWidget):
         # colorcoding
         tmp = (DUCKYSCRIPT_COMMENT, DUCKYSCRIPT_STARTING_KEYWORDS, DUCKYSCRIPT_F_KEYS, DUCKYSCRIPT_ARROWS,
                DUCKYSCRIPT_WINDOWS, DUCKYSCRIPT_CHARS, DUCKYSCRIPT_UNCOMMON)
-        match_found = False
+
+        # get cursor line
         string = self.codespace.toPlainText()
-        lines = string.split("\n")
-        for i in range(len(tmp)):
-             for j in tmp[i]:
-                 for k in lines:
-                    block = SyntaxHighlighter(self.codespace, tmp[i], QColor(self.colors[i][0], 
-                                                                             self.colors[i][1],
-                                                                             self.colors[i][2]),
-                                              QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]),
-                                              QColor(self.colors[-2][0], self.colors[-2][1], self.colors[-2][2]))
-                    block.highlightBlock(k)
-                    break
+        line = string.split("\n")[cursor.blockNumber()]
+        cursor = self.codespace.textCursor()
+        block = SyntaxHighlighter(self.codespace, tmp, self.colors,
+                                  QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]),
+                                  QColor(self.colors[-2][0], self.colors[-2][1], self.colors[-2][2]))
+        block.highlightBlock(line)
         del tmp
 
     # adjust an integer to the height of the application
@@ -315,6 +319,7 @@ class IDE(QMainWindow, QWidget):
     # save the currently editing file
     def save(self):
         text = self.codespace.toPlainText()
+
         
 
     # upload payload(#).dd onto the microcontroller
