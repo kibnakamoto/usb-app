@@ -3,9 +3,11 @@
 import sys
 import re
 from PyQt5.QtCore import QSize, Qt, QRect, QRegExp
-from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit, QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit
+from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit, QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox
 from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, QPalette
 from pyqt_line_number_widget import LineNumberWidget
+import os
+import shutil
 
 import language
 
@@ -35,7 +37,6 @@ ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,2
 class Setup(QMainWindow):
     def __init__(self):
         super().__init__()
-
 
 # Syntax Highlighter for Duckyscript
 class SyntaxHighlighter(QSyntaxHighlighter):
@@ -237,6 +238,13 @@ class IDE(QMainWindow, QWidget):
         code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
         self.codespace.setPalette(code_palette)
         self.codespace.setStyleSheet("background-color: #000000;");
+        self.codespace.textChanged.connect(self.ifTyped)
+
+        # initialize files
+        self.current_payload = "payloads/payload.dd"
+        self.path = os.path.dirname(os.path.realpath(__file__))
+        self.saved = False # wheter the file user is editing is saved
+        self.historySaveLimit = 5 # Ask user how many files of history do they want saved
 
         # set layout
         layout = QHBoxLayout()
@@ -278,6 +286,9 @@ class IDE(QMainWindow, QWidget):
         block.highlightBlock(line)
         del tmp
 
+    def ifTyped(self):
+        self.saved = False
+
     # adjust an integer to the height of the application
     def adjh(self, num:int) -> int:
         return self.size().height()//num
@@ -318,9 +329,48 @@ class IDE(QMainWindow, QWidget):
 
     # save the currently editing file
     def save(self):
-        text = self.codespace.toPlainText()
-
-        
+        if not self.saved:
+            try:
+                payloads = self.path+"payloads"
+                if len(os.listdir(payloads)): # if there are payloads, save history of the last 10 files
+                    payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
+                    count = len(payload_history)
+                    if count >= self.historySavedLimit:
+                        shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3}+_{count}.dd') # copy unedited file to history
+                f = open(f"{payloads}/{self.current_payload}","w")
+                text = self.codespace.toPlainText()
+                f.write(text)
+                self.saved = True
+            except FileNotFoundError: # try to add a backslash and try again
+                try:
+                    self.path += "/"
+                    payloads = self.path+"payloads"
+                    if len(os.listdir(payloads)): # if there are no payloads
+                        payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
+                        count = len(payload_history)
+                        if count >= self.historySavedLimit:
+                            shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3}+_{count}.dd') # copy unedited file to history
+                    f = open(f"{payloads}/{self.current_payload}","w")
+                    text = self.codespace.toPlainText()
+                    f.write(text)
+                    self.saved = True
+                except FileNotFoundError: # try to add a frontslash and try again
+                    try:
+                        self.path += "\\"
+                        if len(os.listdir(self.path+"payloads")): # if there are no payloads
+                            payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
+                            count = len(payload_history)
+                            if count >= self.historySavedLimit:
+                                shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3}+_{count}.dd') # copy unedited file to history
+                                f = open(f"{payloads}/{self.current_payload}","w")
+                                text = self.codespace.toPlainText()
+                                f.write(text)
+                    except FileNotFoundError:
+                        message_box = QMessageBox(QMessageBox.Information,
+                                                  "FileNotFoundError",
+                                                  "File Not Found, please input the correct path to the usb-app",
+                                                  QMessageBox.Critical)
+                        message_box.exec_()
 
     # upload payload(#).dd onto the microcontroller
     def upload(self):
@@ -330,4 +380,4 @@ app = QApplication(sys.argv)
 window = IDE(screensize=app.primaryScreen().availableGeometry(), app=app)
 
 window.show()
-app.exec()
+sys.exit(app.exec())
