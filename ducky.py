@@ -248,12 +248,12 @@ class IDE(QMainWindow, QWidget):
         # initialize files
         self.current_payload = "payload.dd"
         self.path = os.path.dirname(os.path.realpath(__file__))
-        self.saved = False # wheter the file user is editing is saved
+        self.saved = True # wheter the file user is editing is saved
         self.historySaveLimit = 5 # Ask user how many files of history do they want saved
 
-        # load the payload from payloads
+        # load the payload from payloads #################### CAUSES SEGMENTATION FAULT
         # f = open(self.path + "/payloads/" + self.current_payload)
-        # stream = QTextStream(QFile(f.name))
+        # stream = QTextStream(QString(f.name))
         # raise Exception(stream.readAll())
         # self.codespace.setPlainText(stream.readAll())
 
@@ -286,8 +286,6 @@ class IDE(QMainWindow, QWidget):
         # colorcoding
         tmp = (DUCKYSCRIPT_COMMENT, DUCKYSCRIPT_STARTING_KEYWORDS, DUCKYSCRIPT_SHORTCUT_KEYS, DUCKYSCRIPT_F_KEYS, DUCKYSCRIPT_ARROWS,
                DUCKYSCRIPT_WINDOWS, DUCKYSCRIPT_CHARS, DUCKYSCRIPT_UNCOMMON)
-
-        # get cursor line
         string = self.codespace.toPlainText()
         line = string.split("\n")[cursor.blockNumber()]
         cursor = self.codespace.textCursor()
@@ -345,41 +343,56 @@ class IDE(QMainWindow, QWidget):
         if not self.saved:
             try:
                 payloads = self.path+"/payloads"
-                if len(os.listdir(payloads)): # if there are payloads, save history of the last 10 files
+                if len(os.listdir(payloads)) > 1: # if there are payloads, save history of the last 10 files
                     payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
                     count = len(payload_history)
-                    if count != 0 and count <= self.historySaveLimit:
-                        shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}+_{count}.dd') # copy unedited file to history
+                    if count <= self.historySaveLimit:
+                        shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}_{count}.dd') # copy unedited file to history
                 f = open(f"{payloads}/{self.current_payload}","w")
                 text = self.codespace.toPlainText()
                 f.write(text)
                 self.saved = True
+                message_box = QMessageBox(QMessageBox.Information,
+                                          "Save",
+                                          "Sucessfully saved",
+                                          QMessageBox.Ok)
+                message_box.exec_()
             except FileNotFoundError: # try to add a backslash and try again
                 try:
                     self.path += "/"
                     payloads = self.path+"payloads"
-                    if len(os.listdir(payloads)): # if there are no payloads
+                    if len(os.listdir(payloads) > 1): # if there are no payloads
                         payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
                         count = len(payload_history)
-                        if count != 0 and count <= self.historySaveLimit:
-                            shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}+_{count}.dd') # copy unedited file to history
+                        if count <= self.historySaveLimit:
+                            shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}_{count}.dd') # copy unedited file to history
                     f = open(f"{payloads}/{self.current_payload}","w")
                     text = self.codespace.toPlainText()
                     f.write(text)
                     self.saved = True
+                    message_box = QMessageBox(QMessageBox.Information,
+                                              "Save",
+                                              "Sucessfully saved",
+                                              QMessageBox.Ok)
+                    message_box.exec_()
                 except FileNotFoundError: # try to add a frontslash and try again
                     try:
                         self.path += "\\"
-                        if len(os.listdir(self.path+"payloads")): # if there are no payloads
+                        if len(os.listdir(self.path+"payloads")) > 1: # if there are no payloads
                             payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
                             count = len(payload_history)
-                            if count != 0 and count <= self.historySaveLimit:
-                                shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}+_{count}.dd') # copy unedited file to history
-                                f = open(f"{payloads}/{self.current_payload}","w")
-                                text = self.codespace.toPlainText()
-                                f.write(text)
+                            if count <= self.historySaveLimit:
+                                shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}_{count}.dd') # copy unedited file to history
+                        f = open(f"{payloads}/{self.current_payload}","w")
+                        text = self.codespace.toPlainText()
+                        f.write(text)
+                        message_box = QMessageBox(QMessageBox.Information,
+                                                  "Save",
+                                                  "Sucessfully saved",
+                                                  QMessageBox.Ok)
+                        message_box.exec_()
+                        self.saved = True
                     except FileNotFoundError:
-                        raise Exception()
                         message_box = QMessageBox(QMessageBox.Information,
                                                   "FileNotFoundError",
                                                   "File Not Found, please input the correct path to the usb-app",
