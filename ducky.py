@@ -2,7 +2,7 @@
 
 import sys
 import re
-from PyQt5.QtCore import QSize, Qt, QRect, QRegExp
+from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QTextStream, QFile
 from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit, QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox
 from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, QPalette
 from pyqt_line_number_widget import LineNumberWidget
@@ -186,6 +186,7 @@ class IDE(QMainWindow, QWidget):
         self.colors = ITEXT_COLORS_DARK
         self.setWindowTitle("DuckScript IDE & Compiler")
         main_menu = self.menuBar()
+        self.app = app
 
         toolbar = QToolBar("Editor toolbar")
         toolbar.setIconSize(QSize(22,22))
@@ -206,10 +207,14 @@ class IDE(QMainWindow, QWidget):
         paste_act = QAction('&Paste', self)
         cut_act = QAction('&Cut', self)
         quit_act = QAction('&Quit', self)
+        
         copy_act.setShortcut("Ctrl+C")
         paste_act.setShortcut("Ctrl+V")
         cut_act.setShortcut("Ctrl+X")
         quit_act.setShortcut("CTRL+Q")
+        
+        copy_act.triggered.connect(self.copier)
+
         view_menu.addAction(copy_act)
         view_menu.addAction(paste_act)
         view_menu.addAction(cut_act)
@@ -241,10 +246,16 @@ class IDE(QMainWindow, QWidget):
         self.codespace.textChanged.connect(self.ifTyped)
 
         # initialize files
-        self.current_payload = "payloads/payload.dd"
+        self.current_payload = "payload.dd"
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.saved = False # wheter the file user is editing is saved
         self.historySaveLimit = 5 # Ask user how many files of history do they want saved
+
+        # load the payload from payloads
+        # f = open(self.path + "/payloads/" + self.current_payload)
+        # stream = QTextStream(QFile(f.name))
+        # raise Exception(stream.readAll())
+        # self.codespace.setPlainText(stream.readAll())
 
         # set layout
         layout = QHBoxLayout()
@@ -273,7 +284,7 @@ class IDE(QMainWindow, QWidget):
         cursor = self.codespace.textCursor()
         
         # colorcoding
-        tmp = (DUCKYSCRIPT_COMMENT, DUCKYSCRIPT_STARTING_KEYWORDS, DUCKYSCRIPT_F_KEYS, DUCKYSCRIPT_ARROWS,
+        tmp = (DUCKYSCRIPT_COMMENT, DUCKYSCRIPT_STARTING_KEYWORDS, DUCKYSCRIPT_SHORTCUT_KEYS, DUCKYSCRIPT_F_KEYS, DUCKYSCRIPT_ARROWS,
                DUCKYSCRIPT_WINDOWS, DUCKYSCRIPT_CHARS, DUCKYSCRIPT_UNCOMMON)
 
         # get cursor line
@@ -315,8 +326,10 @@ class IDE(QMainWindow, QWidget):
             self.view_theme = view_white
             self.colors = ITEXT_COLORS_LIGHT
 
-
-            
+    def copier(self):
+        clipboard = self.app.clipboard()
+        selected_text = self.codespace.textCursor().selectedText()
+        clipboard.setText(selected_text)
 
     # add another duckyscript file
     # https://github.com/dbisu/pico-ducky#multiple-payloads
@@ -331,12 +344,12 @@ class IDE(QMainWindow, QWidget):
     def save(self):
         if not self.saved:
             try:
-                payloads = self.path+"payloads"
+                payloads = self.path+"/payloads"
                 if len(os.listdir(payloads)): # if there are payloads, save history of the last 10 files
                     payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
                     count = len(payload_history)
-                    if count >= self.historySavedLimit:
-                        shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3}+_{count}.dd') # copy unedited file to history
+                    if count != 0 and count <= self.historySaveLimit:
+                        shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}+_{count}.dd') # copy unedited file to history
                 f = open(f"{payloads}/{self.current_payload}","w")
                 text = self.codespace.toPlainText()
                 f.write(text)
@@ -348,8 +361,8 @@ class IDE(QMainWindow, QWidget):
                     if len(os.listdir(payloads)): # if there are no payloads
                         payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
                         count = len(payload_history)
-                        if count >= self.historySavedLimit:
-                            shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3}+_{count}.dd') # copy unedited file to history
+                        if count != 0 and count <= self.historySaveLimit:
+                            shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}+_{count}.dd') # copy unedited file to history
                     f = open(f"{payloads}/{self.current_payload}","w")
                     text = self.codespace.toPlainText()
                     f.write(text)
@@ -360,16 +373,17 @@ class IDE(QMainWindow, QWidget):
                         if len(os.listdir(self.path+"payloads")): # if there are no payloads
                             payload_history = [f for f in os.listdir(payloads+"/history") if os.path.isfile(f) and f.startswith(self.current_payload[:-3])]
                             count = len(payload_history)
-                            if count >= self.historySavedLimit:
-                                shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3}+_{count}.dd') # copy unedited file to history
+                            if count != 0 and count <= self.historySaveLimit:
+                                shutil.copy(f'{payloads}/{self.current_payload}', f'{payloads}/history/{self.current_payload[:-3]}+_{count}.dd') # copy unedited file to history
                                 f = open(f"{payloads}/{self.current_payload}","w")
                                 text = self.codespace.toPlainText()
                                 f.write(text)
                     except FileNotFoundError:
+                        raise Exception()
                         message_box = QMessageBox(QMessageBox.Information,
                                                   "FileNotFoundError",
                                                   "File Not Found, please input the correct path to the usb-app",
-                                                  QMessageBox.Critical)
+                                                  QMessageBox.Cancel)
                         message_box.exec_()
 
     # upload payload(#).dd onto the microcontroller
