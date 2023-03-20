@@ -3,8 +3,10 @@
 import sys
 import re
 from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QTextStream, QFile
-from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit, QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox
-from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, QPalette
+from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit, \
+                            QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox, QColorDialog
+from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, \
+                        QPalette, QTextCursor
 from pyqt_line_number_widget import LineNumberWidget
 import os
 import shutil
@@ -37,6 +39,22 @@ ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,2
 class Setup(QMainWindow):
     def __init__(self):
         super().__init__()
+
+# RGB to hex, accepts either one RGB tuple or r,g,b as seperate parameters
+def rgbtohex(r:tuple, g:int=None,b:int=None) -> str:
+    value = 0
+    if isinstance(r, tuple):
+        for i in r:
+            value<<=8
+            value|=i
+    else:
+        value<<=8
+        value|=r
+        value<<=8
+        value|=g
+        value<<=8
+        value|=b
+    return hex(value)[2:]
 
 # Syntax Highlighter for Duckyscript
 class SyntaxHighlighter(QSyntaxHighlighter):
@@ -167,18 +185,29 @@ class IDE(QMainWindow, QWidget):
                 ]
         }
 
-        view_black = [ # submenu
+        self.view_black = [ # submenu
             "pictures/black_bk/view.png",
             "view",
         ]
         
-        view_white = [ # submenu
+        self.view_white = [ # submenu
             "pictures/white_bk/view.png",
             "view",
         ]
 
+        self.exit_black = [
+            "pictures/black_bk/exit.png",
+            "exit"
+        ]
+
+        self.exit_white = [
+            "pictures/white_bk/exit.png",
+            "exit"
+        ]
+
         self.pngs = self.black_bk_pngs # default icons
-        self.view_theme = view_black
+        self.exit_png = self.exit_black
+        self.view_theme = self.view_black
         self.rgb = (5,5,5) # black
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
@@ -207,26 +236,36 @@ class IDE(QMainWindow, QWidget):
         paste_act = QAction('&Paste', self)
         cut_act = QAction('&Cut', self)
         quit_act = QAction('&Quit', self)
+        save_act = QAction('&Save', self)
         
         copy_act.setShortcut("Ctrl+C")
         paste_act.setShortcut("Ctrl+V")
         cut_act.setShortcut("Ctrl+X")
         quit_act.setShortcut("CTRL+Q")
+        save_act.setShortcut("CTRL+S")
         
         copy_act.triggered.connect(self.copier)
+        paste_act.triggered.connect(self.paster)
+        cut_act.triggered.connect(self.cutter)
+        quit_act.triggered.connect(self.quitter)
+        save_act.triggered.connect(self.save)
 
         view_menu.addAction(copy_act)
         view_menu.addAction(paste_act)
         view_menu.addAction(cut_act)
         view_menu.addAction(quit_act)
+        view_menu.addAction(save_act)
 
         # theme shortcuts
         themeb_act = QAction("&Black", self)
-        themeb_act.setShortcut("CTRL+SHIFT+B")
         themew_act = QAction("&White", self)
-        themew_act.setShortcut("CTRL+SHIFT+W")
         theme_act = QAction("&Custom", self)
+        themeb_act.setShortcut("CTRL+SHIFT+B")
+        themew_act.setShortcut("CTRL+SHIFT+W")
         theme_act.setShortcut("CTRL+SHIFT+T")
+        themeb_act.triggered.connect(self.black_theme)
+        themew_act.triggered.connect(self.white_theme)
+        theme_act.triggered.connect(self.custom_theme)
         theme_menu.addAction(themeb_act)
         theme_menu.addAction(themew_act)
         theme_menu.addAction(theme_act)
@@ -251,11 +290,14 @@ class IDE(QMainWindow, QWidget):
         self.saved = True # wheter the file user is editing is saved
         self.historySaveLimit = 5 # Ask user how many files of history do they want saved
 
-        # load the payload from payloads #################### CAUSES SEGMENTATION FAULT
-        # f = open(self.path + "/payloads/" + self.current_payload)
-        # stream = QTextStream(QString(f.name))
-        # raise Exception(stream.readAll())
-        # self.codespace.setPlainText(stream.readAll())
+        # load the payload from payloads
+        try:
+            f = open(self.path + "/payloads/" + self.current_payload)
+            # stream = QTextStream(QString(f.name))
+            # raise Exception(stream.readAll())
+            # self.codespace.setPlainText(stream.readAll())
+        except FileNotFoundError:
+            pass
 
         # set layout
         layout = QHBoxLayout()
@@ -264,7 +306,6 @@ class IDE(QMainWindow, QWidget):
         self.wg.setLayout(layout)
         
         self.parse_line()
-
 
     def __line_widget_line_count_changed(self):
         if self.line:
@@ -309,7 +350,7 @@ class IDE(QMainWindow, QWidget):
     def compile_duckyscript(self):
         pass
 
-    def change_theme(self):
+    def set_theme(self):
         average = 0;
         for i in self.rgb:
             average += i
@@ -317,17 +358,74 @@ class IDE(QMainWindow, QWidget):
         color_is_dark = True if average <= 128 else False
         if color_is_dark:
             self.pngs = self.black_bk_pngs
-            self.view_theme = view_black
+            self.view_theme = self.view_black
             self.colors = ITEXT_COLORS_DARK
+            self.exit_png = self.exit_black
         else:
             self.pngs = self.white_bk_pngs
-            self.view_theme = view_white
+            self.view_theme = self.view_white
             self.colors = ITEXT_COLORS_LIGHT
+            self.exit_png = self.exit_white
 
+    # CTRL+C
     def copier(self):
         clipboard = self.app.clipboard()
         selected_text = self.codespace.textCursor().selectedText()
         clipboard.setText(selected_text)
+
+    # CTRL+V
+    def paster(self):
+        self.codespace.insertPlainText(self.app.clipboard().text())
+
+    # CTRL+X
+    def cutter(self):
+        # copy
+        clipboard = self.app.clipboard()
+        selected_text = self.codespace.textCursor().selectedText()
+        clipboard.setText(selected_text)
+
+        # delete selected text
+        text_cursor = self.codespace.textCursor()
+        text_cursor.select(QTextCursor.Document)
+        text_cursor.removeSelectedText()
+
+    # CTRL+Q
+    def quitter(self):
+        if not self.saved:
+            __exit = QMessageBox.question(self.exit_png, 'Quit', "Are you sure you want to exit without saving?\nCTRL+S to save", QMessageBox.No, QMessageBox.Yes)
+            if __exit == QMessageBox.Yes:
+                sys.exit(0)
+        else:
+            sys.exit(0)
+
+    def black_theme(self):
+        self.rgb = (5,5,5)
+        self.set_theme()
+
+
+    def white_theme(self):
+        self.rgb = (250,250,250)
+        self.set_theme()
+
+    # set custom theme for background, and text
+    def custom_theme(self):
+        color = QColorDialog.getColor()
+        color
+        if color.isValid():
+            print(color.name())
+
+
+    def closeEvent(self, event):
+        if not self.saved:
+            __exit = QMessageBox.question(self.exit_png, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No, QMessageBox.Yes)
+            if __exit == QMessageBox.Yes:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
+
+
 
     # add another duckyscript file
     # https://github.com/dbisu/pico-ducky#multiple-payloads
