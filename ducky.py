@@ -35,6 +35,9 @@ ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,2
 
 ######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller
 ######## TODO: add settings submenu for changing the colors of input text
+######## TODO: make a toolbar item for loading from history and payloads
+######## TODO: Make a side-toolbar for all payload files (not history)
+######## TODO: Make a settings.json file for saving all preferences with theme for next time it's opened
 
 class Setup(QMainWindow):
     def __init__(self):
@@ -290,7 +293,7 @@ class IDE(QMainWindow, QWidget):
         self.saved = True # wheter the file user is editing is saved
         self.historySaveLimit = 5 # Ask user how many files of history do they want saved
 
-        # load the payload from payloads
+        # load the last payload from payloads
         try:
             f = open(self.path + "/payloads/" + self.current_payload)
             # stream = QTextStream(QString(f.name))
@@ -393,7 +396,6 @@ class IDE(QMainWindow, QWidget):
     def quitter(self):
         if not self.saved:
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
-            __exit.setIcon(QIcon(self.exit_png[0]))
             if __exit == QMessageBox.Yes:
                 sys.exit(0)
             elif __exit == QMessageBox.Save:
@@ -401,30 +403,51 @@ class IDE(QMainWindow, QWidget):
         else:
             sys.exit(0)
 
+    # set black theme
     def black_theme(self):
         self.rgb = (5,5,5)
+        pallete = QPalette()
+        pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
+        self.setPalette(pallete)
         self.codespace.setStyleSheet("background-color: #000000;");
         self.set_theme()
+        self.parse_line()
+        code_palette = self.codespace.palette()
+        code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
+        self.codespace.setPalette(code_palette)
 
 
+    # set white theme
     def white_theme(self):
         self.rgb = (250,250,250)
+        pallete = QPalette()
+        pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
+        self.setPalette(pallete)
         self.codespace.setStyleSheet("background-color: #ffffff;");
-        self.set_theme()
+        self.set_theme() # sets the icons and text color
+        self.parse_line()
+        code_palette = self.codespace.palette()
+        code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
+        self.codespace.setPalette(code_palette)
 
     # set custom theme for background, and text
     def custom_theme(self):
-        # colors to modify: self.rgb, self.colors
+        # colors to modify: self.rgb, self.colors, codespace background color, codespace pallet for text
         color = QColorDialog.getColor()
-        color
         if color.isValid():
             print(color.name())
 
+        self.set_theme() # sets icons and text color based on how dark the background is
 
-    def closeEvent(self, event):
+
+    def closeEvent(self, event): ###### TODO: add QIcon to QMessageBox, soooo annoying. Not working. Pyton on Crack
         if not self.saved:
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
-            __exit.setIcon(QIcon(self.exit_png[0]))
+            #__exit = QMessageBox()
+            # QMessageBox.setIcon(__exit, QIcon(self.exit_png[0]))
+            # __exit.setText('Quit')
+            # __exit.setInformativeText("Are you sure you want to exit without saving?")
+            # __exit.setStandardButtons(QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
                 event.accept()
             elif __exit == QMessageBox.Save:
