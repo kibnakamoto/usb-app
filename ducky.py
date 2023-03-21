@@ -392,23 +392,29 @@ class IDE(QMainWindow, QWidget):
     # CTRL+Q
     def quitter(self):
         if not self.saved:
-            __exit = QMessageBox.question(self.exit_png, 'Quit', "Are you sure you want to exit without saving?\nCTRL+S to save", QMessageBox.No, QMessageBox.Yes)
+            __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
+            __exit.setIcon(QIcon(self.exit_png[0]))
             if __exit == QMessageBox.Yes:
                 sys.exit(0)
+            elif __exit == QMessageBox.Save:
+                self.save()
         else:
             sys.exit(0)
 
     def black_theme(self):
         self.rgb = (5,5,5)
+        self.codespace.setStyleSheet("background-color: #000000;");
         self.set_theme()
 
 
     def white_theme(self):
         self.rgb = (250,250,250)
+        self.codespace.setStyleSheet("background-color: #ffffff;");
         self.set_theme()
 
     # set custom theme for background, and text
     def custom_theme(self):
+        # colors to modify: self.rgb, self.colors
         color = QColorDialog.getColor()
         color
         if color.isValid():
@@ -417,8 +423,12 @@ class IDE(QMainWindow, QWidget):
 
     def closeEvent(self, event):
         if not self.saved:
-            __exit = QMessageBox.question(self.exit_png, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No, QMessageBox.Yes)
+            __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
+            __exit.setIcon(QIcon(self.exit_png[0]))
             if __exit == QMessageBox.Yes:
+                event.accept()
+            elif __exit == QMessageBox.Save:
+                self.save()
                 event.accept()
             else:
                 event.ignore()
