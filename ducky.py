@@ -33,11 +33,16 @@ ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,2
 
 # COLORS for (COMMENT, starting_keywords, fkeys, shortcut_keys, arrows, windows, chars, uncommon, numbers, text)
 
-######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller
-######## TODO: add settings submenu for changing the colors of input text
+######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
 ######## TODO: make a toolbar item for loading from history and payloads
 ######## TODO: Make a side-toolbar for all payload files (not history)
-######## TODO: Make a settings.json file for saving all preferences with theme for next time it's opened
+
+# Select Custom Color Window
+class ColorWindow(QMainWindow):
+    def __init__():
+        super().__init__()
+        
+        
 
 class Setup(QMainWindow):
     def __init__(self):
@@ -467,7 +472,8 @@ class IDE(QMainWindow, QWidget):
 
     # locally download payload(#).dd
     def download_file(self):
-        pass
+        download_path = "$HOME/Downloads"
+        shutil.copy(f'{payloads}/{self.current_payload}', f'{download_path}/') # copy file to Downloads folder
 
     # save the currently editing file
     def save(self):
