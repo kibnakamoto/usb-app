@@ -178,6 +178,11 @@ class IDE(QMainWindow, QWidget):
                     "save the file",
                     self.save
                 ],
+                "load": [
+                    "pictures/black_bk/load.ong"
+                    "load payload from existing file"
+                    self.load_payload
+                ],
                 "upload": [
                     "pictures/black_bk/upload.png",
                     "upload file onto the hacking USB",
@@ -205,6 +210,11 @@ class IDE(QMainWindow, QWidget):
                     "pictures/white_bk/save.png",
                     "save the file",
                     self.save
+                ],
+                "load": [
+                    "pictures/white_bk/load.ong"
+                    "load payload from existing file"
+                    self.load_payload
                 ],
                 "upload": [
                     "pictures/white_bk/upload.png",
@@ -353,8 +363,8 @@ class IDE(QMainWindow, QWidget):
 
         # Create a widget to hold the content of the sidebar
         widget = QWidget()
-        self.layout.addWidget(QPushButton(""))
-        self.layout.addWidget(QPushButton("files"))
+        self.layout.addWidget(QPushButton("payload1.dd"))
+        self.layout.addWidget(QPushButton("payload2.dd"))
         widget.setLayout(self.layout)
 
         # Set the widget as the content of the dock widget
