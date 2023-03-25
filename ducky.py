@@ -4,7 +4,7 @@ import sys
 import re
 from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QTextStream, QFile
 from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit, \
-                            QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox, QColorDialog
+                            QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox, QColorDialog, QPushButton
 from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, \
                         QPalette, QTextCursor
 from pyqt_line_number_widget import LineNumberWidget
@@ -13,7 +13,7 @@ import shutil
 
 import language
 
-target_os = "" # windows or mac
+target_os = "windows" # windows or mac
 keyboard_lang = "us" # target keyboard language, default is us
 
 # Initialize Duckyscript keywords to color code the ones written to the textbox
@@ -39,30 +39,57 @@ ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,2
 
 # Select Custom Color Window
 class ColorWindow(QMainWindow):
-    def __init__():
+    def __init__(self, colors:list, bg_color:str, names:tuple):
         super().__init__()
-        
-        
+        self.setWindowTitle("Choose Custom Colors") 
+        self.colors = colors
+        for i in range(len(colors)):
+            button = QPushButton(names[i], self)
+            button.clicked.connect(self.color_set)
+
+    def color_set(self) -> None:
+        diag = QColorDialog.getColor()
+        if diag.isValid():
+            self.colors[i] = hextorgb(diag.name())
 
 class Setup(QMainWindow):
     def __init__(self):
         super().__init__()
 
+
+class S(QMainWindow):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle('Second Window')
+        self.resize(400, 300)
+
+
 # RGB to hex, accepts either one RGB tuple or r,g,b as seperate parameters
 def rgbtohex(r:tuple, g:int=None,b:int=None) -> str:
     value = 0
-    if isinstance(r, tuple):
-        for i in r:
-            value<<=8
-            value|=i
-    else:
+    if isinstance(r, int):
         value<<=8
         value|=r
         value<<=8
         value|=g
         value<<=8
         value|=b
+    else:
+        for i in r:
+            value<<=8
+            value|=i
     return hex(value)[2:]
+
+# hex to RGB, accepts string value starting with # or not
+def hextorgb(h:str) -> tuple:
+    if h[0] == '#':
+        value = h[1:]
+    else:
+        value = h
+    rgb = (int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16))
+    return rgb
+
+
 
 # Syntax Highlighter for Duckyscript
 class SyntaxHighlighter(QSyntaxHighlighter):
@@ -405,6 +432,7 @@ class IDE(QMainWindow, QWidget):
                 sys.exit(0)
             elif __exit == QMessageBox.Save:
                 self.save()
+                sys.exit(0)
         else:
             sys.exit(0)
 
@@ -438,12 +466,20 @@ class IDE(QMainWindow, QWidget):
     # set custom theme for background, and text
     def custom_theme(self):
         # colors to modify: self.rgb, self.colors, codespace background color, codespace pallet for text
-        color = QColorDialog.getColor()
-        if color.isValid():
-            print(color.name())
-
+        names =  ('comment', 'starting keywords', 'F-keys', "shortcut keys", "arrows", "windows", "chars",
+                  "uncommon", "numbers", "text", "textbubble")
+        colors = list(self.colors)
+        colors.append(self.rgb)
+        bg_color_h = "#ffffff" # codespace/textbubble color
+        color = ColorWindow(colors, bg_color_h, names)
+        color.show()
+        pallete = QPalette()
+        pallete.setColor(QPalette.Window, QColor(colors[-1][0], colors[-1][1], colors[-1][2]))
+        self.setPalette(pallete)
+        self.codespace.setStyleSheet(f"background-color: {bg_color_h};")
+        self.rgb = colors[-1]
+        self.colors = colors[:-1]
         self.set_theme() # sets icons and text color based on how dark the background is
-
 
     def closeEvent(self, event): ###### TODO: add QIcon to QMessageBox, soooo annoying. Not working. Pyton on Crack
         if not self.saved:
@@ -472,8 +508,8 @@ class IDE(QMainWindow, QWidget):
 
     # locally download payload(#).dd
     def download_file(self):
-        download_path = "$HOME/Downloads"
-        shutil.copy(f'{payloads}/{self.current_payload}', f'{download_path}/') # copy file to Downloads folder
+        download_path = os.path.expanduser("~") + "/Downloads"
+        shutil.copy(f'payloads/{self.current_payload}', f'{download_path}/') # copy file to Downloads folder
 
     # save the currently editing file
     def save(self):
@@ -540,8 +576,9 @@ class IDE(QMainWindow, QWidget):
     def upload(self):
         pass
 
-app = QApplication(sys.argv)
-window = IDE(screensize=app.primaryScreen().availableGeometry(), app=app)
-
-window.show()
-sys.exit(app.exec())
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = IDE(screensize=app.primaryScreen().availableGeometry(), app=app)
+    
+    window.show()
+    sys.exit(app.exec())
