@@ -3,13 +3,15 @@
 import sys
 import re
 from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QTextStream, QFile
-from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit, \
-                            QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox, QColorDialog, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit,  \
+                            QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox, QColorDialog, \
+                            QPushButton, QDockWidget, QFileDialog
 from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, \
                         QPalette, QTextCursor
 from pyqt_line_number_widget import LineNumberWidget
 import os
 import shutil
+import json
 
 import language
 
@@ -28,14 +30,15 @@ DUCKYSCRIPT_CHARS = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
                      "R", "S", "T", "U", "V", "W", "X", "Y", "Z")
 DUCKYSCRIPT_UNCOMMON = ("APP", "MENU", "BREAK", "PAUSE", "DELETE", "END", "HOME", "INSERT", "NUMLOCK",
                         "PAGEUP", "PAGEDOWN", "PRINTSCREEN", "SCROLLLOCK")
-ITEXT_COLORS_LIGHT = ((94,148,81), (220,11,11), (255,128,0), (0,204,204), (204,204,0), (0,0,204), (255,127,80), (46,199,199), (84,107,107), (32,32,32)) # 12 colors
-ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,255,255), (62,62,236), (255,102,102), (133,193,187), (212,21,212), (250,250,250)) # 12 colors
 
 # COLORS for (COMMENT, starting_keywords, fkeys, shortcut_keys, arrows, windows, chars, uncommon, numbers, text)
+ITEXT_COLORS_LIGHT = ((94,148,81), (220,11,11), (255,128,0), (0,204,204), (204,204,0), (0,0,204), (255,127,80), (46,199,199), (84,107,107), (32,32,32)) # 12 colors
+ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,255,255), (62,62,236), (255,102,102), (133,193,187), (212,21,212), (250,250,250)) # 12 colors
 
 ######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
 ######## TODO: make a toolbar item for loading from history and payloads
 ######## TODO: Make a side-toolbar for all payload files (not history)
+######## TODO: Make button for selecting target os and target keyboard language
 
 # Select Custom Color Window
 class ColorWindow(QMainWindow):
@@ -56,14 +59,6 @@ class Setup(QMainWindow):
     def __init__(self):
         super().__init__()
 
-
-class S(QMainWindow):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle('Second Window')
-        self.resize(400, 300)
-
-
 # RGB to hex, accepts either one RGB tuple or r,g,b as seperate parameters
 def rgbtohex(r:tuple, g:int=None,b:int=None) -> str:
     value = 0
@@ -78,7 +73,7 @@ def rgbtohex(r:tuple, g:int=None,b:int=None) -> str:
         for i in r:
             value<<=8
             value|=i
-    return hex(value)[2:]
+    return hex(value)[2:].zfill(6)
 
 # hex to RGB, accepts string value starting with # or not
 def hextorgb(h:str) -> tuple:
@@ -88,8 +83,6 @@ def hextorgb(h:str) -> tuple:
         value = h
     rgb = (int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16))
     return rgb
-
-
 
 # Syntax Highlighter for Duckyscript
 class SyntaxHighlighter(QSyntaxHighlighter):
@@ -240,6 +233,7 @@ class IDE(QMainWindow, QWidget):
             "exit"
         ]
 
+        self.change_count = 0 # amount of changes made
         self.pngs = self.black_bk_pngs # default icons
         self.exit_png = self.exit_black
         self.view_theme = self.view_black
@@ -319,20 +313,21 @@ class IDE(QMainWindow, QWidget):
         self.codespace.setStyleSheet("background-color: #000000;");
         self.codespace.textChanged.connect(self.ifTyped)
 
+        # assuming the JSON script is stored in a variable named json_script
+        with open("settings.json", 'r') as f:
+            self.settings = json.load(f)
         # initialize files
-        self.current_payload = "payload.dd"
+        self.current_payload = self.settings['current file']
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.saved = True # wheter the file user is editing is saved
         self.historySaveLimit = 5 # Ask user how many files of history do they want saved
 
         # load the last payload from payloads
         try:
-            f = open(self.path + "/payloads/" + self.current_payload)
-            # stream = QTextStream(QString(f.name))
-            # raise Exception(stream.readAll())
-            # self.codespace.setPlainText(stream.readAll())
+            with open(self.path + "/payloads/" + self.current_payload) as f:
+                self.codespace.setText(f.read())
         except FileNotFoundError:
-            pass
+            print("payload not found")
 
         # set layout
         layout = QHBoxLayout()
@@ -340,7 +335,30 @@ class IDE(QMainWindow, QWidget):
         layout.addWidget(self.codespace)
         self.wg.setLayout(layout)
         
+        # color code
         self.parse_line()
+
+        # Create a toolbar
+        toolbar = QToolBar("Sidebar", self)
+        self.addToolBar(toolbar)
+
+        # Create a dock widget                                                                                
+        layout = QHBoxLayout()
+        dock = QDockWidget("Sidebar", self)
+        dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
+        dock.setFeatures(QDockWidget.DockWidgetClosable|QDockWidget.DockWidgetFloatable|QDockWidget.DockWidgetMovable)
+        dock.setMaximumWidth(200)
+        dock.setMinimumWidth(50)
+        self.addDockWidget(Qt.LeftDockWidgetArea, dock)
+
+        # Create a widget to hold the content of the sidebar
+        widget = QWidget()
+        layout.addWidget(QPushButton("Button 1"))
+        layout.addWidget(QPushButton("Button 2"))
+        widget.setLayout(layout)
+
+        # Set the widget as the content of the dock widget
+        dock.setWidget(widget)
 
     def __line_widget_line_count_changed(self):
         if self.line:
@@ -371,8 +389,27 @@ class IDE(QMainWindow, QWidget):
         block.highlightBlock(line)
         del tmp
 
+    # load external payload
+    def load_extern_payload(self):
+        options = QFileDialog.Options()
+        options |= QFileDialog.DontUseNativeDialog
+        file = QFileDialog.getOpenFileNames(self, "Select Files", "", "All Files (*);;Duckyscript Files (*.dd)", options=options)[0]
+        if not file.startswith(self.path): # if path is different, copy it to the path
+            payloads_count = len(os.listdir(self.path+"/payloads"))-1
+            if payloads_count == 0:
+                self.current_payload = f"payload.dd"
+            else:
+                self.current_payload = f"payload{payloads_count}.dd"
+            shutil.copy(f'{file}', f'payloads/{self.current_payload}') # copy file to Downloads folder
+            message_box = QMessageBox(QMessageBox.Information,
+                                      "Sucessfully Copied file",
+                                      f"{file} is saved as {self.current_payload}",
+                                      QMessageBox.Ok)
+
     def ifTyped(self):
-        self.saved = False
+        if self.change_count != 0:
+            self.saved = False
+        self.change_count+=1
 
     # adjust an integer to the height of the application
     def adjh(self, num:int) -> int:
@@ -481,22 +518,26 @@ class IDE(QMainWindow, QWidget):
         self.colors = colors[:-1]
         self.set_theme() # sets icons and text color based on how dark the background is
 
-    def closeEvent(self, event): ###### TODO: add QIcon to QMessageBox, soooo annoying. Not working. Pyton on Crack
+    def closeEvent(self, event):
         if not self.saved:
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
-            #__exit = QMessageBox()
-            # QMessageBox.setIcon(__exit, QIcon(self.exit_png[0]))
-            # __exit.setText('Quit')
-            # __exit.setInformativeText("Are you sure you want to exit without saving?")
-            # __exit.setStandardButtons(QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
+                with open("settings.json", "w") as f:
+                    self.settings['colors'][0]['0'][0]['current file'] = self.current_payload
+                    json.dump(self.settings, f)
                 event.accept()
             elif __exit == QMessageBox.Save:
                 self.save()
+                with open("settings.json", "w") as f:
+                    self.settings['colors'][0]['0'][0]['current file'] = self.current_payload
+                    json.dump(self.settings, f)
                 event.accept()
             else:
                 event.ignore()
         else:
+            with open("settings.json", "w") as f:
+                self.settings['colors'][0]['0'][0]['current file'] = self.current_payload
+                json.dump(self.settings, f)
             event.accept()
 
 
@@ -504,7 +545,12 @@ class IDE(QMainWindow, QWidget):
     # add another duckyscript file
     # https://github.com/dbisu/pico-ducky#multiple-payloads
     def add_file(self):
-        pass
+        payloads_count = len(os.listdir(self.path+"/payloads"))-1
+        if payloads_count == 0:
+            self.current_payload = f"payload.dd"
+        else:
+            self.current_payload = f"payload{payloads_count}.dd"
+        open(self.path+"/payloads/"+self.current_payload, "x").close()
 
     # locally download payload(#).dd
     def download_file(self):
@@ -525,6 +571,7 @@ class IDE(QMainWindow, QWidget):
                 text = self.codespace.toPlainText()
                 f.write(text)
                 self.saved = True
+                self.change_count = 0
                 message_box = QMessageBox(QMessageBox.Information,
                                           "Save",
                                           "Sucessfully saved",
@@ -543,6 +590,7 @@ class IDE(QMainWindow, QWidget):
                     text = self.codespace.toPlainText()
                     f.write(text)
                     self.saved = True
+                    self.change_count = 0
                     message_box = QMessageBox(QMessageBox.Information,
                                               "Save",
                                               "Sucessfully saved",
@@ -565,6 +613,7 @@ class IDE(QMainWindow, QWidget):
                                                   QMessageBox.Ok)
                         message_box.exec_()
                         self.saved = True
+                        self.change_count = 0
                     except FileNotFoundError:
                         message_box = QMessageBox(QMessageBox.Information,
                                                   "FileNotFoundError",
