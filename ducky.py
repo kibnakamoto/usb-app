@@ -327,13 +327,13 @@ class IDE(QMainWindow, QWidget):
             with open(self.path + "/payloads/" + self.current_payload) as f:
                 self.codespace.setText(f.read())
         except FileNotFoundError:
-            print("payload not found")
+            print(f"payload not found, please create {self.current_payload} or load existing payload")
 
         # set layout
-        layout = QHBoxLayout()
-        layout.addWidget(self.line)
-        layout.addWidget(self.codespace)
-        self.wg.setLayout(layout)
+        self.layout = QHBoxLayout()
+        self.layout.addWidget(self.line)
+        self.layout.addWidget(self.codespace)
+        self.wg.setLayout(self.layout)
         
         # color code
         self.parse_line()
@@ -343,7 +343,7 @@ class IDE(QMainWindow, QWidget):
         self.addToolBar(toolbar)
 
         # Create a dock widget                                                                                
-        layout = QHBoxLayout()
+        self.layout = QHBoxLayout()
         dock = QDockWidget("Sidebar", self)
         dock.setAllowedAreas(Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea)
         dock.setFeatures(QDockWidget.DockWidgetClosable|QDockWidget.DockWidgetFloatable|QDockWidget.DockWidgetMovable)
@@ -353,9 +353,9 @@ class IDE(QMainWindow, QWidget):
 
         # Create a widget to hold the content of the sidebar
         widget = QWidget()
-        layout.addWidget(QPushButton("Button 1"))
-        layout.addWidget(QPushButton("Button 2"))
-        widget.setLayout(layout)
+        self.layout.addWidget(QPushButton(""))
+        self.layout.addWidget(QPushButton("files"))
+        widget.setLayout(self.layout)
 
         # Set the widget as the content of the dock widget
         dock.setWidget(widget)
@@ -389,11 +389,11 @@ class IDE(QMainWindow, QWidget):
         block.highlightBlock(line)
         del tmp
 
-    # load external payload
-    def load_extern_payload(self):
+    # load payload from any directory, the default directory is payloads
+    def load_payload(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        file = QFileDialog.getOpenFileNames(self, "Select Files", "", "All Files (*);;Duckyscript Files (*.dd)", options=options)[0]
+        file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", options)[0]
         if not file.startswith(self.path): # if path is different, copy it to the path
             payloads_count = len(os.listdir(self.path+"/payloads"))-1
             if payloads_count == 0:
@@ -405,6 +405,14 @@ class IDE(QMainWindow, QWidget):
                                       "Sucessfully Copied file",
                                       f"{file} is saved as {self.current_payload}",
                                       QMessageBox.Ok)
+        else:
+            self.current_payload = file.split('/')[-1]
+        # load the payload into codespace
+        try:
+            with open(self.path + "/payloads/" + self.current_payload) as f:
+                self.codespace.setText(f.read())
+        except FileNotFoundError:
+            print("payload not found")
 
     def ifTyped(self):
         if self.change_count != 0:
