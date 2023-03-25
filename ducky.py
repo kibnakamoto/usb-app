@@ -179,8 +179,8 @@ class IDE(QMainWindow, QWidget):
                     self.save
                 ],
                 "load": [
-                    "pictures/black_bk/load.ong"
-                    "load payload from existing file"
+                    "pictures/black_bk/load.png",
+                    "load payload from existing file",
                     self.load_payload
                 ],
                 "upload": [
@@ -212,8 +212,8 @@ class IDE(QMainWindow, QWidget):
                     self.save
                 ],
                 "load": [
-                    "pictures/white_bk/load.ong"
-                    "load payload from existing file"
+                    "pictures/white_bk/load.png",
+                    "load payload from existing file",
                     self.load_payload
                 ],
                 "upload": [
@@ -270,12 +270,15 @@ class IDE(QMainWindow, QWidget):
 
         # add the view submenu
         view_menu = main_menu.addMenu(QIcon(self.view_theme[0]), 'View')
-        theme_menu = view_menu.addMenu(QIcon("pictures/theme.png"), 'Theme')
         copy_act = QAction('&Copy', self)
         paste_act = QAction('&Paste', self)
         cut_act = QAction('&Cut', self)
         quit_act = QAction('&Quit', self)
+        theme_menu = view_menu.addMenu(QIcon("pictures/theme.png"), 'Theme')
+
+        edit_menu = main_menu.addMenu(QIcon(self.view_theme[0]), 'Edit')
         save_act = QAction('&Save', self)
+        load_act = QAction('&Load', self)
         
         copy_act.setShortcut("Ctrl+C")
         paste_act.setShortcut("Ctrl+V")
