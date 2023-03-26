@@ -326,7 +326,6 @@ class IDE(QMainWindow, QWidget):
         self.codespace.setStyleSheet("background-color: #000000;");
         self.codespace.textChanged.connect(self.ifTyped)
 
-        # assuming the JSON script is stored in a variable named json_script
         with open("settings.json", 'r') as f:
             self.settings = json.load(f)
         # initialize files
@@ -568,21 +567,21 @@ class IDE(QMainWindow, QWidget):
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
                 with open("settings.json", "w") as f:
-                    self.settings['colors'][0]['0'][0]['current file'] = self.current_payload
-                    json.dump(self.settings, f)
+                    self.settings['current file'] = self.current_payload
+                    json.dump(self.settings, f, indent=4)
                 event.accept()
             elif __exit == QMessageBox.Save:
                 self.save()
                 with open("settings.json", "w") as f:
-                    self.settings['colors'][0]['0'][0]['current file'] = self.current_payload
-                    json.dump(self.settings, f)
+                    self.settings['current file'] = self.current_payload
+                    json.dump(self.settings, f, indent=4)
                 event.accept()
             else:
                 event.ignore()
         else:
             with open("settings.json", "w") as f:
-                self.settings['colors'][0]['0'][0]['current file'] = self.current_payload
-                json.dump(self.settings, f)
+                self.settings['current file'] = self.current_payload
+                json.dump(self.settings, f, indent=4)
             event.accept()
 
 

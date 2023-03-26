@@ -1,1 +1,45 @@
-{"current file": "payload.dd", "colors": [{"0": [{"background": "050505", "comment": "32cd32", "starting keywords": "ff0000", "fkeys": "696969", "shortcut keys": "d2691e", "arrows": "e0ffff", "windows": "3e3eec", "chars": "ff6666", "uncommon": "85c1bb", "numbers": "d415d4", "text": "fafafa", "textbubble": "ffffff", "current file": "payload.dd"}]}]}
+{
+    "current file": "payload.dd",
+    "colors": [
+        {
+            "black": [
+                {
+                    "background": "050505",
+                    "comment": "32cd32",
+                    "starting keywords": "ff0000",
+                    "fkeys": "696969",
+                    "shortcut keys": "d2691e",
+                    "arrows": "e0ffff",
+                    "windows": "3e3eec",
+                    "chars": "ff6666",
+                    "uncommon": "85c1bb",
+                    "numbers": "d415d4",
+                    "text": "fafafa",
+                    "textbubble": "ffffff",
+        			"background sidebar": "070707",
+        			"color sidebar": "f0f0f0",
+                    "current file": "payload.dd"
+                }
+            ],
+            "white": [
+                {
+                    "background": "050505",
+                    "comment": "32cd32",
+                    "starting keywords": "ff0000",
+                    "fkeys": "696969",
+                    "shortcut keys": "d2691e",
+                    "arrows": "e0ffff",
+                    "windows": "3e3eec",
+                    "chars": "ff6666",
+                    "uncommon": "85c1bb",
+                    "numbers": "d415d4",
+                    "text": "fafafa",
+                    "textbubble": "ffffff",
+        			"background sidebar": "070707",
+        			"color sidebar": "f0f0f0",
+                    "current file": "payload.dd"
+                }
+            ]
+        }
+    ]
+}
