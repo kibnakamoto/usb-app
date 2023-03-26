@@ -375,20 +375,20 @@ class IDE(QMainWindow, QWidget):
         layout = QVBoxLayout(widget)
         
         #creating the file selector
-        fileSelector = QFileSystemModel()
-        tree = QTreeView(widget)
-        tree.setModel(fileSelector)
-        tree.setRootIndex(fileSelector.setRootPath(self.path+"/payloads/"))
-        fileSelector.setFilter(QDir.NoDotAndDotDot | QDir.Files) # hide folder
-        tree.setHeaderHidden(True)
-        tree.setSortingEnabled(True)
-        tree.setColumnHidden(1,True) # hide other data
-        tree.setColumnHidden(2,True)
-        tree.setColumnHidden(3,True)
-        tree.setFixedWidth(200)
-        tree.setFixedHeight(400)
-        tree.setStyleSheet("background-color: #000000;color: #ffffff")
-        fileSelector.setNameFilters(["*.dd"])
+        self.fileSelector = QFileSystemModel()
+        self.tree = QTreeView(widget)
+        self.tree.setModel(self.fileSelector)
+        self.tree.setRootIndex(self.fileSelector.setRootPath(self.path+"/payloads/"))
+        self.fileSelector.setFilter(QDir.NoDotAndDotDot | QDir.Files) # hide folder
+        self.tree.setHeaderHidden(True)
+        self.tree.setSortingEnabled(True)
+        self.tree.setColumnHidden(1,True) # hide other data
+        self.tree.setColumnHidden(2,True)
+        self.tree.setColumnHidden(3,True)
+        self.tree.setFixedWidth(self.width//6)
+        self.tree.setFixedHeight(self.height)
+        self.tree.setStyleSheet("background-color: #070707;color: #f0f0f0")
+        self.fileSelector.setNameFilters(["*.dd"])
 
         # Set the widget as the content of the dock widget
         dock.setWidget(widget)
@@ -521,12 +521,12 @@ class IDE(QMainWindow, QWidget):
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
         self.setPalette(pallete)
         self.codespace.setStyleSheet("background-color: #000000;");
+        self.tree.setStyleSheet("background-color: #070707;color: #f0f0f0")
         self.set_theme()
         self.parse_line()
         code_palette = self.codespace.palette()
         code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
         self.codespace.setPalette(code_palette)
-
 
     # set white theme
     def white_theme(self):
@@ -535,6 +535,7 @@ class IDE(QMainWindow, QWidget):
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
         self.setPalette(pallete)
         self.codespace.setStyleSheet("background-color: #ffffff;");
+        self.tree.setStyleSheet("background-color: #f1f1f1;color: #050505")
         self.set_theme() # sets the icons and text color
         self.parse_line()
         code_palette = self.codespace.palette()
@@ -549,12 +550,15 @@ class IDE(QMainWindow, QWidget):
         colors = list(self.colors)
         colors.append(self.rgb)
         bg_color_h = "#ffffff" # codespace/textbubble color
+        bg_color_sidebar = "#070707"
+        color_sidebar = "#f0f0f0"
         color = ColorWindow(colors, bg_color_h, names)
         color.show()
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(colors[-1][0], colors[-1][1], colors[-1][2]))
         self.setPalette(pallete)
         self.codespace.setStyleSheet(f"background-color: {bg_color_h};")
+        self.tree.setStyleSheet(f"background-color: {bg_color_sidebar};color: {color_sidebar}")
         self.rgb = colors[-1]
         self.colors = colors[:-1]
         self.set_theme() # sets icons and text color based on how dark the background is
