@@ -2,10 +2,10 @@
 
 import sys
 import re
-from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QTextStream, QFile
+from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QTextStream, QFile, QDir
 from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit,  \
                             QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox, QColorDialog, \
-                            QPushButton, QDockWidget, QFileDialog
+                            QPushButton, QDockWidget, QFileDialog, QVBoxLayout, QFileSystemModel, QTreeView
 from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, \
                         QPalette, QTextCursor
 from pyqt_line_number_widget import LineNumberWidget
@@ -366,9 +366,29 @@ class IDE(QMainWindow, QWidget):
 
         # Create a widget to hold the content of the sidebar
         widget = QWidget()
-        self.layout.addWidget(QPushButton("payload1.dd"))
-        self.layout.addWidget(QPushButton("payload2.dd"))
-        widget.setLayout(self.layout)
+
+        #creating the main widget
+        widget = QWidget(self)
+        self.setCentralWidget(widget)
+        
+        #creating the layout
+        layout = QVBoxLayout(widget)
+        
+        #creating the file selector
+        fileSelector = QFileSystemModel()
+        tree = QTreeView(widget)
+        tree.setModel(fileSelector)
+        tree.setRootIndex(fileSelector.setRootPath(self.path+"/payloads/"))
+        fileSelector.setFilter(QDir.NoDotAndDotDot | QDir.Files) # hide folder
+        tree.setHeaderHidden(True)
+        tree.setSortingEnabled(True)
+        tree.setColumnHidden(1,True) # hide other data
+        tree.setColumnHidden(2,True)
+        tree.setColumnHidden(3,True)
+        tree.setFixedWidth(200)
+        tree.setFixedHeight(400)
+        tree.setStyleSheet("background-color: #000000;color: #ffffff")
+        fileSelector.setNameFilters(["*.dd"])
 
         # Set the widget as the content of the dock widget
         dock.setWidget(widget)
@@ -419,7 +439,7 @@ class IDE(QMainWindow, QWidget):
                                       f"{file} is saved as {self.current_payload}",
                                       QMessageBox.Ok)
         else:
-            self.current_payload = file.split('/')[-1]
+            self.current_payload = file.split('/')[-1] # seperate path from filename
         # load the payload into codespace
         try:
             with open(self.path + "/payloads/" + self.current_payload) as f:
