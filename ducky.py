@@ -84,6 +84,95 @@ def hextorgb(h:str) -> tuple:
     rgb = (int(value[0:2], 16), int(value[2:4], 16), int(value[4:6], 16))
     return rgb
 
+# read settings json
+class Settings():
+    def __init__():
+        with open("settings.json", "r") as f:
+            self.settings = json.load(f)
+        self.cf = self.settings["current file"]
+        self.theme = self.settings["last color"]
+
+    # select theme (has to be already existing)
+    def set_theme(self, name:str=None) -> None:
+        if name:
+            self.theme = name
+        self.set_theme()
+
+    # create new theme
+    def create_theme(self, bg:str, comment:str, starting_keywords:str, fkeys:str, shortcuts:str, arrows:str,
+                     windows:str, chars:str, uncommon:str, numbers:str, text:str, textbubble:str,
+                     bg_sidebar:str, color_sidebar:str, name:str=None) -> bool:
+        if name:
+            self.theme = name
+
+        properties = [
+           {
+                "background": bg,
+                "comment": comment,
+                "starting keywords": starting_keywords,
+                "fkeys": fkeys,
+                "shortcut keys": shortcuts,
+                "arrows": arrows,
+                "windows": windows,
+                "chars": chars,
+                "uncommon": uncommon,
+                "numbers": numbers,
+                "text": text,
+                "textbubble": textbubble,
+           	    "background sidebar": bg_sidebar,
+                "color sidebar": color_sidebar
+           }
+        ]
+
+        # check if theme exists
+        if not self.theme in self.settings["colors"][0].keys():
+            self.settings["colors"][0][self.theme] = properties
+            self.set_theme()
+            return 0
+        else:
+            return 1 # theme exists
+
+    # set property class members of a theme
+    def set_theme(self) -> None:
+        self.bg = self.settings["colors"][0][self.theme][0]["background"]
+        self.comment = self.settings["colors"][0][self.theme][0]["comment"]
+        self.starting_keywords = self.settings["colors"][0][self.theme][0]["starting keywords"]
+        self.fkeys = self.settings["colors"][0][self.theme][0]["fkeys"]
+        self.shortcuts = self.settings["colors"][0][self.theme][0]["shortcut keys"]
+        self.arrows = self.settings["colors"][0][self.theme][0]["arrows"]
+        self.windows = self.settings["colors"][0][self.theme][0]["windows"]
+        self.chars = self.settings["colors"][0][self.theme][0]["chars"]
+        self.uncommon = self.settings["colors"][0][self.theme][0]["uncommon"]
+        self.numbers = self.settings["colors"][0][self.theme][0]["numbers"]
+        self.text = self.settings["colors"][0][self.theme][0]["text"]
+        self.textbubble = self.settings["colors"][0][self.theme][0]["textbubble"]
+        self.bg_sidebar = self.settings["colors"][0][self.theme][0]["background sidebar"]
+        self.color_sidebar = self.settings["colors"][0][self.theme][0]["color sidebar"]
+
+    def save(self, settings:dict=None) -> None:
+        if settings:
+            self.settings = settings
+        else:
+            self.settings["colors"][0][self.theme][0]["background"] = self.bg
+            self.settings["colors"][0][self.theme][0]["comment"] = self.comment
+            self.settings["colors"][0][self.theme][0]["starting keywords"] = self.starting_keywords
+            self.settings["colors"][0][self.theme][0]["fkeys"] = self.fkeys
+            self.settings["colors"][0][self.theme][0]["shortcut keys"] = self.shortcuts
+            self.settings["colors"][0][self.theme][0]["arrows"] = self.arrows
+            self.settings["colors"][0][self.theme][0]["windows"] = self.windows
+            self.settings["colors"][0][self.theme][0]["chars"] = self.chars
+            self.settings["colors"][0][self.theme][0]["uncommon"] = self.uncommon
+            self.settings["colors"][0][self.theme][0]["numbers"] = self.numbers
+            self.settings["colors"][0][self.theme][0]["text"] = self.text
+            self.settings["colors"][0][self.theme][0]["textbubble"] = self.textbubble
+            self.settings["colors"][0][self.theme][0]["background sidebar"] = self.bg_sidebar
+            self.settings["colors"][0][self.theme][0]["color sidebar"] = self.color_sidebar
+            self.settings["current file"] = self.cf
+            self.settings["last color"] = self.theme
+        with open("settings.json", "w") as f:
+            self.settings['current file'] = self.current_payload
+            json.dump(self.settings, f, indent=4)
+
 # Syntax Highlighter for Duckyscript
 class SyntaxHighlighter(QSyntaxHighlighter):
 
@@ -242,6 +331,9 @@ class IDE(QMainWindow, QWidget):
             "pictures/white_bk/exit.png",
             "exit"
         ]
+
+        self.settings = Settings()
+        self.settings.bg
 
         self.change_count = 0 # amount of changes made
         self.pngs = self.black_bk_pngs # default icons

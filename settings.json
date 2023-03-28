@@ -1,5 +1,6 @@
 {
     "current file": "payload.dd",
+	"last color": "black",
     "colors": [
         {
             "black": [
@@ -17,8 +18,7 @@
                     "text": "fafafa",
                     "textbubble": "ffffff",
         			"background sidebar": "070707",
-        			"color sidebar": "f0f0f0",
-                    "current file": "payload.dd"
+        			"color sidebar": "f0f0f0"
                 }
             ],
             "white": [
@@ -36,8 +36,7 @@
                     "text": "fafafa",
                     "textbubble": "ffffff",
         			"background sidebar": "070707",
-        			"color sidebar": "f0f0f0",
-                    "current file": "payload.dd"
+        			"color sidebar": "f0f0f0"
                 }
             ]
         }
