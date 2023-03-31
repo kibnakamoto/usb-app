@@ -5,7 +5,8 @@ import re
 from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QTextStream, QFile, QDir
 from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit,  \
                             QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox, QColorDialog, \
-                            QPushButton, QDockWidget, QFileDialog, QVBoxLayout, QFileSystemModel, QTreeView
+                            QPushButton, QDockWidget, QFileDialog, QVBoxLayout, QFileSystemModel, QTreeView, \
+                            QCheckBox, QGridLayout
 from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, \
                         QPalette, QTextCursor
 from pyqt_line_number_widget import LineNumberWidget
@@ -37,23 +38,37 @@ ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,2
 
 ######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
 ######## TODO: make a toolbar item for loading from history and payloads
-######## TODO: Make a side-toolbar for all payload files (not history)
 ######## TODO: Make button for selecting target os and target keyboard language
 
 # Select Custom Color Window
 class ColorWindow(QMainWindow):
-    def __init__(self, colors:list, bg_color:str, names:tuple):
+    def __init__(self, colors:list, bg_color:str, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00)):
         super().__init__()
+        pallete = QPalette()
+        pallete.setColor(QPalette.Window, QColor(bg_rgb[0], bg_rgb[1], bg_rgb[2]))
+        self.setPalette(pallete)
         self.setWindowTitle("Choose Custom Colors") 
         self.colors = colors
-        for i in range(len(colors)):
-            button = QPushButton(names[i], self)
-            button.clicked.connect(self.color_set)
+        self.names = names
+        length = len(colors)
+        self.rows = 2
+        self.columns = 6
 
     def color_set(self) -> None:
-        diag = QColorDialog.getColor()
-        if diag.isValid():
-            self.colors[i] = hextorgb(diag.name())
+        grid_layout = QGridLayout()
+        self.boxes = []
+        for i in range(self.rows):
+            for j in range(self.columns):
+                if j != self.columns-1 and j%2 != 1:
+                    checkbox = QCheckBox(f"Color {self.names[i*self.rows+j]}")
+                    self.boxes.append(checkbox)
+                    grid_layout.addWidget(checkbox, i, j)
+        
+
+        # remove the existing layout
+        self.layout().deleteLater()
+        
+        self.setLayout(grid_layout)
 
 class Setup(QMainWindow):
     def __init__(self):
@@ -85,8 +100,8 @@ def hextorgb(h:str) -> tuple:
     return rgb
 
 # read settings json
-class Settings():
-    def __init__():
+class Settings:
+    def __init__(self):
         with open("settings.json", "r") as f:
             self.settings = json.load(f)
         self.cf = self.settings["current file"]
@@ -96,7 +111,7 @@ class Settings():
     def set_theme(self, name:str=None) -> None:
         if name:
             self.theme = name
-        self.set_theme()
+        self.set_colors()
 
     # create new theme
     def create_theme(self, bg:str, comment:str, starting_keywords:str, fkeys:str, shortcuts:str, arrows:str,
@@ -127,13 +142,13 @@ class Settings():
         # check if theme exists
         if not self.theme in self.settings["colors"][0].keys():
             self.settings["colors"][0][self.theme] = properties
-            self.set_theme()
+            self.set_colors()
             return 0
         else:
             return 1 # theme exists
 
     # set property class members of a theme
-    def set_theme(self) -> None:
+    def set_colors(self) -> None:
         self.bg = self.settings["colors"][0][self.theme][0]["background"]
         self.comment = self.settings["colors"][0][self.theme][0]["comment"]
         self.starting_keywords = self.settings["colors"][0][self.theme][0]["starting keywords"]
@@ -333,17 +348,20 @@ class IDE(QMainWindow, QWidget):
         ]
 
         self.settings = Settings()
-        self.settings.bg
+        if self.settings.theme == "black":
+            self.rgb = (5,5,5) # black
+            self.set_theme()
+        elif self.settings.theme == "white":
+            self.rgb = (250,250,250)
+            self.set_theme()
+        else: # custom theme
+            self.rgb = hextorgb(self.settings.bg)
+        self.set_theme()
 
         self.change_count = 0 # amount of changes made
-        self.pngs = self.black_bk_pngs # default icons
-        self.exit_png = self.exit_black
-        self.view_theme = self.view_black
-        self.rgb = (5,5,5) # black
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
         self.setPalette(pallete)
-        self.colors = ITEXT_COLORS_DARK
         self.setWindowTitle("DuckScript IDE & Compiler")
         main_menu = self.menuBar()
         self.app = app
@@ -418,10 +436,8 @@ class IDE(QMainWindow, QWidget):
         self.codespace.setStyleSheet("background-color: #000000;");
         self.codespace.textChanged.connect(self.ifTyped)
 
-        with open("settings.json", 'r') as f:
-            self.settings = json.load(f)
         # initialize files
-        self.current_payload = self.settings['current file']
+        self.current_payload = self.settings.settings['current file']
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.saved = True # wheter the file user is editing is saved
         self.historySaveLimit = 5 # Ask user how many files of history do they want saved
@@ -638,42 +654,53 @@ class IDE(QMainWindow, QWidget):
         # colors to modify: self.rgb, self.colors, codespace background color, codespace pallet for text
         names =  ('comment', 'starting keywords', 'F-keys', "shortcut keys", "arrows", "windows", "chars",
                   "uncommon", "numbers", "text", "textbubble")
+        self.theme_name = self.settings.theme
         colors = list(self.colors)
         colors.append(self.rgb)
-        bg_color_h = "#ffffff" # codespace/textbubble color
-        bg_color_sidebar = "#070707"
-        color_sidebar = "#f0f0f0"
+        bg_color_h = self.settings.textbubble # codespace/textbubble color
+        bg_color_sidebar = self.settings.bg_sidebar
+        color_sidebar = self.settings.color_sidebar
         color = ColorWindow(colors, bg_color_h, names)
+        color.color_set()
         color.show()
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(colors[-1][0], colors[-1][1], colors[-1][2]))
-        self.setPalette(pallete)
-        self.codespace.setStyleSheet(f"background-color: {bg_color_h};")
-        self.tree.setStyleSheet(f"background-color: {bg_color_sidebar};color: {color_sidebar}")
+        self.setPalette(pallete) # set background color
+        self.codespace.setStyleSheet(f"background-color: #{bg_color_h};") # codespace color
+        self.tree.setStyleSheet(f"background-color: #{bg_color_sidebar};color: #{color_sidebar}") # filebar color
         self.rgb = colors[-1]
         self.colors = colors[:-1]
         self.set_theme() # sets icons and text color based on how dark the background is
+
+        __exit = QMessageBox.question(None, 'Save Theme', "Do you want to save the theme?\nyou can change the theme anytime", QMessageBox.No|QMessageBox.Yes)
+        if __exit == QMessageBox.Yes:
+            colors = [rgbtohex(i) for i in self.colors]
+            self.settings.theme = self.theme_name
+            self.settings.create_theme(self.rgb, colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
+                                       colors[6], colors[7], colors[8], colors[9], bg_color_h, bg_color_sidebar, color_sidebar)
+            self.settings.set_colors()
+            self.settings.set.save()
 
     def closeEvent(self, event):
         if not self.saved:
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
                 with open("settings.json", "w") as f:
-                    self.settings['current file'] = self.current_payload
-                    json.dump(self.settings, f, indent=4)
+                    self.settings.settings['current file'] = self.current_payload
+                    json.dump(self.settings.settings, f, indent=4)
                 event.accept()
             elif __exit == QMessageBox.Save:
                 self.save()
                 with open("settings.json", "w") as f:
-                    self.settings['current file'] = self.current_payload
-                    json.dump(self.settings, f, indent=4)
+                    self.settings.settings['current file'] = self.current_payload
+                    json.dump(self.settings.settings, f, indent=4)
                 event.accept()
             else:
                 event.ignore()
         else:
             with open("settings.json", "w") as f:
-                self.settings['current file'] = self.current_payload
-                json.dump(self.settings, f, indent=4)
+                self.settings.settings['current file'] = self.current_payload
+                json.dump(self.settings.settings, f, indent=4)
             event.accept()
 
 

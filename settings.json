@@ -1,6 +1,6 @@
 {
     "current file": "payload.dd",
-	"last color": "black",
+    "last color": "black",
     "colors": [
         {
             "black": [
@@ -17,8 +17,8 @@
                     "numbers": "d415d4",
                     "text": "fafafa",
                     "textbubble": "ffffff",
-        			"background sidebar": "070707",
-        			"color sidebar": "f0f0f0"
+                    "background sidebar": "070707",
+                    "color sidebar": "f0f0f0"
                 }
             ],
             "white": [
@@ -35,8 +35,8 @@
                     "numbers": "d415d4",
                     "text": "fafafa",
                     "textbubble": "ffffff",
-        			"background sidebar": "070707",
-        			"color sidebar": "f0f0f0"
+                    "background sidebar": "070707",
+                    "color sidebar": "f0f0f0"
                 }
             ]
         }
