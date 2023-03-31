@@ -42,7 +42,7 @@ ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,2
 
 # Select Custom Color Window
 class ColorWindow(QMainWindow):
-    def __init__(self, colors:list, bg_color:str, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00)):
+    def __init__(self, colors:list, bg_color:str, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00), settings=None):
         super().__init__()
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(bg_rgb[0], bg_rgb[1], bg_rgb[2]))
@@ -50,25 +50,53 @@ class ColorWindow(QMainWindow):
         self.setWindowTitle("Choose Custom Colors") 
         self.colors = colors
         self.names = names
-        length = len(colors)
         self.rows = 2
         self.columns = 6
+        self.settings = settings
+        self.closed_event = False
 
     def color_set(self) -> None:
         grid_layout = QGridLayout()
         self.boxes = []
         for i in range(self.rows):
             for j in range(self.columns):
-                if j != self.columns-1 and j%2 != 1:
-                    checkbox = QCheckBox(f"Color {self.names[i*self.rows+j]}")
-                    self.boxes.append(checkbox)
-                    grid_layout.addWidget(checkbox, i, j)
-        
+                checkbox = QCheckBox(f"Color {self.names[i*self.columns+j]}")
+                self.boxes.append(checkbox)
+                grid_layout.addWidget(checkbox, i, j)
 
-        # remove the existing layout
-        self.layout().deleteLater()
-        
-        self.setLayout(grid_layout)
+        # save layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        central_widget.setLayout(grid_layout)
+
+    def closeEvent(self, event):
+        __exit = QMessageBox.question(None, 'Save Theme', "Do you want to save the theme?\nyou can change the theme anytime", QMessageBox.No|QMessageBox.Yes)
+        if __exit == QMessageBox.Yes:
+            colors = [rgbtohex(i) for i in self.colors]
+            self.settings.theme = self.theme_name
+            self.settings.create_theme(colors[-1], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
+                                       colors[6], colors[7], colors[8], colors[9], bg_color_h, bg_color_sidebar, color_sidebar)
+            self.settings.set_colors()
+            self.settings.save()
+            self.closed_event = True
+            event.accept()
+        else:
+            msg = QMessageBox.question(None, 'Exit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
+            if msg == QMessageBox.Yes:
+                self.closed_event = True
+                event.accept()
+            elif msg == QMessageBox.Save:
+                colors = [rgbtohex(i) for i in self.colors]
+                self.settings.theme = self.theme_name
+                self.settings.create_theme(colors[-1], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
+                                           colors[6], colors[7], colors[8], colors[9], bg_color_h, bg_color_sidebar, color_sidebar)
+                self.settings.set_colors()
+                self.settings.save()
+                self.closed_event = True
+                event.accept()
+            else:
+                event.ignore()
+
 
 class Setup(QMainWindow):
     def __init__(self):
@@ -167,6 +195,7 @@ class Settings:
     def save(self, settings:dict=None) -> None:
         if settings:
             self.settings = settings
+            self.settings['current file'] = self.cf
         else:
             self.settings["colors"][0][self.theme][0]["background"] = self.bg
             self.settings["colors"][0][self.theme][0]["comment"] = self.comment
@@ -185,7 +214,6 @@ class Settings:
             self.settings["current file"] = self.cf
             self.settings["last color"] = self.theme
         with open("settings.json", "w") as f:
-            self.settings['current file'] = self.current_payload
             json.dump(self.settings, f, indent=4)
 
 # Syntax Highlighter for Duckyscript
@@ -357,6 +385,7 @@ class IDE(QMainWindow, QWidget):
         else: # custom theme
             self.rgb = hextorgb(self.settings.bg)
         self.set_theme()
+        self.settings.set_theme()
 
         self.change_count = 0 # amount of changes made
         pallete = QPalette()
@@ -634,6 +663,7 @@ class IDE(QMainWindow, QWidget):
         code_palette = self.codespace.palette()
         code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
         self.codespace.setPalette(code_palette)
+        self.settings.set_theme("black")
 
     # set white theme
     def white_theme(self):
@@ -648,19 +678,20 @@ class IDE(QMainWindow, QWidget):
         code_palette = self.codespace.palette()
         code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
         self.codespace.setPalette(code_palette)
+        self.settings.set_theme("white")
 
     # set custom theme for background, and text
     def custom_theme(self):
         # colors to modify: self.rgb, self.colors, codespace background color, codespace pallet for text
         names =  ('comment', 'starting keywords', 'F-keys', "shortcut keys", "arrows", "windows", "chars",
-                  "uncommon", "numbers", "text", "textbubble")
+                  "uncommon", "numbers", "text", "textbubble", "background")
         self.theme_name = self.settings.theme
         colors = list(self.colors)
         colors.append(self.rgb)
         bg_color_h = self.settings.textbubble # codespace/textbubble color
         bg_color_sidebar = self.settings.bg_sidebar
         color_sidebar = self.settings.color_sidebar
-        color = ColorWindow(colors, bg_color_h, names)
+        color = ColorWindow(colors, bg_color_h, names, self.rgb, self.settings)
         color.color_set()
         color.show()
         pallete = QPalette()
@@ -668,18 +699,12 @@ class IDE(QMainWindow, QWidget):
         self.setPalette(pallete) # set background color
         self.codespace.setStyleSheet(f"background-color: #{bg_color_h};") # codespace color
         self.tree.setStyleSheet(f"background-color: #{bg_color_sidebar};color: #{color_sidebar}") # filebar color
+        code_palette = self.codespace.palette() # set text color
+        code_palette.setColor(QPalette.Text, QColor(colors[-2][0], colors[-2][1], colors[-2][2]))
+        self.codespace.setPalette(code_palette)
         self.rgb = colors[-1]
         self.colors = colors[:-1]
         self.set_theme() # sets icons and text color based on how dark the background is
-
-        __exit = QMessageBox.question(None, 'Save Theme', "Do you want to save the theme?\nyou can change the theme anytime", QMessageBox.No|QMessageBox.Yes)
-        if __exit == QMessageBox.Yes:
-            colors = [rgbtohex(i) for i in self.colors]
-            self.settings.theme = self.theme_name
-            self.settings.create_theme(self.rgb, colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
-                                       colors[6], colors[7], colors[8], colors[9], bg_color_h, bg_color_sidebar, color_sidebar)
-            self.settings.set_colors()
-            self.settings.set.save()
 
     def closeEvent(self, event):
         if not self.saved:
