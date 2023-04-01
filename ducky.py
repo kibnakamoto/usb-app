@@ -37,7 +37,6 @@ ITEXT_COLORS_LIGHT = ((94,148,81), (220,11,11), (255,128,0), (0,204,204), (204,2
 ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,255,255), (62,62,236), (255,102,102), (133,193,187), (212,21,212), (250,250,250)) # 12 colors
 
 ######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
-######## TODO: make a toolbar item for loading from history and payloads
 ######## TODO: Make button for selecting target os and target keyboard language
 
 # Select Custom Color Window
@@ -63,7 +62,7 @@ class ColorWindow(QMainWindow):
                 checkbox = QCheckBox(f"Color {self.names[i*self.columns+j]}")
                 self.boxes.append(checkbox)
                 grid_layout.addWidget(checkbox, i, j)
-
+ 
         # save layout
         central_widget = QWidget()
         self.setCentralWidget(central_widget)
@@ -167,13 +166,26 @@ class Settings:
            }
         ]
 
+        # if values rgb
+        for k,v in properties[0].items():
+            if not isinstance(properties[0][k], str):
+                properties[0][k] = rgbtohex(v)
+
         # check if theme exists
         if not self.theme in self.settings["colors"][0].keys():
             self.settings["colors"][0][self.theme] = properties
             self.set_colors()
             return 0
         else:
-            return 1 # theme exists
+            if properties != self.settings["colors"][0][self.theme]: # if settings don't have the new properties
+                __exit = QMessageBox.question(None, 'Theme Creator', "The selected theme exists\nWould you like to ovveride it?", QMessageBox.No|QMessageBox.Yes)
+                if __exit == QMessageBox.Yes:
+                    self.settings["colors"][0][self.theme] = properties
+                    self.set_colors()
+                else:
+                    theme = len(self.settings["colors"][0])-2 # if theme exists add number to differ from original theme
+                    self.settings["colors"][0][self.theme+f"{theme}"] = properties
+                    self.set_colors()
 
     # set property class members of a theme
     def set_colors(self) -> None:
@@ -523,8 +535,10 @@ class IDE(QMainWindow, QWidget):
         self.tree.setColumnHidden(3,True)
         self.tree.setFixedWidth(self.width//6)
         self.tree.setFixedHeight(self.height)
-        self.tree.setStyleSheet("background-color: #070707;color: #f0f0f0")
+        self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}")
         self.fileSelector.setNameFilters(["*.dd"])
+        self.selection_model = self.tree.selectionModel()
+        self.selection_model.selectionChanged.connect(self.file_picked)
 
         # Set the widget as the content of the dock widget
         dock.setWidget(widget)
@@ -557,6 +571,16 @@ class IDE(QMainWindow, QWidget):
                                   QColor(self.colors[-2][0], self.colors[-2][1], self.colors[-2][2]))
         block.highlightBlock(line)
         del tmp
+
+    # file picked in sidebar
+    def file_picked(self, selected, deselected):
+        indexes = self.selection.selectedIndexes()
+        if indexes:
+            index = indexes[0]
+            # check if the selected item is a file
+            if self.file_selector.isFile(index):
+                file = self.file_selector.filePath(index)
+
 
     # load payload from any directory, the default directory is payloads
     def load_payload(self):
@@ -691,7 +715,7 @@ class IDE(QMainWindow, QWidget):
         bg_color_h = self.settings.textbubble # codespace/textbubble color
         bg_color_sidebar = self.settings.bg_sidebar
         color_sidebar = self.settings.color_sidebar
-        color = ColorWindow(colors, bg_color_h, names, self.rgb, self.settings)
+        color = ColorWindow(colors, bg_color_h, names, self.rgb, self.settings, self.theme_name, bg_color_sidebar, color_sidebar)
         color.color_set()
         color.show()
         pallete = QPalette()
@@ -799,9 +823,9 @@ class IDE(QMainWindow, QWidget):
                                                   "Save",
                                                   "Sucessfully saved",
                                                   QMessageBox.Ok)
-                        message_box.exec_()
                         self.saved = True
                         self.change_count = 0
+                        message_box.exec_()
                     except FileNotFoundError:
                         message_box = QMessageBox(QMessageBox.Information,
                                                   "FileNotFoundError",
