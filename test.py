@@ -30,17 +30,39 @@ class ColorCheckBox(QWidget):
 
 # Select Custom Color Window
 class ColorWindow(QMainWindow):
-    def __init__(self, colors:list, bg_color:str, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00), settings=None,
-                 theme_name="black", bg_color_sidebar="070707", color_sidebar="f0f0f0"):
+    def __init__(self, colors:list, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00), settings=None,
+                 screensize=None):
         super().__init__()
         pallete = QPalette()
+        self.screensize = screensize
+        if self.screensize != None:
+            self.setGeometry(self.screensize.left()//2, self.screensize.top()//2, self.screensize.width()//2,
+                             self.screensize.height()//2)
         pallete.setColor(QPalette.Window, QColor(bg_rgb[0], bg_rgb[1], bg_rgb[2]))
         self.setPalette(pallete)
+
+        # save button
+        save = QPushButton("Save Theme", self)
+        save.resize(save.sizeHint())
+        #save.move(self.width(), self.height())
+        save.clicked.connect(self.saver)
+
+        # color picker button
+        pick_color = QPushButton("RGB Color Picker", self)
+        pick_color.resize(pick_color.sizeHint())
+        pick_color.move(self.screensize.width(), self.height())
+        pick_color.setToolTip("set colors of selected checkboxes")
+        pick_color.clicked.connect(self.selector)
+
         if (bg_rgb[0]+bg_rgb[1]+bg_rgb[2])//3 <= 127:
-            self.setStyleSheet(f"color: #ffffff")
+            self.setStyleSheet("color: #ffffff")
+            save.setStyleSheet("color: #ffffff")
+            pick_color.setStyleSheet("color: #ffffff")
             self.borderofbox = "white"
         else:
-            self.setStyleSheet(f"color: #000000")
+            self.setStyleSheet("color: #000000")
+            save.setStyleSheet("color:  #000000")
+            pick_color.setStyleSheet("color: #000000")
             self.borderofbox = "black"
 
         self.setWindowTitle("Choose Custom Colors") 
@@ -54,21 +76,7 @@ class ColorWindow(QMainWindow):
         self.columns = 6
         self.settings = settings
         self.closed_event = False
-        self.theme_name = theme_name
-        self.bg_color = bg_color
-        self.bg_color_sidebar = bg_color_sidebar
-        self.color_sidebar = color_sidebar
-        pick_color = QPushButton("RGB Color Picker", self)
-        pick_color.move(self.width(), self.height())
-        pick_color.setToolTip("set colors of selected checkboxes")
-        pick_color.clicked.connect(self.selector)
         self.saved = True
-
-        # save button
-        save = QPushButton("Save Theme", self)
-        save.resize(save.sizeHint())
-        save.move(self.width(), self.height())
-        save.clicked.connect(self.saver)
 
     # custom color picker
     def color_set(self) -> None:
@@ -119,9 +127,8 @@ class ColorWindow(QMainWindow):
 
     def saver(self) -> None:
         if not self.saved:
-            self.settings.theme = self.theme_name
             self.settings.create_theme(colors[-1], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
-                                       colors[6], colors[7], colors[8], colors[9], self.bg_color, self.bg_color_sidebar, self.color_sidebar)
+                                       colors[6], colors[7], colors[8], colors[9], colors[10], colors[11], colors[12])
             self.settings.set_colors()
             self.settings.save()
             self.saved = True
@@ -150,8 +157,9 @@ l = ((50, 205, 50), (255, 0, 0), (105, 105, 105), (210, 105, 30), (224, 255, 255
 
 names =  ('comment', 'starting keywords', 'F-keys', "shortcut keys", "arrows", "windows", "chars",
                  "uncommon", "numbers", "text", "textbubble", "background")
+screensize = a.primaryScreen().availableGeometry()
 s = Settings()
-w = ColorWindow(l, "000000", names, (0,0,0), s)
+w = ColorWindow(l, names, (0,0,0), s, screensize)
 w.color_set()
 w.show()
 a.exec_()
