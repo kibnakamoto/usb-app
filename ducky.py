@@ -32,10 +32,6 @@ DUCKYSCRIPT_CHARS = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
 DUCKYSCRIPT_UNCOMMON = ("APP", "MENU", "BREAK", "PAUSE", "DELETE", "END", "HOME", "INSERT", "NUMLOCK",
                         "PAGEUP", "PAGEDOWN", "PRINTSCREEN", "SCROLLLOCK")
 
-# COLORS for (COMMENT, starting_keywords, fkeys, shortcut_keys, arrows, windows, chars, uncommon, numbers, text)
-ITEXT_COLORS_LIGHT = ((94,148,81), (220,11,11), (255,128,0), (0,204,204), (204,204,0), (0,0,204), (255,127,80), (46,199,199), (84,107,107), (32,32,32)) # 12 colors
-ITEXT_COLORS_DARK = ((50,205,50), (255,0,0), (105,105,105), (210,105,30), (224,255,255), (62,62,236), (255,102,102), (133,193,187), (212,21,212), (250,250,250)) # 12 colors
-
 ######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
 ######## TODO: Make button for selecting target os and target keyboard language
 
@@ -73,7 +69,7 @@ class ColorWindow(QMainWindow):
         if __exit == QMessageBox.Yes:
             colors = [rgbtohex(i) for i in self.colors]
             self.settings.theme = self.theme_name
-            self.settings.create_theme(colors[-1], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
+            self.settings.create_theme(colors[-4], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
                                        colors[6], colors[7], colors[8], colors[9], bg_color_h, bg_color_sidebar, color_sidebar)
             self.settings.set_colors()
             self.settings.save()
@@ -87,7 +83,7 @@ class ColorWindow(QMainWindow):
             elif msg == QMessageBox.Save:
                 colors = [rgbtohex(i) for i in self.colors]
                 self.settings.theme = self.theme_name
-                self.settings.create_theme(colors[-1], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
+                self.settings.create_theme(colors[-4], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
                                            colors[6], colors[7], colors[8], colors[9], bg_color_h, bg_color_sidebar, color_sidebar)
                 self.settings.set_colors()
                 self.settings.save()
@@ -143,7 +139,7 @@ class Settings:
     # create new theme
     def create_theme(self, bg:str, comment:str, starting_keywords:str, fkeys:str, shortcuts:str, arrows:str,
                      windows:str, chars:str, uncommon:str, numbers:str, text:str, textbubble:str,
-                     bg_sidebar:str, color_sidebar:str, name:str=None) -> bool:
+                     bg_sidebar:str, color_sidebar:str, name:str=None) -> None:
         if name:
             self.theme = name
 
@@ -175,7 +171,6 @@ class Settings:
         if not self.theme in self.settings["colors"][0].keys():
             self.settings["colors"][0][self.theme] = properties
             self.set_colors()
-            return 0
         else:
             if properties != self.settings["colors"][0][self.theme]: # if settings don't have the new properties
                 __exit = QMessageBox.question(None, 'Theme Creator', "The selected theme exists\nWould you like to ovveride it?", QMessageBox.No|QMessageBox.Yes)
@@ -227,6 +222,25 @@ class Settings:
             self.settings["last color"] = self.theme
         with open("settings.json", "w") as f:
             json.dump(self.settings, f, indent=4)
+
+
+# COLORS for (COMMENT, starting_keywords, fkeys, shortcut_keys, arrows, windows, chars, uncommon, numbers, text, textbubble, background, sidebar background, sidebar text)
+s = Settings()
+s.set_theme("white")
+
+ITEXT_COLORS_LIGHT = [s.comment, s.starting_keywords, s.fkeys, s.shortcuts, s.arrows, s.windows,
+                      s.chars, s.uncommon, s.numbers, s.text, s.textbubble, s.bg, s.bg_sidebar, s.color_sidebar] # 12 colors
+s.set_theme("black")
+ITEXT_COLORS_DARK = [s.comment, s.starting_keywords, s.fkeys, s.shortcuts, s.arrows, s.windows,
+                      s.chars, s.uncommon, s.numbers, s.text, s.textbubble, s.bg, s.bg_sidebar, s.color_sidebar] # 12 colors
+
+for i in range(len(ITEXT_COLORS_DARK)):
+    ITEXT_COLORS_LIGHT[i] = hextorgb(ITEXT_COLORS_LIGHT[i])
+    ITEXT_COLORS_DARK[i] = hextorgb(ITEXT_COLORS_DARK[i])
+ITEXT_COLORS_LIGHT = tuple(ITEXT_COLORS_LIGHT)
+ITEXT_COLORS_DARK = tuple(ITEXT_COLORS_DARK)
+del s
+
 
 # Syntax Highlighter for Duckyscript
 class SyntaxHighlighter(QSyntaxHighlighter):
@@ -388,16 +402,9 @@ class IDE(QMainWindow, QWidget):
         ]
 
         self.settings = Settings()
-        if self.settings.theme == "black":
-            self.rgb = (5,5,5) # black
-            self.set_theme()
-        elif self.settings.theme == "white":
-            self.rgb = (250,250,250)
-            self.set_theme()
-        else: # custom theme
-            self.rgb = hextorgb(self.settings.bg)
+        self.settings.set_colors()
+        self.rgb = hextorgb(self.settings.bg)
         self.set_theme()
-        self.settings.set_theme()
 
         self.change_count = 0 # amount of changes made
         pallete = QPalette()
@@ -472,9 +479,9 @@ class IDE(QMainWindow, QWidget):
         self.codespace.textChanged.connect(self.__line_widget_line_count_changed)
         self.line = LineNumberWidget(self.codespace)
         code_palette = self.codespace.palette()
-        code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
+        code_palette.setColor(QPalette.Text, QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]))
         self.codespace.setPalette(code_palette)
-        self.codespace.setStyleSheet("background-color: #000000;");
+        self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text}");
         self.codespace.textChanged.connect(self.ifTyped)
 
         # initialize files
@@ -523,11 +530,11 @@ class IDE(QMainWindow, QWidget):
         layout = QVBoxLayout(widget)
         
         #creating the file selector
-        self.fileSelector = QFileSystemModel()
+        self.file_selector = QFileSystemModel()
         self.tree = QTreeView(widget)
-        self.tree.setModel(self.fileSelector)
-        self.tree.setRootIndex(self.fileSelector.setRootPath(self.path+"/payloads/"))
-        self.fileSelector.setFilter(QDir.NoDotAndDotDot | QDir.Files) # hide folder
+        self.tree.setModel(self.file_selector)
+        self.tree.setRootIndex(self.file_selector.setRootPath(self.path+"/payloads/"))
+        self.file_selector.setFilter(QDir.NoDotAndDotDot | QDir.Files) # hide folder
         self.tree.setHeaderHidden(True)
         self.tree.setSortingEnabled(True)
         self.tree.setColumnHidden(1,True) # hide other data
@@ -536,9 +543,9 @@ class IDE(QMainWindow, QWidget):
         self.tree.setFixedWidth(self.width//6)
         self.tree.setFixedHeight(self.height)
         self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}")
-        self.fileSelector.setNameFilters(["*.dd"])
-        self.selection_model = self.tree.selectionModel()
-        self.selection_model.selectionChanged.connect(self.file_picked)
+        self.file_selector.setNameFilters(["*.dd"])
+        self.selection = self.tree.selectionModel()
+        self.tree.doubleClicked.connect(self.file_picked)
 
         # Set the widget as the content of the dock widget
         dock.setWidget(widget)
@@ -567,20 +574,25 @@ class IDE(QMainWindow, QWidget):
         line = string.split("\n")[cursor.blockNumber()]
         cursor = self.codespace.textCursor()
         block = SyntaxHighlighter(self.codespace, tmp, self.colors,
-                                  QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]),
-                                  QColor(self.colors[-2][0], self.colors[-2][1], self.colors[-2][2]))
+                                  QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]),
+                                  QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]))
         block.highlightBlock(line)
         del tmp
 
     # file picked in sidebar
-    def file_picked(self, selected, deselected):
+    def file_picked(self, selected):
         indexes = self.selection.selectedIndexes()
         if indexes:
             index = indexes[0]
-            # check if the selected item is a file
-            if self.file_selector.isFile(index):
-                file = self.file_selector.filePath(index)
-
+            file = self.file_selector.filePath(index)
+            if self.current_payload != file.split('/')[-1]: # if not the currently editing file
+                if not self.saved:
+                    msg = QMessageBox.question(None, 'Exit', "Are you sure you want to load another payload without saving the current edited file?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
+                    if msg == QMessageBox.Save:
+                        self.save()
+                    if msg != QMessageBox.No:
+                        with open(file, "r") as f:
+                            self.codespace.setText(f.read())
 
     # load payload from any directory, the default directory is payloads
     def load_payload(self):
@@ -602,7 +614,7 @@ class IDE(QMainWindow, QWidget):
             self.current_payload = file.split('/')[-1] # seperate path from filename
         # load the payload into codespace
         try:
-            with open(self.path + "/payloads/" + self.current_payload) as f:
+            with open(self.path + "/payloads/" + self.current_payload, "r") as f:
                 self.codespace.setText(f.read())
         except FileNotFoundError:
             print("payload not found")
@@ -676,62 +688,69 @@ class IDE(QMainWindow, QWidget):
 
     # set black theme
     def black_theme(self):
-        self.rgb = (5,5,5)
+        self.settings.set_theme("black")
+        self.rgb = hextorgb(self.settings.bg)
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
         self.setPalette(pallete)
-        self.codespace.setStyleSheet("background-color: #000000;");
-        self.tree.setStyleSheet("background-color: #070707;color: #f0f0f0")
+        self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text}");
+        self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}") # filebar color
         self.set_theme()
         self.parse_line()
         code_palette = self.codespace.palette()
-        code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
+        code_palette.setColor(QPalette.Text, QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]))
         self.codespace.setPalette(code_palette)
-        self.settings.set_theme("black")
 
     # set white theme
     def white_theme(self):
-        self.rgb = (250,250,250)
+        self.settings.set_theme("white")
+        self.rgb = hextorgb(self.settings.bg) # background color
         pallete = QPalette()
-        pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
+        pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2])) # background color
         self.setPalette(pallete)
-        self.codespace.setStyleSheet("background-color: #ffffff;");
-        self.tree.setStyleSheet("background-color: #f1f1f1;color: #050505")
+        self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text}");
+        self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}") # filebar color
         self.set_theme() # sets the icons and text color
         self.parse_line()
         code_palette = self.codespace.palette()
-        code_palette.setColor(QPalette.Text, QColor(self.colors[-1][0], self.colors[-1][1], self.colors[-1][2]))
+        code_palette.setColor(QPalette.Text, QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]))
         self.codespace.setPalette(code_palette)
-        self.settings.set_theme("white")
 
     # set custom theme for background, and text
     def custom_theme(self):
         # colors to modify: self.rgb, self.colors, codespace background color, codespace pallet for text
         names =  ('comment', 'starting keywords', 'F-keys', "shortcut keys", "arrows", "windows", "chars",
-                  "uncommon", "numbers", "text", "textbubble", "background")
+                  "uncommon", "numbers", "text", "textbubble", "background", "background filebar", "filebar text")
         self.theme_name = self.settings.theme
         colors = list(self.colors)
-        colors.append(self.rgb)
         bg_color_h = self.settings.textbubble # codespace/textbubble color
-        bg_color_sidebar = self.settings.bg_sidebar
-        color_sidebar = self.settings.color_sidebar
+        bg_color_sidebar = self.settings.bg_sidebar # background of sidebar color
+        color_sidebar = self.settings.color_sidebar # text of sidebar color
+        colors.append(hextorgb(bg_color_h))
+        colors.append(self.rgb)
+        colors.append(bg_color_sidebar)
+        colors.append(color_sidebar)
         color = ColorWindow(colors, bg_color_h, names, self.rgb, self.settings, self.theme_name, bg_color_sidebar, color_sidebar)
         color.color_set()
         color.show()
+
+        # set background color
         pallete = QPalette()
-        pallete.setColor(QPalette.Window, QColor(colors[-1][0], colors[-1][1], colors[-1][2]))
+        pallete.setColor(QPalette.Window, QColor(colors[-3][0], colors[-3][1], colors[-3][2]))
         self.setPalette(pallete) # set background color
         self.codespace.setStyleSheet(f"background-color: #{bg_color_h};") # codespace color
         self.tree.setStyleSheet(f"background-color: #{bg_color_sidebar};color: #{color_sidebar}") # filebar color
-        code_palette = self.codespace.palette() # set text color
-        code_palette.setColor(QPalette.Text, QColor(colors[-2][0], colors[-2][1], colors[-2][2]))
+
+        # set text color
+        code_palette = self.codespace.palette()
+        code_palette.setColor(QPalette.Text, QColor(colors[-4][0], colors[-4][1], colors[-4][2]))
         self.codespace.setPalette(code_palette)
-        self.rgb = colors[-1]
-        self.colors = colors[:-1]
+        self.rgb = colors[-3]
+        self.colors = colors
         self.set_theme() # sets icons and text color based on how dark the background is
 
     def closeEvent(self, event):
-        if not self.saved:
+        if not self.saved: # warn user if not saved
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
                 with open("settings.json", "w") as f:
