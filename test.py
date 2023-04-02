@@ -44,25 +44,37 @@ class ColorWindow(QMainWindow):
         # save button
         save = QPushButton("Save Theme", self)
         save.resize(save.sizeHint())
-        #save.move(self.width(), self.height())
+        save.move(self.screensize.width()//4, 10)
         save.clicked.connect(self.saver)
 
         # color picker button
         pick_color = QPushButton("RGB Color Picker", self)
         pick_color.resize(pick_color.sizeHint())
-        pick_color.move(self.screensize.width(), self.height())
+        pick_color.move(self.screensize.width()//4+save.width(), 10)
+        self.setMinimumSize(pick_color.width()*10, pick_color.height()*10)
         pick_color.setToolTip("set colors of selected checkboxes")
         pick_color.clicked.connect(self.selector)
 
         if (bg_rgb[0]+bg_rgb[1]+bg_rgb[2])//3 <= 127:
             self.setStyleSheet("color: #ffffff")
-            save.setStyleSheet("color: #ffffff")
-            pick_color.setStyleSheet("color: #ffffff")
+            save.setStyleSheet("""
+                QPushButton {
+                    background-color: #9f9f9f;
+                    color: #ffffff;
+                }
+                QPushButton:hover {
+                    background-color: #afafaf;
+                    color: #f1f1f1;
+                }
+            """)
+            pick_color.setStyleSheet("background-color: #9f9f9f; color: #ffffff")
+            
+            color: white;
             self.borderofbox = "white"
         else:
             self.setStyleSheet("color: #000000")
-            save.setStyleSheet("color:  #000000")
-            pick_color.setStyleSheet("color: #000000")
+            save.setStyleSheet("background-color: #efefef; color: #000000")
+            pick_color.setStyleSheet("background-color: #efefef; color: #000000")
             self.borderofbox = "black"
 
         self.setWindowTitle("Choose Custom Colors") 
@@ -100,6 +112,7 @@ class ColorWindow(QMainWindow):
                 grid_layout.addWidget(widget, i, j)
                 self.boxes.append(checkbox)
                 self.box_colors.append(color_box)
+        self.setFixedWidth(self.width())
 
     # return colors as rgb
     def rgb(self) -> tuple:
