@@ -15,19 +15,6 @@ from ducky import rgbtohex, hextorgb, Settings
 
 import language
 
-# Color of checkbox
-class ColorCheckBox(QWidget):
-    def __init__(self):
-        super().__init__()
-
-        # create a checkbox and a colorbox to show what color it is
-        self.color_box = QFrame(self)
-        self.color_box.setMinimumSize(10, 10)
-        self.check_box = QCheckBox(self)
-        layout = QHBoxLayout(self)
-        layout.addWidget(self.check_box)
-        layout.addWidget(self.color_box)
-
 # Select Custom Color Window
 class ColorWindow(QMainWindow):
     def __init__(self, colors:list, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00), settings=None,
@@ -44,13 +31,14 @@ class ColorWindow(QMainWindow):
         # save button
         save = QPushButton("Save Theme", self)
         save.resize(save.sizeHint())
-        save.move(self.screensize.width()//4, 10)
+        save.move(self.screensize.width()//3-save.width()-10, 10)
+        save.setToolTip("Save the Custom Theme")
         save.clicked.connect(self.saver)
 
         # color picker button
         pick_color = QPushButton("RGB Color Picker", self)
         pick_color.resize(pick_color.sizeHint())
-        pick_color.move(self.screensize.width()//4+save.width(), 10)
+        pick_color.move(self.screensize.width()//3-10, 10)
         self.setMinimumSize(pick_color.width()*10, pick_color.height()*10)
         pick_color.setToolTip("set colors of selected checkboxes")
         pick_color.clicked.connect(self.selector)
@@ -132,7 +120,7 @@ class ColorWindow(QMainWindow):
                 if self.boxes[i].isChecked():
                     self.saved = False
                     color = self.color_picker.name()
-                    self.box_colors[i].setStyleSheet(f"background-color: {color};")
+                    self.box_colors[i].setStyleSheet(f"background-color: #{color};border: 1px solid {self.borderofbox};")
                     self.colors[i] = color[1:] # remove #
                     
         else:
