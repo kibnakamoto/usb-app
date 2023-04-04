@@ -587,12 +587,21 @@ class IDE(QMainWindow, QWidget):
             file = self.file_selector.filePath(index)
             if self.current_payload != file.split('/')[-1]: # if not the currently editing file
                 if not self.saved:
-                    msg = QMessageBox.question(None, 'Exit', "Are you sure you want to load another payload without saving the current edited file?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
+                    msg = QMessageBox.question(None, 'Exit',
+                                               "Are you sure you want to load another payload without saving the current edited file?",
+                                               QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
                     if msg == QMessageBox.Save:
                         self.save()
                     if msg != QMessageBox.No:
                         with open(file, "r") as f:
                             self.codespace.setText(f.read())
+                            self.saved = False
+                            self.current_payload = file.split('/')[-1]
+                else:
+                    with open(file, "r") as f:
+                        self.codespace.setText(f.read())
+                        self.saved = False
+                        self.current_payload = file.split('/')[-1]
 
     # load payload from any directory, the default directory is payloads
     def load_payload(self):
