@@ -15,6 +15,8 @@ from ducky import rgbtohex, hextorgb, Settings
 
 import language
 
+########### TODO: Create a textbox for inputting theme name
+
 # Select Custom Color Window
 class ColorWindow(QMainWindow):
     def __init__(self, colors:list, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00), settings=None,
@@ -27,51 +29,15 @@ class ColorWindow(QMainWindow):
                              self.screensize.height()//2)
         pallete.setColor(QPalette.Window, QColor(bg_rgb[0], bg_rgb[1], bg_rgb[2]))
         self.setPalette(pallete)
-
-        # save button
-        save = QPushButton("Save Theme", self)
-        save.resize(save.sizeHint())
-        save.move(self.screensize.width()//3-save.width()-10, 10)
-        save.setToolTip("Save the Custom Theme")
-        save.clicked.connect(self.saver)
-
-        # color picker button
-        pick_color = QPushButton("RGB Color Picker", self)
-        pick_color.resize(pick_color.sizeHint())
-        pick_color.move(self.screensize.width()//3-10, 10)
-        self.setMinimumSize(pick_color.width()*10, pick_color.height()*10)
-        pick_color.setToolTip("set colors of selected checkboxes")
-        pick_color.clicked.connect(self.selector)
-
-        if (bg_rgb[0]+bg_rgb[1]+bg_rgb[2])//3 <= 127:
-            self.setStyleSheet("color: #ffffff")
-            save.setStyleSheet("""
-                QPushButton {
-                    background-color: #9f9f9f;
-                    color: #ffffff;
-                }
-                QPushButton:hover {
-                    background-color: #afafaf;
-                    color: #f1f1f1;
-                }
-            """)
-            pick_color.setStyleSheet("background-color: #9f9f9f; color: #ffffff")
-            
-            color: white;
-            self.borderofbox = "white"
-        else:
-            self.setStyleSheet("color: #000000")
-            save.setStyleSheet("background-color: #efefef; color: #000000")
-            pick_color.setStyleSheet("background-color: #efefef; color: #000000")
-            self.borderofbox = "black"
-
         self.setWindowTitle("Choose Custom Colors") 
 
         # convert colors to hex if they aren't
         self.colors = colors
         if not isinstance(colors[0], str):
             self.colors = self.hex_str()
+        self.colors = list(self.colors)
         self.names = names
+        self.bg_rgb = bg_rgb
         self.rows = 2
         self.columns = 6
         self.settings = settings
@@ -80,6 +46,12 @@ class ColorWindow(QMainWindow):
 
     # custom color picker
     def color_set(self) -> None:
+        if (self.bg_rgb[0]+self.bg_rgb[1]+self.bg_rgb[2])//3 <= 127:
+            self.setStyleSheet("color: #ffffff")
+            self.borderofbox = "white"
+        else:
+            self.setStyleSheet("color: #000000")
+            self.borderofbox = "black"
         grid_layout = QGridLayout()
         central_widget = QWidget(self)
         self.setCentralWidget(central_widget)
@@ -102,6 +74,64 @@ class ColorWindow(QMainWindow):
                 self.box_colors.append(color_box)
         self.setFixedWidth(self.width())
 
+        # save button
+        save = QPushButton("Save Theme", self)
+        save.resize(save.sizeHint())
+        save.move(self.screensize.width()//3-save.width()-10, 10)
+        save.setToolTip("Save the Custom Theme")
+        save.clicked.connect(self.saver)
+
+        # color picker button
+        pick_color = QPushButton("RGB Color Picker", self)
+        pick_color.resize(pick_color.sizeHint())
+        pick_color.move(self.screensize.width()//3-10, 10)
+        self.setMinimumSize(pick_color.width()*10, pick_color.height()*10)
+        pick_color.setToolTip("set colors of selected checkboxes")
+        pick_color.clicked.connect(self.selector)
+
+        if self.borderofbox == "white":
+            save.setStyleSheet("""
+                QPushButton {
+                    background-color: #9f9f9f;
+                    color: #ffffff;
+                }
+                QPushButton:hover {
+                    background-color: #afafaf;
+                    color: #f1f1f1;
+                }
+            """)
+            pick_color.setStyleSheet("""
+                QPushButton {
+                    background-color: #9f9f9f;
+                    color: #ffffff;
+                }
+                QPushButton:hover {
+                    background-color: #afafaf;
+                    color: #f1f1f1;
+                }
+            """)
+        else:
+            save.setStyleSheet("""
+                QPushButton {
+                    background-color: #efefef;
+                    color: #000000;
+                }
+                QPushButton:hover {
+                    background-color: #afafaf;
+                    color: #f1f1f1;
+                }
+            """)
+            pick_color.setStyleSheet("""
+                QPushButton {
+                    background-color: #efefef;
+                    color: #000000;
+                }
+                QPushButton:hover {
+                    background-color: #afafaf;
+                    color: #f1f1f1;
+                }
+            """)
+
     # return colors as rgb
     def rgb(self) -> tuple:
         rgbs = tuple([hextorgb(i) for i in self.colors])
@@ -120,14 +150,15 @@ class ColorWindow(QMainWindow):
                 if self.boxes[i].isChecked():
                     self.saved = False
                     color = self.color_picker.name()
-                    self.box_colors[i].setStyleSheet(f"background-color: #{color};border: 1px solid {self.borderofbox};")
+                    self.box_colors[i].setStyleSheet(f"background-color: {color};border: 1px solid {self.borderofbox};")
                     self.colors[i] = color[1:] # remove #
                     
         else:
-            err = QMessageBox.question(None, 'Color Window', "Color chosen doesn't exist", QMessageBox.Ok)
+            err = QMessageBox.question(None, 'Color Window', "Color not Chosen Properly or Color chosen doesn't exist", QMessageBox.Ok)
 
     def saver(self) -> None:
         if not self.saved:
+            colors = self.colors
             self.settings.create_theme(colors[-1], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
                                        colors[6], colors[7], colors[8], colors[9], colors[10], colors[11], colors[12])
             self.settings.set_colors()
@@ -135,22 +166,25 @@ class ColorWindow(QMainWindow):
             self.saved = True
 
     def closeEvent(self, event):
-        __exit = QMessageBox.question(None, 'Save Theme', "Do you want to save the theme?\nyou can change the theme anytime", QMessageBox.No|QMessageBox.Yes)
-        if __exit == QMessageBox.Yes:
-            self.saver()
-            self.closed_event = True
-            event.accept()
-        else:
-            msg = QMessageBox.question(None, 'Exit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
-            if msg == QMessageBox.Yes:
-                self.closed_event = True
-                event.accept()
-            elif msg == QMessageBox.Save:
+        if not self.saved:
+            __exit = QMessageBox.question(None, 'Save Theme', "Do you want to save the theme?\nyou can change the theme anytime", QMessageBox.No|QMessageBox.Yes)
+            if __exit == QMessageBox.Yes:
                 self.saver()
                 self.closed_event = True
                 event.accept()
             else:
-                event.ignore()
+                msg = QMessageBox.question(None, 'Exit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
+                if msg == QMessageBox.Yes:
+                    self.closed_event = True
+                    event.accept()
+                elif msg == QMessageBox.Save:
+                    self.saver()
+                    self.closed_event = True
+                    event.accept()
+                else:
+                    event.ignore()
+        else:
+            event.accept()
 
 a = QApplication([])
 l = ((50, 205, 50), (255, 0, 0), (105, 105, 105), (210, 105, 30), (224, 255, 255), (62, 62, 236),

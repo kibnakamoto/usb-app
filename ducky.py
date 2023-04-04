@@ -595,12 +595,12 @@ class IDE(QMainWindow, QWidget):
                     if msg != QMessageBox.No:
                         with open(file, "r") as f:
                             self.codespace.setText(f.read())
-                            self.saved = False
+                            self.saved = True # True because newly loaded saved file
                             self.current_payload = file.split('/')[-1]
                 else:
                     with open(file, "r") as f:
                         self.codespace.setText(f.read())
-                        self.saved = False
+                        self.saved = True # True because newly loaded saved file
                         self.current_payload = file.split('/')[-1]
 
     # load payload from any directory, the default directory is payloads
