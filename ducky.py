@@ -560,9 +560,9 @@ class IDE(QMainWindow, QWidget):
         bg_color_h = rgbtohex(colors[-4]) # codespace/textbubble color
         bg_color_sidebar = rgbtohex(colors[-2]) # background of sidebar color
         color_sidebar = rgbtohex(colors[-1]) # text of sidebar color
-        color = ColorWindow(colors, names, self.rgb, self.settings, self.screensize)
-        color.color_set()
-        color.show()
+        self.color = ColorWindow(colors, names, self.rgb, self.settings, self.screensize)
+        self.color.color_set()
+        self.color.show()
 
         # set background color
         pallete = QPalette()
@@ -617,6 +617,7 @@ class IDE(QMainWindow, QWidget):
     def download_file(self):
         download_path = os.path.expanduser("~") + "/Downloads"
         shutil.copy(f'payloads/{self.current_payload}', f'{download_path}/') # copy file to Downloads folder
+
 
     # save the currently editing file
     def save(self):
