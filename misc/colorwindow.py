@@ -1,24 +1,20 @@
+"""
+The file for Color Picker Window
+"""
+
 import sys
-import re
-from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QTextStream, QFile, QDir
-from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QMenu, QTextEdit,  \
-                            QHBoxLayout, QSizePolicy, QWidget, QPlainTextEdit, QMessageBox, QColorDialog, \
-                            QPushButton, QDockWidget, QFileDialog, QVBoxLayout, QFileSystemModel, QTreeView, \
-                            QCheckBox, QGridLayout, QFrame
-from PyQt5.QtGui import QIcon, QColor, QTextFormat, QBrush, QTextCharFormat, QFont, QSyntaxHighlighter, \
-                        QPalette, QTextCursor
-from pyqt_line_number_widget import LineNumberWidget
 import os
-import shutil
-import json
-from ducky import rgbtohex, hextorgb, Settings
 
-import language
+from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QMessageBox, QColorDialog, \
+                            QPushButton, QCheckBox, QGridLayout, QFrame, QInputDialog
+from PyQt5.QtGui import QColor, QPalette
 
-########### TODO: Create a textbox for inputting theme name
+sys.path.append(os.path.abspath(".."))
+from misc.misc import rgbtohex, hextorgb
 
 # Select Custom Color Window
 class ColorWindow(QMainWindow):
+    """ Default Class Initializer """
     def __init__(self, colors:list, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00), settings=None,
                  screensize=None):
         super().__init__()
@@ -89,7 +85,14 @@ class ColorWindow(QMainWindow):
         pick_color.setToolTip("set colors of selected checkboxes")
         pick_color.clicked.connect(self.selector)
 
-        if self.borderofbox == "white":
+        # Input theme name
+        theme_button = QPushButton("Input Theme Name", self)
+        theme_button.resize(theme_button.sizeHint())
+        theme_button.move(self.screensize.width()//3+pick_color.width()-10, 10)
+        theme_button.setToolTip("Input the Theme Name Before Saving")
+        theme_button.clicked.connect(self.input_theme_name)
+
+        if self.borderofbox[0] == 'w': # white border of box means dark background
             save.setStyleSheet("""
                 QPushButton {
                     background-color: #9f9f9f;
@@ -101,6 +104,16 @@ class ColorWindow(QMainWindow):
                 }
             """)
             pick_color.setStyleSheet("""
+                QPushButton {
+                    background-color: #9f9f9f;
+                    color: #ffffff;
+                }
+                QPushButton:hover {
+                    background-color: #afafaf;
+                    color: #f1f1f1;
+                }
+            """)
+            theme_button.setStyleSheet("""
                 QPushButton {
                     background-color: #9f9f9f;
                     color: #ffffff;
@@ -122,6 +135,16 @@ class ColorWindow(QMainWindow):
                 }
             """)
             pick_color.setStyleSheet("""
+                QPushButton {
+                    background-color: #efefef;
+                    color: #000000;
+                }
+                QPushButton:hover {
+                    background-color: #afafaf;
+                    color: #f1f1f1;
+                }
+            """)
+            theme_button.setStyleSheet("""
                 QPushButton {
                     background-color: #efefef;
                     color: #000000;
@@ -154,7 +177,7 @@ class ColorWindow(QMainWindow):
                     self.colors[i] = color[1:] # remove #
                     
         else:
-            err = QMessageBox.question(None, 'Color Window', "Color not Chosen Properly or Color chosen doesn't exist", QMessageBox.Ok)
+            QMessageBox.question(None, 'Color Window', "Color not Chosen Properly or Color chosen doesn't exist", QMessageBox.Ok)
 
     def saver(self) -> None:
         if not self.saved:
@@ -165,7 +188,20 @@ class ColorWindow(QMainWindow):
             self.settings.save()
             self.saved = True
 
-    def closeEvent(self, event):
+    def input_theme_name(self) -> None:
+        dialog = QInputDialog(self)
+        dialog.setInputMode(QInputDialog.TextInput)
+        dialog.setLabelText("Enter Theme Name")
+        if self.borderofbox[0] == 'w': # white border of box means dark background
+            dialog.setStyleSheet("QLineEdit { background-color: f5f5f5;color: 050505; }")
+        else:
+            dialog.setStyleSheet("background: 5f5f5f;color: f5f5f5;")
+        ok = dialog.exec_()
+        self.theme = dialog.textValue()
+        if ok and self.theme != "":
+            self.settings.theme = self.theme
+
+    def closeEvent(self, event) -> None:
         if not self.saved:
             __exit = QMessageBox.question(None, 'Save Theme', "Do you want to save the theme?\nyou can change the theme anytime", QMessageBox.No|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
@@ -185,16 +221,3 @@ class ColorWindow(QMainWindow):
                     event.ignore()
         else:
             event.accept()
-
-a = QApplication([])
-l = ((50, 205, 50), (255, 0, 0), (105, 105, 105), (210, 105, 30), (224, 255, 255), (62, 62, 236),
-     (255, 102, 102), (133, 193, 187), (212, 21, 212), (250, 250, 250), (0, 0, 0), (5, 5, 5), (7, 7, 7), (240, 240, 240))
-
-names =  ('comment', 'starting keywords', 'F-keys', "shortcut keys", "arrows", "windows", "chars",
-                 "uncommon", "numbers", "text", "textbubble", "background")
-screensize = a.primaryScreen().availableGeometry()
-s = Settings()
-w = ColorWindow(l, names, (0,0,0), s, screensize)
-w.color_set()
-w.show()
-a.exec_()
