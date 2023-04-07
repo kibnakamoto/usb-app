@@ -1,4 +1,5 @@
-""" GUI and compiler of duckyscript on a raspberry pi pico (w)
+"""
+GUI and compiler of duckyscript on a raspberry pi pico (w)
 @Author: Taha Canturk
 @Github: Kibnakamoto
 Date: Apr 7, 2023
@@ -37,8 +38,8 @@ DUCKYSCRIPT_CHARS = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
 DUCKYSCRIPT_UNCOMMON = ("APP", "MENU", "BREAK", "PAUSE", "DELETE", "END", "HOME", "INSERT", "NUMLOCK",
                         "PAGEUP", "PAGEDOWN", "PRINTSCREEN", "SCROLLLOCK")
 
-######## TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
-######## TODO: Make button for selecting target os and target keyboard language
+# TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
+# TODO: Make button for selecting target os and target keyboard language
 
 class Setup(QMainWindow):
     """ Default Class Initializer """
@@ -469,7 +470,7 @@ class IDE(QMainWindow, QWidget):
         pass
 
     def set_theme(self):
-        average = 0;
+        average = 0
         for i in self.rgb:
             average += i
         average//=3
@@ -526,7 +527,7 @@ class IDE(QMainWindow, QWidget):
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
         self.setPalette(pallete)
-        self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text}");
+        self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text}")
         self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}") # filebar color
         self.set_theme()
         self.parse_line()
@@ -607,7 +608,7 @@ class IDE(QMainWindow, QWidget):
     def add_file(self):
         payloads_count = len(os.listdir(self.path+"/payloads"))-1
         if payloads_count == 0:
-            self.current_payload = f"payload.dd"
+            self.current_payload = "payload.dd"
         else:
             self.current_payload = f"payload{payloads_count}.dd"
         open(self.path+"/payloads/"+self.current_payload, "x").close()
