@@ -563,7 +563,7 @@ class IDE(QMainWindow, QWidget):
         self.color = ColorWindow(colors, names, self.rgb, self.settings, self.screensize)
         self.color.color_set()
         self.color.show()
-
+        ######################### TODO: UPDATE SELF.SETTINGS AND COLORS HERE
         # set background color
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(colors[-3][0], colors[-3][1], colors[-3][2]))

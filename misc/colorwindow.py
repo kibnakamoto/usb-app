@@ -187,15 +187,27 @@ class ColorWindow(QMainWindow):
             self.settings.set_colors()
             self.settings.save()
             self.saved = True
+            QMessageBox.question(None, 'Save Theme', "Saved Theme", QMessageBox.Ok)
 
     def input_theme_name(self) -> None:
         dialog = QInputDialog(self)
-        dialog.setInputMode(QInputDialog.TextInput)
-        dialog.setLabelText("Enter Theme Name")
+        palette = dialog.palette()
+
         if self.borderofbox[0] == 'w': # white border of box means dark background
-            dialog.setStyleSheet("QLineEdit { background-color: f5f5f5;color: 050505; }")
+            dialog.setStyleSheet("background: black; color: white;")
+            dialog.setStyleSheet("QLineEdit { color: white; background-color: black; } QPushButton { background-color: #202020; color: white; }")
+            palette.setColor(QPalette.Background, QColor(5, 5, 5))
+            
+            # ok_button.setStyleSheet("background-color: #fafafa; color: #050505;")
+            # cancel_button.setStyleSheet("background-color: #fafafa; color: #050505;")
         else:
             dialog.setStyleSheet("background: 5f5f5f;color: f5f5f5;")
+            dialog.setStyleSheet("QLineEdit { color: black; background-color: white; }")
+            palette.setColor(QPalette.Background, QColor(250,250,250))
+        dialog.setLabelText(f"Enter Theme Name (existing themes: {tuple(self.settings.all_themes)}\n\ncan also be new themes)")
+        dialog.setWindowTitle("Theme name Picker")
+        dialog.setInputMode(QInputDialog.TextInput)
+        dialog.setPalette(palette)
         ok = dialog.exec_()
         self.theme = dialog.textValue()
         if ok and self.theme != "":
