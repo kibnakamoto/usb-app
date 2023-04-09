@@ -5,7 +5,6 @@ The file for Color Picker Window
 import sys
 import os
 
-from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QMessageBox, QColorDialog, \
                             QPushButton, QCheckBox, QGridLayout, QFrame, QInputDialog, QLabel
 from PyQt5.QtGui import QColor, QPalette
@@ -17,8 +16,9 @@ from misc.misc import rgbtohex, hextorgb
 class ColorWindow(QMainWindow):
     """ Default Class Initializer """
     def __init__(self, colors:list, names:tuple, bg_rgb:tuple=(0x00,0x00,0x00), settings=None,
-                 screensize=None):
+                 screensize=None, parent=None):
         super().__init__()
+        self.parent = parent
         pallete = QPalette()
         self.screensize = screensize
         if self.screensize != None:
@@ -40,8 +40,7 @@ class ColorWindow(QMainWindow):
         self.settings = settings
         self.closed_event = False
         self.saved = True
-        self.closed = pyqtSignal()
-        self.theme_text = QLabel(f"theme: {self.settings.theme}", self)
+        self.theme_text = QLabel(f"{self.settings.theme}", self)
 
     # custom color picker
     def color_set(self) -> None:
@@ -74,29 +73,29 @@ class ColorWindow(QMainWindow):
         self.setFixedWidth(self.width())
 
         # save button
-        save = QPushButton("Save Theme", self)
-        save.resize(save.sizeHint())
-        save.move(self.screensize.width()//3-save.width()-10, 10)
-        save.setToolTip("Save the Custom Theme")
-        save.clicked.connect(self.saver)
+        self.save = QPushButton("Save Theme", self)
+        self.save.resize(self.save.sizeHint())
+        self.save.move(self.screensize.width()//3-self.save.width()-10, 10)
+        self.save.setToolTip("Save the Custom Theme")
+        self.save.clicked.connect(self.saver)
 
         # color picker button
-        pick_color = QPushButton("RGB Color Picker", self)
-        pick_color.resize(pick_color.sizeHint())
-        pick_color.move(self.screensize.width()//3-10, 10)
-        self.setMinimumSize(pick_color.width()*10, pick_color.height()*10)
-        pick_color.setToolTip("set colors of selected checkboxes")
-        pick_color.clicked.connect(self.selector)
+        self.pick_color = QPushButton("RGB Color Picker", self)
+        self.pick_color.resize(self.pick_color.sizeHint())
+        self.pick_color.move(self.screensize.width()//3-10, 10)
+        self.setMinimumSize(self.pick_color.width()*10, self.pick_color.height()*10)
+        self.pick_color.setToolTip("set colors of selected checkboxes")
+        self.pick_color.clicked.connect(self.selector)
 
         # Input theme name
-        theme_button = QPushButton("Input Theme Name", self)
-        theme_button.resize(theme_button.sizeHint())
-        theme_button.move(self.screensize.width()//3+pick_color.width()-10, 10)
-        theme_button.setToolTip("Input the Theme Name Before Saving")
-        theme_button.clicked.connect(self.input_theme_name)
+        self.theme_button = QPushButton("Input Theme Name", self)
+        self.theme_button.resize(self.theme_button.sizeHint())
+        self.theme_button.move(self.screensize.width()//3+self.pick_color.width()-10, 10)
+        self.theme_button.setToolTip("Input the Theme Name Before Saving")
+        self.theme_button.clicked.connect(self.input_theme_name)
 
         if self.borderofbox[0] == 'w': # white border of box means dark background
-            save.setStyleSheet("""
+            self.save.setStyleSheet("""
                 QPushButton {
                     background-color: #9f9f9f;
                     color: #ffffff;
@@ -106,7 +105,7 @@ class ColorWindow(QMainWindow):
                     color: #f1f1f1;
                 }
             """)
-            pick_color.setStyleSheet("""
+            self.pick_color.setStyleSheet("""
                 QPushButton {
                     background-color: #9f9f9f;
                     color: #ffffff;
@@ -116,7 +115,7 @@ class ColorWindow(QMainWindow):
                     color: #f1f1f1;
                 }
             """)
-            theme_button.setStyleSheet("""
+            self.theme_button.setStyleSheet("""
                 QPushButton {
                     background-color: #9f9f9f;
                     color: #ffffff;
@@ -127,7 +126,7 @@ class ColorWindow(QMainWindow):
                 }
             """)
         else:
-            save.setStyleSheet("""
+            self.save.setStyleSheet("""
                 QPushButton {
                     background-color: #efefef;
                     color: #000000;
@@ -137,7 +136,7 @@ class ColorWindow(QMainWindow):
                     color: #f1f1f1;
                 }
             """)
-            pick_color.setStyleSheet("""
+            self.pick_color.setStyleSheet("""
                 QPushButton {
                     background-color: #efefef;
                     color: #000000;
@@ -147,7 +146,7 @@ class ColorWindow(QMainWindow):
                     color: #f1f1f1;
                 }
             """)
-            theme_button.setStyleSheet("""
+            self.theme_button.setStyleSheet("""
                 QPushButton {
                     background-color: #efefef;
                     color: #000000;
@@ -158,10 +157,21 @@ class ColorWindow(QMainWindow):
                 }
             """)
 
-        self.theme_text.setText(f"theme: {self.settings.theme}")
+        self.theme_text.setText(f"selected theme: {self.settings.theme}")
+        self.theme_text.resize(self.theme_text.sizeHint())
         self.theme_text.setGeometry((self.width() - self.theme_text.width()) // 2, (self.height() -
                                                                                     self.theme_text.height()) // 2,
                                     self.theme_text.width(), self.theme_text.height())
+
+    # resize window if moved
+    def resizeEvent(self, event):
+        # resize theme_text
+        size = self.size()
+        text_size = self.theme_text.sizeHint()
+        self.theme_text.move((size.width() - text_size.width()) // 2, (size.height() - text_size.height()) // 2)
+        self.save.move((size.width() - self.save.sizeHint().width()) // 2 - int(self.pick_color.sizeHint().width()/1.03), 10)
+        self.pick_color.move((size.width() - self.pick_color.sizeHint().width()) // 2 - self.save.sizeHint().width()//7, 10)
+        self.theme_button.move((size.width() - self.theme_button.sizeHint().width()) // 2 + int(self.pick_color.sizeHint().width()/1.03), 10)
 
     # return colors as rgb
     def rgb(self) -> tuple:
@@ -195,6 +205,27 @@ class ColorWindow(QMainWindow):
             self.settings.set_colors()
             self.settings.save()
             self.saved = True
+
+            # save the changes to the parent function
+            self.parent.settings.set_theme() # update theme
+    
+            # set background color
+            bg_color_h = rgbtohex(colors[-4]) # codespace/textbubble color
+            bg_color_sidebar = rgbtohex(colors[-2]) # background of sidebar color
+            color_sidebar = rgbtohex(colors[-1]) # text of sidebar color
+            pallete = QPalette()
+            pallete.setColor(QPalette.Window, QColor(colors[-3][0], colors[-3][1], colors[-3][2]))
+            self.parent.setPalette(pallete) # set background color
+            self.parent.codespace.setStyleSheet(f"background-color: #{bg_color_h};") # codespace color
+            self.parent.tree.setStyleSheet(f"background-color: #{bg_color_sidebar};color: #{color_sidebar}") # filebar color
+    
+            # set text color
+            code_palette = self.codespace.palette()
+            code_palette.setColor(QPalette.Text, QColor(colors[-5][0], colors[-5][1], colors[-5][2]))
+            self.parent.codespace.setPalette(code_palette)
+            self.parent.rgb = colors[-3]
+            self.parent.colors = colors
+            self.parent.set_theme() # sets icons and text color based on how dark the background is
             QMessageBox.question(None, 'Save Theme', "Saved Theme", QMessageBox.Ok)
 
     def input_theme_name(self) -> None:
@@ -217,7 +248,8 @@ class ColorWindow(QMainWindow):
         self.theme = dialog.textValue()
         if ok and self.theme != "":
             if self.theme in self.settings.all_themes: # if selected theme exists
-                __exit = QMessageBox.question(None, 'Theme Selector', "An existing theme is selected, the selected colors won't be automatically saved and the configuration of the newly selected theme will turn active, do you want to continue?",
+                __exit = QMessageBox.question(None, 'Theme Selector',
+                                              "An existing theme is selected, the selected colors won't be automatically saved and the configuration of the newly selected theme will turn active, do you want to continue?",
                                               QMessageBox.No|QMessageBox.Yes)
                 if __exit == QMessageBox.Yes:
                     # set properties of existing theme, if theme was modified, it won't be saved
@@ -229,7 +261,7 @@ class ColorWindow(QMainWindow):
                     self.settings.theme = self.theme
                     self.saved = True
                     self.close()
-                    self = ColorWindow(self.colors, self.names, self.bg_rgb, self.settings, self.screensize)
+                    self.__init__(self.colors, self.names, self.bg_rgb, self.settings, self.screensize, self.parent)
                     self.color_set()
                     self.show()
             else:
@@ -242,21 +274,18 @@ class ColorWindow(QMainWindow):
             if __exit == QMessageBox.Yes:
                 self.saver()
                 self.closed_event = True
-                self.closed.emit(1)
                 event.accept()
             else:
                 msg = QMessageBox.question(None, 'Exit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
                 if msg == QMessageBox.Yes:
                     self.closed_event = True
-                    self.closed.emit(1)
                     event.accept()
                 elif msg == QMessageBox.Save:
                     self.saver()
                     self.closed_event = True
-                    self.closed.emit(1)
                     event.accept()
                 else:
                     event.ignore()
         else:
+            self.closed_event = True
             event.accept()
-            self.closed.emit(1)

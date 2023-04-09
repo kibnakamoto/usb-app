@@ -308,7 +308,7 @@ class IDE(QMainWindow, QWidget):
         code_palette.setColor(QPalette.Text, QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]))
         self.codespace.setPalette(code_palette)
         self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text};")
-        self.codespace.textChanged.connect(self.ifTyped)
+        self.codespace.textChanged.connect(self.if_typed)
         self.change_count = 0 # amount of changes made
 
         # initialize files
@@ -373,7 +373,7 @@ class IDE(QMainWindow, QWidget):
         dock.setWidget(widget)
 
         # add all themes to toolbar
-        to_load = self.settings.all_themes
+        to_load = self.settings.all_themes[:]
         to_load.remove("black") # these 2 themes are exclusively added
         to_load.remove("white") 
         for i in to_load:
@@ -463,7 +463,7 @@ class IDE(QMainWindow, QWidget):
         except FileNotFoundError:
             print("payload not found")
 
-    def ifTyped(self):
+    def if_typed(self):
         if self.change_count != 0:
             self.saved = False
         self.change_count+=1
@@ -576,43 +576,16 @@ class IDE(QMainWindow, QWidget):
         self.codespace.setPalette(code_palette)
 
     # set custom theme for background, and text
-    def custom_theme(self):
+    def custom_theme(self) -> None:
         # colors to modify: self.rgb, self.colors, codespace background color, codespace pallet for text
         names =  ('comment', 'starting keywords', 'F-keys', "shortcut keys", "arrows", "windows", "chars",
                   "uncommon", "numbers", "text", "textbubble", "background", "background filebar", "filebar text")
         colors = list(self.colors)
-        bg_color_h = rgbtohex(colors[-4]) # codespace/textbubble color
-        bg_color_sidebar = rgbtohex(colors[-2]) # background of sidebar color
-        color_sidebar = rgbtohex(colors[-1]) # text of sidebar color
-        self.color = ColorWindow(colors, names, self.rgb, self.settings, self.screensize)
+        self.color = ColorWindow(colors, names, self.rgb, self.settings, self.screensize, self)
         self.color.color_set()
         self.color.show()
 
-        # when second window is closed
-        def when_closed() -> None:
-            self.settings.set_theme() # update theme
-            colors = [self.settings.comment, self.settings.starting_keywords, self.settings.fkeys,
-                      self.settings.shortcuts, self.settings.arrows, self.settings.windows,
-                      self.settings.chars, self.settings.uncommon, self.settings.numbers, self.settings.text,
-                      self.settings.textbubble, self.settings.bg,  self.settings.bg_sidebar, self.settings.color_sidebar] # 12 colors
-
-            # set background color
-            pallete = QPalette()
-            pallete.setColor(QPalette.Window, QColor(colors[-3][0], colors[-3][1], colors[-3][2]))
-            self.setPalette(pallete) # set background color
-            self.codespace.setStyleSheet(f"background-color: #{bg_color_h};") # codespace color
-            self.tree.setStyleSheet(f"background-color: #{bg_color_sidebar};color: #{color_sidebar}") # filebar color
-
-            # set text color
-            code_palette = self.codespace.palette()
-            code_palette.setColor(QPalette.Text, QColor(colors[-5][0], colors[-5][1], colors[-5][2]))
-            self.codespace.setPalette(code_palette)
-            self.rgb = colors[-3]
-            self.colors = colors
-            self.set_theme() # sets icons and text color based on how dark the background is
-        self.color.closed.connect(when_closed) # use the current theme
-
-    def closeEvent(self, event):
+    def closeEvent(self, event) -> None:
         if not self.saved: # warn user if not saved
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
