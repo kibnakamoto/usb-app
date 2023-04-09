@@ -255,7 +255,7 @@ class IDE(QMainWindow, QWidget):
         paste_act = QAction('&Paste', self)
         cut_act = QAction('&Cut', self)
         quit_act = QAction('&Quit', self)
-        theme_menu = view_menu.addMenu(QIcon("pictures/theme.png"), 'Theme')
+        self.theme_menu = view_menu.addMenu(QIcon("pictures/theme.png"), 'Theme')
 
         edit_menu = main_menu.addMenu(QIcon(self.view_theme[0]), 'Edit')
         save_act = QAction('&Save', self)
@@ -292,9 +292,9 @@ class IDE(QMainWindow, QWidget):
         themeb_act.triggered.connect(self.black_theme)
         themew_act.triggered.connect(self.white_theme)
         theme_act.triggered.connect(self.custom_theme)
-        theme_menu.addAction(themeb_act)
-        theme_menu.addAction(themew_act)
-        theme_menu.addAction(theme_act)
+        self.theme_menu.addAction(themeb_act)
+        self.theme_menu.addAction(themew_act)
+        self.theme_menu.addAction(theme_act)
 
         # add codespace to write code
         self.wg = QWidget(self)
@@ -371,6 +371,16 @@ class IDE(QMainWindow, QWidget):
 
         # Set the widget as the content of the dock widget
         dock.setWidget(widget)
+
+        # add all themes to toolbar
+        to_load = self.settings.all_themes
+        to_load.remove("black") # these 2 themes are exclusively added
+        to_load.remove("white") 
+        for i in to_load:
+            self.iter_theme = i
+            act = QAction(i, self)
+            act.triggered.connect(self.load_theme)
+            self.theme_menu.addAction(act)
 
     def __line_widget_line_count_changed(self):
         if self.line:
@@ -520,6 +530,21 @@ class IDE(QMainWindow, QWidget):
         else:
             sys.exit(0)
 
+    # load themes
+    def load_theme(self):
+        self.settings.set_theme(self.iter_theme)
+        self.rgb = hextorgb(self.settings.bg)
+        pallete = QPalette()
+        pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
+        self.setPalette(pallete)
+        self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text}")
+        self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}") # filebar color
+        self.set_theme()
+        self.parse_line()
+        code_palette = self.codespace.palette()
+        code_palette.setColor(QPalette.Text, QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]))
+        self.codespace.setPalette(code_palette)
+
     # set black theme
     def black_theme(self):
         self.settings.set_theme("black")
@@ -608,8 +633,6 @@ class IDE(QMainWindow, QWidget):
                 self.settings.settings['current file'] = self.current_payload
                 json.dump(self.settings.settings, f, indent=4)
             event.accept()
-
-
 
     # add another duckyscript file
     # https://github.com/dbisu/pico-ducky#multiple-payloads
