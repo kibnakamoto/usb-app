@@ -61,7 +61,7 @@ class Settings:
         if not self.theme in self.settings["colors"][0].keys():
             self.settings["colors"][0][self.theme] = properties
             self.set_colors()
-        else:
+        else: # if it doesn't exists
             if properties != self.settings["colors"][0][self.theme]: # if settings don't have the new properties
                 __exit = QMessageBox.question(None, 'Theme Creator', "The selected theme exists\nWould you like to ovveride it?", QMessageBox.No|QMessageBox.Yes)
                 if __exit == QMessageBox.Yes:

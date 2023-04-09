@@ -5,8 +5,9 @@ The file for Color Picker Window
 import sys
 import os
 
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QMessageBox, QColorDialog, \
-                            QPushButton, QCheckBox, QGridLayout, QFrame, QInputDialog
+                            QPushButton, QCheckBox, QGridLayout, QFrame, QInputDialog, QLabel
 from PyQt5.QtGui import QColor, QPalette
 
 sys.path.append(os.path.abspath(".."))
@@ -39,6 +40,8 @@ class ColorWindow(QMainWindow):
         self.settings = settings
         self.closed_event = False
         self.saved = True
+        self.closed = pyqtSignal()
+        self.theme_text = QLabel(f"theme: {self.settings.theme}", self)
 
     # custom color picker
     def color_set(self) -> None:
@@ -155,6 +158,11 @@ class ColorWindow(QMainWindow):
                 }
             """)
 
+        self.theme_text.setText(f"theme: {self.settings.theme}")
+        self.theme_text.setGeometry((self.width() - self.theme_text.width()) // 2, (self.height() -
+                                                                                    self.theme_text.height()) // 2,
+                                    self.theme_text.width(), self.theme_text.height())
+
     # return colors as rgb
     def rgb(self) -> tuple:
         rgbs = tuple([hextorgb(i) for i in self.colors])
@@ -197,9 +205,6 @@ class ColorWindow(QMainWindow):
             dialog.setStyleSheet("background: black; color: white;")
             dialog.setStyleSheet("QLineEdit { color: white; background-color: black; } QPushButton { background-color: #202020; color: white; }")
             palette.setColor(QPalette.Background, QColor(5, 5, 5))
-            
-            # ok_button.setStyleSheet("background-color: #fafafa; color: #050505;")
-            # cancel_button.setStyleSheet("background-color: #fafafa; color: #050505;")
         else:
             dialog.setStyleSheet("background: 5f5f5f;color: f5f5f5;")
             dialog.setStyleSheet("QLineEdit { color: black; background-color: white; }")
@@ -211,7 +216,25 @@ class ColorWindow(QMainWindow):
         ok = dialog.exec_()
         self.theme = dialog.textValue()
         if ok and self.theme != "":
-            self.settings.theme = self.theme
+            if self.theme in self.settings.all_themes: # if selected theme exists
+                __exit = QMessageBox.question(None, 'Theme Selector', "An existing theme is selected, the selected colors won't be automatically saved and the configuration of the newly selected theme will turn active, do you want to continue?",
+                                              QMessageBox.No|QMessageBox.Yes)
+                if __exit == QMessageBox.Yes:
+                    # set properties of existing theme, if theme was modified, it won't be saved
+                    self.settings.set_theme(self.theme)
+                    self.colors = [self.settings.comment, self.settings.starting_keywords, self.settings.fkeys,
+                                   self.settings.shortcuts, self.settings.arrows, self.settings.windows,
+                                   self.settings.chars, self.settings.uncommon, self.settings.numbers, self.settings.text,
+                                   self.settings.textbubble, self.settings.bg,  self.settings.bg_sidebar, self.settings.color_sidebar] # 12 colors
+                    self.settings.theme = self.theme
+                    self.saved = True
+                    self.close()
+                    self = ColorWindow(self.colors, self.names, self.bg_rgb, self.settings, self.screensize)
+                    self.color_set()
+                    self.show()
+            else:
+                self.settings.theme = self.theme
+
 
     def closeEvent(self, event) -> None:
         if not self.saved:
@@ -219,17 +242,21 @@ class ColorWindow(QMainWindow):
             if __exit == QMessageBox.Yes:
                 self.saver()
                 self.closed_event = True
+                self.closed.emit(1)
                 event.accept()
             else:
                 msg = QMessageBox.question(None, 'Exit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
                 if msg == QMessageBox.Yes:
                     self.closed_event = True
+                    self.closed.emit(1)
                     event.accept()
                 elif msg == QMessageBox.Save:
                     self.saver()
                     self.closed_event = True
+                    self.closed.emit(1)
                     event.accept()
                 else:
                     event.ignore()
         else:
             event.accept()
+            self.closed.emit(1)
