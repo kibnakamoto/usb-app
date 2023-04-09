@@ -36,7 +36,7 @@ class ColorWindow(QMainWindow):
         self.names = names
         self.bg_rgb = bg_rgb
         self.rows = 2
-        self.columns = 6
+        self.columns = 7
         self.settings = settings
         self.closed_event = False
         self.saved = True
@@ -210,22 +210,22 @@ class ColorWindow(QMainWindow):
             self.parent.settings.set_theme() # update theme
     
             # set background color
-            bg_color_h = rgbtohex(colors[-4]) # codespace/textbubble color
-            bg_color_sidebar = rgbtohex(colors[-2]) # background of sidebar color
-            color_sidebar = rgbtohex(colors[-1]) # text of sidebar color
             pallete = QPalette()
-            pallete.setColor(QPalette.Window, QColor(colors[-3][0], colors[-3][1], colors[-3][2]))
+            tmp = hextorgb(colors[-3])
+            pallete.setColor(QPalette.Window, QColor(tmp[0], tmp[1], tmp[2]))
             self.parent.setPalette(pallete) # set background color
-            self.parent.codespace.setStyleSheet(f"background-color: #{bg_color_h};") # codespace color
-            self.parent.tree.setStyleSheet(f"background-color: #{bg_color_sidebar};color: #{color_sidebar}") # filebar color
+            self.parent.codespace.setStyleSheet(f"background-color: #{colors[-4]};") # codespace color
+            self.parent.tree.setStyleSheet(f"background-color: #{colors[-2]};color: #{colors[-1]}") # filebar color
     
             # set text color
-            code_palette = self.codespace.palette()
-            code_palette.setColor(QPalette.Text, QColor(colors[-5][0], colors[-5][1], colors[-5][2]))
+            code_palette = self.parent.codespace.palette()
+            tmp = hextorgb(colors[-5])
+            code_palette.setColor(QPalette.Text, QColor(tmp[0], tmp[1], tmp[2]))
             self.parent.codespace.setPalette(code_palette)
-            self.parent.rgb = colors[-3]
-            self.parent.colors = colors
+            self.parent.rgb = hextorgb(colors[-3])
+            self.parent.colors = self.rgb()
             self.parent.set_theme() # sets icons and text color based on how dark the background is
+            self.parent.parse_line()
             QMessageBox.question(None, 'Save Theme', "Saved Theme", QMessageBox.Ok)
 
     def input_theme_name(self) -> None:
@@ -249,7 +249,7 @@ class ColorWindow(QMainWindow):
         if ok and self.theme != "":
             if self.theme in self.settings.all_themes: # if selected theme exists
                 __exit = QMessageBox.question(None, 'Theme Selector',
-                                              "An existing theme is selected, the selected colors won't be automatically saved and the configuration of the newly selected theme will turn active, do you want to continue?",
+                                              "An existing theme is selected, if the current theme is modified, it won't be automatically saved, would you like to continue?",
                                               QMessageBox.No|QMessageBox.Yes)
                 if __exit == QMessageBox.Yes:
                     # set properties of existing theme, if theme was modified, it won't be saved
@@ -259,6 +259,8 @@ class ColorWindow(QMainWindow):
                                    self.settings.chars, self.settings.uncommon, self.settings.numbers, self.settings.text,
                                    self.settings.textbubble, self.settings.bg,  self.settings.bg_sidebar, self.settings.color_sidebar] # 12 colors
                     self.settings.theme = self.theme
+                    self.theme_text.setText(f"selected theme: {self.settings.theme}")
+                    self.theme_text.resize(self.theme_text.sizeHint())
                     self.saved = True
                     self.close()
                     self.__init__(self.colors, self.names, self.bg_rgb, self.settings, self.screensize, self.parent)
@@ -266,6 +268,8 @@ class ColorWindow(QMainWindow):
                     self.show()
             else:
                 self.settings.theme = self.theme
+                self.theme_text.setText(f"selected theme: {self.settings.theme}")
+                self.theme_text.resize(self.theme_text.sizeHint())
 
 
     def closeEvent(self, event) -> None:

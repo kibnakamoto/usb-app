@@ -488,13 +488,20 @@ class IDE(QMainWindow, QWidget):
         if color_is_dark:
             self.pngs = self.black_bk_pngs
             self.view_theme = self.view_black
-            self.colors = ITEXT_COLORS_DARK
             self.exit_png = self.exit_black
         else:
             self.pngs = self.white_bk_pngs
             self.view_theme = self.view_white
-            self.colors = ITEXT_COLORS_LIGHT
             self.exit_png = self.exit_white
+        self.colors = [self.settings.comment, self.settings.starting_keywords, self.settings.fkeys,
+                       self.settings.shortcuts, self.settings.arrows, self.settings.windows,
+                       self.settings.chars, self.settings.uncommon, self.settings.numbers,
+                       self.settings.text, self.settings.textbubble, self.settings.bg,
+                       self.settings.bg_sidebar, self.settings.color_sidebar] # 12 colors
+
+        # convert all hex colors to rgb
+        for i in range(len(self.colors)):
+            self.colors[i] = hextorgb(self.colors[i])
 
     # CTRL+C
     def copier(self):
