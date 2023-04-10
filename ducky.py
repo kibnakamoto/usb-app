@@ -441,7 +441,7 @@ class IDE(QMainWindow, QWidget):
     def load_payload(self):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
-        file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", options)[0]
+        file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", QFileDialog.DontUseNativeDialog)[0][0]
         if not file.startswith(self.path): # if path is different, copy it to the path
             payloads_count = len(os.listdir(self.path+"/payloads"))-1
             if payloads_count == 0:
