@@ -230,12 +230,14 @@ class IDE(QMainWindow, QWidget):
         self.rgb = hextorgb(self.settings.bg)
         self.set_theme()
 
+        self.app = app
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
         self.setPalette(pallete)
         self.setWindowTitle("DuckScript IDE & Compiler")
+        self.setWindowIcon(QIcon("pictures/logo.png"))
+        self.app.setApplicationName("Duckyscript IDE")
         main_menu = self.menuBar()
-        self.app = app
 
         toolbar = QToolBar("Editor toolbar")
         toolbar.setIconSize(QSize(22,22))
@@ -381,6 +383,7 @@ class IDE(QMainWindow, QWidget):
             act = QAction(i, self)
             act.triggered.connect(self.load_theme)
             self.theme_menu.addAction(act)
+
 
     def __line_widget_line_count_changed(self):
         if self.line:
