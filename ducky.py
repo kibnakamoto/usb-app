@@ -412,8 +412,34 @@ class IDE(QMainWindow, QWidget):
             }}
 
             QComboBox:!editable:on, QComboBox::drop-down:editable:on {{
-                 background: #{self.settings.color_sidebar};
-                 color: #{self.settings.bg_sidebar};
+                 background: #555555;
+                 color: #ffffff;
+            }}
+
+            QComboBox:focus, QComboBox:focus QListView  {{
+                 background: #07035C;
+                 color: #ffffff;
+            }}
+        """)
+
+        self.languages.setStyleSheet(f"""
+            QComboBox {{
+                padding: 1px 15px 1px 3px;
+            }}
+
+            QComboBox:!editable, QComboBox::drop-down:editable {{
+                 background: #{self.settings.bg_sidebar};
+                 color: #{self.settings.color_sidebar};
+            }}
+
+            QComboBox:!editable:on, QComboBox::drop-down:editable:on {{
+                 background: #555555;
+                 color: #ffffff;
+            }}
+
+            QComboBox:focus, QComboBox:focus QListView  {{
+                 background: #07035C;
+                 color: #ffffff;
             }}
         """)
 
@@ -438,7 +464,7 @@ class IDE(QMainWindow, QWidget):
         self.languages.setToolTip("select target device Keyboard Language")
         self.languages.currentIndexChanged.connect(self.selected_lang)
 
-
+    # if language is selected
     def selected_lang(self, index):
         self.target_lang = self.languages.itemText(index)
         self.settings.target_language = self.target_lang
