@@ -12,7 +12,7 @@ import json
 from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QDir
 from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QTextEdit,  \
                             QHBoxLayout, QSizePolicy, QWidget, QMessageBox, \
-                            QDockWidget, QFileDialog, QFileSystemModel, QTreeView
+                            QDockWidget, QFileDialog, QFileSystemModel, QTreeView, QComboBox
 from PyQt5.QtGui import QIcon, QColor, QTextCharFormat, QFont, QSyntaxHighlighter, \
                         QPalette, QTextCursor
 from pyqt_line_number_widget import LineNumberWidget
@@ -22,8 +22,7 @@ from misc.colorwindow import ColorWindow
 from misc.misc import hextorgb, rgbtohex
 from settings import Settings
 
-target_os = "windows" # windows or mac
-keyboard_lang = "us" # target keyboard language, default is us
+SUPPORTED_OSS = ("windows", "mac") # currently
 
 # Initialize Duckyscript keywords to color code the ones written to the textbox
 DUCKYSCRIPT_COMMENT = ("REM")
@@ -39,7 +38,6 @@ DUCKYSCRIPT_UNCOMMON = ("APP", "MENU", "BREAK", "PAUSE", "DELETE", "END", "HOME"
                         "PAGEUP", "PAGEDOWN", "PRINTSCREEN", "SCROLLLOCK")
 
 # TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
-# TODO: Make button for selecting target os and target keyboard language
 
 class Setup(QMainWindow):
     """ Default Class Initializer """
@@ -336,10 +334,6 @@ class IDE(QMainWindow, QWidget):
         # color code
         self.parse_line()
 
-        # Create a toolbar
-        toolbar = QToolBar("Sidebar", self)
-        self.addToolBar(toolbar)
-
         # Create a dock widget                                                                                
         self.layout = QHBoxLayout()
         dock = QDockWidget("Sidebar", self)
@@ -384,6 +378,71 @@ class IDE(QMainWindow, QWidget):
             act.triggered.connect(self.load_theme)
             self.theme_menu.addAction(act)
 
+        # target device os and language
+        self.target_os = "windows"
+        self.target_lang = "us"
+
+        # Operating System Selector
+        self.select_os = QComboBox()
+        for OS in SUPPORTED_OSS: # Supported Operating Systems
+            self.select_os.addItem(OS)
+        self.select_os.currentIndexChanged.connect(self.selected_os)
+
+        # Language Selector
+        self.keyboard_languages = language.LANGUAGES_WIN[:]
+        self.languages = QComboBox()
+        for lang in self.keyboard_languages:
+            self.languages.addItem(lang)
+        self.select_os.setToolTip("select target device OS")
+        self.languages.setToolTip("select target device Keyboard Language")
+        self.languages.currentIndexChanged.connect(self.selected_lang)
+
+        # set colors of target language and OS selector
+        # self.select_os.setStyleSheet(f"background-color: {self.settings.bg_sidebar}; color: {self.settings.color_sidebar};")
+        # self.languages.setStyleSheet(f"background: {self.settings.bg_sidebar}; color: {self.settings.color_sidebar};")
+
+        self.select_os.setStyleSheet(f"""
+            QComboBox {{
+                padding: 1px 15px 1px 3px;
+            }}
+
+            QComboBox:!editable, QComboBox::drop-down:editable {{
+                 background: #{self.settings.bg_sidebar};
+                 color: #{self.settings.color_sidebar};
+            }}
+
+            QComboBox:!editable:on, QComboBox::drop-down:editable:on {{
+                 background: #{self.settings.color_sidebar};
+                 color: #{self.settings.bg_sidebar};
+            }}
+        """)
+
+        # add target info selector to toolbar
+        toolbar.addWidget(self.select_os)
+        toolbar.addWidget(self.languages)
+
+    # if os selected
+    def selected_os(self, index):
+        self.target_os = self.select_os.itemText(index)
+        self.settings.target_os = self.target_os
+        self.settings.settings["last os"] = self.target_os
+        if self.target_os == "mac":
+            self.keyboard_languages = language.LANGUAGES_MAC[:]
+        elif self.target_os == "windows":
+            self.keyboard_languages = language.LANGUAGES_WIN[:]
+
+        # reset languages and put the ones for the newly chosen OS
+        self.languages.clear()
+        for lang in self.keyboard_languages:
+            self.languages.addItem(lang)
+        self.languages.setToolTip("select target device Keyboard Language")
+        self.languages.currentIndexChanged.connect(self.selected_lang)
+
+
+    def selected_lang(self, index):
+        self.target_lang = self.languages.itemText(index)
+        self.settings.target_language = self.target_lang
+        self.settings.settings["last language"] = self.target_lang
 
     def __line_widget_line_count_changed(self):
         if self.line:

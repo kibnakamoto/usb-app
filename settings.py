@@ -18,6 +18,8 @@ class Settings:
             self.settings = json.load(f)
         self.cf = self.settings["current file"]
         self.theme = self.settings["last color"]
+        self.target_os = self.settings["last os"]
+        self.target_language = self.settings["last language"]
         self.all_themes = list(self.settings["colors"][0].keys()) # name of all themes
 
     # select theme (has to be already existing)
