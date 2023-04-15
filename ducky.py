@@ -226,6 +226,26 @@ class IDE(QMainWindow, QWidget):
         self.settings = Settings()
         self.settings.set_colors()
         self.rgb = hextorgb(self.settings.bg)
+
+        # target device os and language
+        self.target_os = "windows"
+        self.target_lang = "us"
+
+        # Operating System Selector
+        self.select_os = QComboBox()
+        for OS in SUPPORTED_OSS: # Supported Operating Systems
+            self.select_os.addItem(OS)
+        self.select_os.currentIndexChanged.connect(self.selected_os)
+
+        # Language Selector
+        self.keyboard_languages = language.LANGUAGES_WIN[:]
+        self.languages = QComboBox()
+        for lang in self.keyboard_languages:
+            self.languages.addItem(lang)
+        self.select_os.setToolTip("select target device OS")
+        self.languages.setToolTip("select target device Keyboard Language")
+        self.languages.currentIndexChanged.connect(self.selected_lang)
+
         self.set_theme()
 
         self.app = app
@@ -378,71 +398,6 @@ class IDE(QMainWindow, QWidget):
             act.triggered.connect(self.load_theme)
             self.theme_menu.addAction(act)
 
-        # target device os and language
-        self.target_os = "windows"
-        self.target_lang = "us"
-
-        # Operating System Selector
-        self.select_os = QComboBox()
-        for OS in SUPPORTED_OSS: # Supported Operating Systems
-            self.select_os.addItem(OS)
-        self.select_os.currentIndexChanged.connect(self.selected_os)
-
-        # Language Selector
-        self.keyboard_languages = language.LANGUAGES_WIN[:]
-        self.languages = QComboBox()
-        for lang in self.keyboard_languages:
-            self.languages.addItem(lang)
-        self.select_os.setToolTip("select target device OS")
-        self.languages.setToolTip("select target device Keyboard Language")
-        self.languages.currentIndexChanged.connect(self.selected_lang)
-
-        # set colors of target language and OS selector
-        # self.select_os.setStyleSheet(f"background-color: {self.settings.bg_sidebar}; color: {self.settings.color_sidebar};")
-        # self.languages.setStyleSheet(f"background: {self.settings.bg_sidebar}; color: {self.settings.color_sidebar};")
-
-        self.select_os.setStyleSheet(f"""
-            QComboBox {{
-                padding: 1px 15px 1px 3px;
-            }}
-
-            QComboBox:!editable, QComboBox::drop-down:editable {{
-                 background: #{self.settings.bg_sidebar};
-                 color: #{self.settings.color_sidebar};
-            }}
-
-            QComboBox:!editable:on, QComboBox::drop-down:editable:on {{
-                 background: #555555;
-                 color: #ffffff;
-            }}
-
-            QComboBox:focus, QComboBox:focus QListView  {{
-                 background: #07035C;
-                 color: #ffffff;
-            }}
-        """)
-
-        self.languages.setStyleSheet(f"""
-            QComboBox {{
-                padding: 1px 15px 1px 3px;
-            }}
-
-            QComboBox:!editable, QComboBox::drop-down:editable {{
-                 background: #{self.settings.bg_sidebar};
-                 color: #{self.settings.color_sidebar};
-            }}
-
-            QComboBox:!editable:on, QComboBox::drop-down:editable:on {{
-                 background: #555555;
-                 color: #ffffff;
-            }}
-
-            QComboBox:focus, QComboBox:focus QListView  {{
-                 background: #07035C;
-                 color: #ffffff;
-            }}
-        """)
-
         # add target info selector to toolbar
         toolbar.addWidget(self.select_os)
         toolbar.addWidget(self.languages)
@@ -577,10 +532,56 @@ class IDE(QMainWindow, QWidget):
             self.pngs = self.black_bk_pngs
             self.view_theme = self.view_black
             self.exit_png = self.exit_black
+
+            self.select_os.setStyleSheet(f"""
+                QComboBox {{
+                    padding: 1px 15px 1px 3px;
+                }}
+
+                QComboBox:!editable, QComboBox::drop-down:editable {{
+                     background: #{self.settings.bg_sidebar};
+                     color: #{self.settings.color_sidebar};
+                }}
+
+                QComboBox:!editable:on, QComboBox::drop-down:editable:on {{
+                     background: #555555;
+                     color: #ffffff;
+                }}
+
+                QComboBox:focus, QComboBox:focus QListView  {{
+                     background: #07035C;
+                     color: #ffffff;
+                }}
+            """)
+
+            self.languages.setStyleSheet(f"""
+                QComboBox {{
+                    padding: 1px 15px 1px 3px;
+                }}
+
+                QComboBox:!editable, QComboBox::drop-down:editable {{
+                     background: #{self.settings.bg_sidebar};
+                     color: #{self.settings.color_sidebar};
+                }}
+
+                QComboBox:!editable:on, QComboBox::drop-down:editable:on {{
+                     background: #555555;
+                     color: #ffffff;
+                }}
+
+                QComboBox:focus, QComboBox:focus QListView  {{
+                     background: #07035C;
+                     color: #ffffff;
+                }}
+            """)
+
         else:
             self.pngs = self.white_bk_pngs
             self.view_theme = self.view_white
             self.exit_png = self.exit_white
+            self.select_os.setStyleSheet("")
+            self.languages.setStyleSheet("")
+
         self.colors = [self.settings.comment, self.settings.starting_keywords, self.settings.fkeys,
                        self.settings.shortcuts, self.settings.arrows, self.settings.windows,
                        self.settings.chars, self.settings.uncommon, self.settings.numbers,
@@ -669,6 +670,9 @@ class IDE(QMainWindow, QWidget):
         code_palette = self.codespace.palette()
         code_palette.setColor(QPalette.Text, QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2])) # textbubble color
         self.codespace.setPalette(code_palette)
+
+        self.select_os.setStyleSheet("")
+        self.languages.setStyleSheet("")
 
     # set custom theme for background, and text
     def custom_theme(self) -> None:
