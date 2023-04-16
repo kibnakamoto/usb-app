@@ -1,3 +1,10 @@
+"""
+miscallanious indipendant functions
+Author: Taha Canturk
+Github: Kibnakamoto
+Date: Apr 16, 2023
+"""
+
 # RGB to hex, accepts either one RGB tuple or r,g,b as seperate parameters
 def rgbtohex(r:tuple, g:int=None,b:int=None) -> str:
     value = 0

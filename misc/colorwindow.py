@@ -1,5 +1,8 @@
 """
 The file for Color Picker Window
+Author: Taha Canturk
+Github: Kibnakamoto
+Date: Apr 16, 2023
 """
 
 import sys
