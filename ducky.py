@@ -21,6 +21,7 @@ import language
 from misc.colorwindow import ColorWindow
 from misc.misc import hextorgb, rgbtohex
 from settings import Settings
+import setup
 
 SUPPORTED_OSS = ("windows", "mac") # currently
 

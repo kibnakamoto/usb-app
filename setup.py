@@ -11,6 +11,9 @@ from PyQt5.QtWidgets import QMainWindow, QApplication
 
 # TODO: provide instructions on what to do while enabling/disabling hacking mode
 
+# disable: press the button on the usb while plugging the usb in. After the USB shows up as a storage device. Execute the disable_h()
+# enable: nothing
+
 # Setup the Microcontoller for hacking (hacking usb) or default mode (Normal MicroController)
 class Setup(QMainWindow):
     """ Default Class Initializer """
@@ -48,7 +51,8 @@ class Setup(QMainWindow):
         # while holding the button, plug the usb in and run this code
         shutil.copy("{self.add_path}/flash_nuke.uf2", self.pico_path) # copy uf2 nuke to pico
 
-app = QApplication([])
-w = Setup("/media/kibnakamoto/RPI-RP2")
-w.show()
-app.exec_()
+if __name__ == '__main__':
+    app = QApplication([])
+    w = Setup("/media/kibnakamoto/RPI-RP2")
+    w.show()
+    app.exec_()
