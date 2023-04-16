@@ -9,6 +9,8 @@ import shutil
 from time import sleep
 from PyQt5.QtWidgets import QMainWindow, QApplication
 
+# TODO: provide instructions on what to do while enabling/disabling hacking mode
+
 # Setup the Microcontoller for hacking (hacking usb) or default mode (Normal MicroController)
 class Setup(QMainWindow):
     """ Default Class Initializer """
@@ -20,9 +22,9 @@ class Setup(QMainWindow):
         self.pico_path = pico_path
     
     # enable hacking mode
-    def enable_h(self) -> None:
+    def enable_h(self, hack_mode:bool=True) -> None:
         # upload the files onto the microcontoller
-        self.hack_mode = True
+        self.hack_mode = hack_mode
 
         # copy the uf2.uf2 file to the microcontroller and wait for it to reboot
         shutil.copy("{self.add_path}/uf2.uf2", self.pico_path) # copy file to pico
@@ -39,10 +41,12 @@ class Setup(QMainWindow):
             shutil.copy(f"{self.add_path}{file}", self.pico_path) # copy file to pico
 
     # disable hacking mode
-    def disable_h(self) -> None:
+    def disable_h(self, hack_mode:bool=False) -> None:
         # remove the uploaded files from the microcontroller
-        self.hack_mode = False
-        
+        self.hack_mode = hack_mode
+
+        # while holding the button, plug the usb in and run this code
+        shutil.copy("{self.add_path}/flash_nuke.uf2", self.pico_path) # copy uf2 nuke to pico
 
 app = QApplication([])
 w = Setup("/media/kibnakamoto/RPI-RP2")
