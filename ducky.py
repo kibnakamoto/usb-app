@@ -2,7 +2,7 @@
 GUI and compiler of duckyscript on a raspberry pi pico (w)
 @Author: Taha Canturk
 @Github: Kibnakamoto
-Date: Apr 7, 2023
+Date: Apr 16, 2023
 """
 
 import sys

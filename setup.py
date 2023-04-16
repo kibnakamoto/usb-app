@@ -1,7 +1,7 @@
 """
 @Author: Taha Canturk
 @Github: Kibnakamoto
-Date: Apr 8, 2023
+Date: Apr 16, 2023
 """
 
 import os
@@ -24,11 +24,20 @@ class Setup(QMainWindow):
         # upload the files onto the microcontoller
         self.hack_mode = True
 
-        # add uf2 file
-        shutil.copy("{self.add_path}/uf2.uf2", self.pico_path) # copy file to Downloads folder
+        # copy the uf2.uf2 file to the microcontroller and wait for it to reboot
+        shutil.copy("{self.add_path}/uf2.uf2", self.pico_path) # copy file to pico
         sleep(2.0) # wait for the uf2 file to be uploaded and microcontroller to reboot
-        
-        
+
+        # add all the lib files
+        lib_files = os.listdir(f"{self.add_path}lib")
+        for file in lib_files:
+            shutil.copy("{self.add_path}{file}", self.pico_path+"/lib") # copy file to pico
+
+        # add all the root files
+        root_files = os.listdir(f"{self.add_path}root")
+        for file in root_files:
+            shutil.copy("{self.add_path}{file}", self.pico_path) # copy file to pico
+
 
     # disable hacking mode
     def disable_h(self) -> None:
