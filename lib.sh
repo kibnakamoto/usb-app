@@ -1,4 +1,7 @@
 # This is a developer file for download lib folder content of the microcontroller
+# Author: Taha Canturk
+# Github: Kibnakamoto
+# Date: Apr 16, 2023
 
 # make sure the path is already usb-app. This will make sure commands won't run accidents
 if [path basename "$PWD" = "usb-app"]; then

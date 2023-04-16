@@ -1,4 +1,8 @@
 # add required files into root (This is for developer)
+# Author: Taha Canturk
+# Github: Kibnakamoto
+# Date: Apr 16, 2023
+
 if [path basename "$PWD" = "usb-app"]; then
 	cd pico-ducky/
 	git pull

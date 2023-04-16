@@ -37,8 +37,6 @@ DUCKYSCRIPT_CHARS = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
 DUCKYSCRIPT_UNCOMMON = ("APP", "MENU", "BREAK", "PAUSE", "DELETE", "END", "HOME", "INSERT", "NUMLOCK",
                         "PAGEUP", "PAGEDOWN", "PRINTSCREEN", "SCROLLLOCK")
 
-# TODO: make a setup function that downloads add_to_pico/* into the microcontroller for if the microcontroller was reset
-
 class Setup(QMainWindow):
     """ Default Class Initializer """
     def __init__(self):
