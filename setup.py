@@ -38,12 +38,11 @@ class Setup(QMainWindow):
         for file in root_files:
             shutil.copy("{self.add_path}{file}", self.pico_path) # copy file to pico
 
-
     # disable hacking mode
     def disable_h(self) -> None:
         # remove the uploaded files from the microcontroller
         self.hack_mode = False
-
+        
 
 app = QApplication([])
 w = Setup("/media/kibnakamoto/RPI-RP2")
