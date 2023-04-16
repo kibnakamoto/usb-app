@@ -31,12 +31,12 @@ class Setup(QMainWindow):
         # add all the lib files
         lib_files = os.listdir(f"{self.add_path}lib")
         for file in lib_files:
-            shutil.copy("{self.add_path}{file}", self.pico_path+"/lib") # copy file to pico
+            shutil.copy(f"{self.add_path}{file}", self.pico_path+"/lib") # copy file to pico
 
         # add all the root files
         root_files = os.listdir(f"{self.add_path}root")
         for file in root_files:
-            shutil.copy("{self.add_path}{file}", self.pico_path) # copy file to pico
+            shutil.copy(f"{self.add_path}{file}", self.pico_path) # copy file to pico
 
     # disable hacking mode
     def disable_h(self) -> None:
