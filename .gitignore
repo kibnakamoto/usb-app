@@ -6,3 +6,7 @@ payloads/
 
 # logs
 *.log
+
+# latex files
+*.aux
+*.dvi

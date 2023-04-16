@@ -1,2 +1,2 @@
-pdftex tutorial.tex
+pdflatex tutorial.tex
 evince tutrial.pdf
