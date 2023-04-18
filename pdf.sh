@@ -1,2 +1,3 @@
 pdflatex tutorial.tex
-evince tutrial.pdf
+pdflatex tutorial.tex
+evince tutorial.pdf

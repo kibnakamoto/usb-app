@@ -10,3 +10,6 @@ payloads/
 # latex files
 *.aux
 *.dvi
+*.lof
+*.lot
+*.toc
