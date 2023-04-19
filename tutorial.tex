@@ -8,7 +8,7 @@
 }
 
 \title{
-	\Huge Hacking USB - Raspberry Pi Pico\\
+	\Huge Hacking USB - USB Pico Ducky\\
 	\ \\
 	\Large Documentation \& Guide
 }
@@ -87,11 +87,25 @@ By downloading, installing and/or using the Program, You acknowledge that You ha
 
 \tableofcontents
 
-\large
+\normalsize
+
+\newpage
 
 \section{App}
 
+\subsection{What is the USB Pico Ducky}
+
+The USB Pico Ducky is a Hacking USB. The physical device is a Raspberry Pi Pico. A Hacking USB is a device that fools a computer into thinking it is an external input device such as a keyboard, this means that the computer is fooled into thinking that the user is typing while the usb is the one inputting keystrokes. Ask yourself, what can I do using an input device (e.g. Keyboard)? Whatever you can do using an inputer peripheral, you can do using USB Pico Ducky. If you want to, as mentioned in section \ref{hack_mode_off}, you can turn the hacking mode off and program the Raspberry Pi Pico as a normal microcontroller.
+
+This Application is an IDE (Integrated Development Environment) for Duckyscript. Duckyscript is a simple scripting language made by the company Hak5, originally known for the USB Rubber Ducky, which costs around \$130 CAD (plus tax \& fees).
+Even though the USB Rubber Ducky is more than double the price, the USB Rubber Ducky doesn't come with an IDE while the USB Pico Ducky does.
+
+This might seem too good to be true. but, there is one main difference,
+it's that only Duckyscript 1.0 is supported on a USB Pico Ducky while USB Rubber Ducky supports Duckyscript 3.0. This will not affect most users because Duckyscript 3.0 just provides extra keywords but the possibiltiies are just as endless without them.
+
 \subsection{How to use}
+
+\subsection{payloads}
 
 \subsection{Saving \& Editing}
 
@@ -126,17 +140,60 @@ By downloading, installing and/or using the Program, You acknowledge that You ha
 
 \subsubsection{When to Reset USB}
 
-\subsubsection{How to Reset USB}
+You can reset the USB at any time, all it takes is the click of a simple button in the Duckyscript IDE (on the toolbar). Resetting the USB turns hacking mode off. Section \ref{hack_mode_off} covers this area. You can also reset back to the USB Pico Ducky (hacking mode) as specified in more detail in section \ref{hack_mode_on}.
 
-\subsection{Hack Mode On}
+\subsubsection{How to Reset USB}\label{how_to_reset}
+
+\subsection{Hack Mode On}\label{hack_mode_on}
 
 \subsubsection{Duckyscript Language}
 
-\subsection{Hack Mode Off}
+\subsection{Hack Mode Off}\label{hack_mode_off}
 
-\subsubsection{C/C++ Language}
+\subsubsection{C/C++/MicroPython Language}\label{cc_lang}
+
+Here are some links on tutorials of these langauges for Raspberry Pi Pico
+
+\textbf{Windows Tutorials:}\\
+\indent\indent 1. \underline{\href{https://www.raspberrypi.com/news/raspberry-pi-pico-windows-installer/}{C Language}}
+
+\indent\indent 2. \underline{\href{https://www.raspberrypi.com/news/raspberry-pi-pico-windows-installer/}{C++ Language}}
+
+\indent\indent 3. \underline{\href{https://how2electronics.com/raspberry-pi-pico-getting-started-tutorial-with-micropython/}{MicroPython Langauge}}\\
+
+\textbf{Mac/Linux Tutorials:}
+
+% TODO: indent bullet point items
+
+\indent\indent 1. C Language:
+\begin{description}
+	\item[$\bullet$] \underline{\href{https://www.electronicshub.org/program-raspberry-pi-pico-using-c/}{Tutorial in Linux}}
+	\item[$\bullet$] \underline{\href{https://blog.smittytone.net/2021/02/02/program-raspberry-pi-pico-c-mac/}{Tutorial in Mac}}
+\end{description}
+
+\indent\indent 2. C++ Language:
+\begin{description}
+	\item[$\bullet$]\underline{\href{https://circuitdigest.com/microcontroller-projects/how-to-program-raspberry-pi-pico-using-c}{C++ Language in Linux}}
+	\item[$\bullet$]\underline{\href{https://www.peterzimon.com/raspberry-pi-pico-mac-c-getting-started/}{C++ Language in Mac}}
+\end{description}
+
+\indent\indent 3. MicroPython Language:
+\begin{description}
+	\item[$\bullet$]\underline{\href{https://circuitdigest.com/microcontroller-projects/getting-started-with-raspberry-pi-pico-with-micropython}{Python Language in Linux}}
+	\item[$\bullet$]\underline{\href{https://desertbot.io/blog/raspberry-pi-pico-setup-mac}{Python Language in Mac}}
+\end{description}
+
+\large
+\emph{\textbf{Other Helpful Sources:}}
+\normalsize
+\begin{description}
+	\item[$\bullet$] \underline{\url{https://how2electronics.com/raspberry-pi-pico-getting-started-tutorial-with-micropython/}}
+	\item[$\bullet$] \underline{\url{https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html}}
+\end{description}
 
 \subsubsection{Upload}
+
+The Duckyscript IDE doesn't have C/C++ support at this time. To use C/C++ on the USB Pico Ducky. First, reset the USB as mentioned in section \ref{how_to_reset}, then use a different IDE/texteditor to write a C/C++ program. You can reserach for more information in section \ref{cc_lang}.
 
 \pagenumbering{roman}
 
