@@ -222,6 +222,11 @@ class IDE(QMainWindow, QWidget):
             "exit"
         ]
 
+        self.setup_pic = [
+            "pictures/setup.png",
+            "setup"
+        ]
+
         self.settings = Settings()
         self.settings.set_colors()
         self.rgb = hextorgb(self.settings.bg)
@@ -251,7 +256,7 @@ class IDE(QMainWindow, QWidget):
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
         self.setPalette(pallete)
-        self.setWindowTitle("DuckScript IDE & Compiler")
+        self.setWindowTitle("DuckScript IDE - USB Pico Ducky")
         self.setWindowIcon(QIcon("pictures/logo.png"))
         self.app.setApplicationName("Duckyscript IDE")
         main_menu = self.menuBar()
@@ -291,6 +296,7 @@ class IDE(QMainWindow, QWidget):
         cut_act.triggered.connect(self.cutter)
         quit_act.triggered.connect(self.quitter)
         save_act.triggered.connect(self.save)
+        load_act.triggered.connect(self.load_payload)
 
         view_menu.addAction(copy_act)
         view_menu.addAction(paste_act)
@@ -300,7 +306,6 @@ class IDE(QMainWindow, QWidget):
 
         edit_menu.addAction(save_act)
         edit_menu.addAction(load_act)
-
         # theme shortcuts
         themeb_act = QAction("&Black", self)
         themew_act = QAction("&White", self)
@@ -341,8 +346,8 @@ class IDE(QMainWindow, QWidget):
             with open(self.path + "/payloads/" + self.current_payload) as f:
                 self.codespace.setText(f.read())
                 self.change_count = 0
-        except FileNotFoundError:
-            print(f"payload not found, please create {self.current_payload} or load existing payload")
+        except FileNotFoundError as e:
+            print(f"error: Payload not found, please create {self.current_payload} or load existing payload\nFileNotFoundError: {e}")
 
         # set layout
         self.layout = QHBoxLayout()
@@ -397,9 +402,20 @@ class IDE(QMainWindow, QWidget):
             act.triggered.connect(self.load_theme)
             self.theme_menu.addAction(act)
 
+        # add setup button to toolbar
+        self.setup = QAction(QIcon(self.setup_pic[0]), self.setup_pic[1], self)
+        self.setup.triggered.connect(self.setup_w)
+        self.setup.setToolTip("Setup USB Pico Ducky")
+
         # add target info selector to toolbar
         toolbar.addWidget(self.select_os)
         toolbar.addWidget(self.languages)
+        toolbar.addAction(self.setup)
+
+    # setup window
+    def setup_w(self) -> None:
+        self.setup_window = setup.Setup(screensize=self.screensize)
+        self.setup_window.show()
 
     # if os selected
     def selected_os(self, index):

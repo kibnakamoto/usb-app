@@ -5,25 +5,81 @@ Date: Apr 16, 2023
 """
 
 import os
+import sys
 import shutil
 from time import sleep
-from PyQt5.QtWidgets import QMainWindow, QApplication
-
-# TODO: provide instructions on what to do while enabling/disabling hacking mode
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QPushButton
+from PyQt5.QtGui import QColor, QPalette
 
 # disable: press the button on the usb while plugging the usb in. After the USB shows up as a storage device. Execute the disable_h()
 # enable: nothing
 
+#TODO: add to tutorial: usb rbuber ducky has 12mb storage while this usb has 256mb
+
 # Setup the Microcontoller for hacking (hacking usb) or default mode (Normal MicroController)
 class Setup(QMainWindow):
     """ Default Class Initializer """
-    def __init__(self, pico_path):
+    def __init__(self, bg_rgb:tuple=(0x00,0x00,0x00), screensize=None):
         super().__init__()
+        self.setWindowTitle("Setup USB Pico Ducky")
         self.hack_mode = True
         self.path = os.path.dirname(os.path.realpath(__file__)) # get path of the application folder
         self.add_path = self.path + "/add_to_pico/"
-        self.pico_path = pico_path
-    
+
+        self.screensize = screensize
+        self.bg_rgb = bg_rgb
+
+        # set background color
+        pallete = QPalette()
+        pallete.setColor(QPalette.Window, QColor(bg_rgb[0], bg_rgb[1], bg_rgb[2]))
+        self.setPalette(pallete)
+
+        self.pico_path = None
+
+        self.select_path = QPushButton("Select USB Pico Ducky path", self)
+        self.select_path.resize(self.select_path.sizeHint())
+        self.select_path.move(self.screensize.width()//2-self.select_path.width()//2, self.screensize.height()//2)
+        self.select_path.clicked.connect(self.path_selector)
+        self.select_path.setToolTip("Select the path of USB Pico Ducky")
+
+        # "/media/kibnakamoto/RPI-RP2"
+
+    # resize window if moved
+    def resizeEvent(self, event):
+        # resize theme_text
+        size = self.size()
+        self.select_path.move(size.width()//2-self.select_path.width()//2, size.height()//2)
+
+        if hasattr(self, "selector_h"):
+            self.selector_h.move(size.width()//2-self.select_path.width()//2, size.height()//2-self.select_path.height())
+
+    def path_selector(self) -> None:
+        if sys.platform == "darwin":
+            self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "/volumes/")
+        elif sys.platform == "linux":
+            self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "/media/")
+        else:
+            self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "C:This PC/Computer/")
+
+        if os.path.exists(self.pico_path+"/root/duckyinpython.py"): # if root/duckyinpython.py exists, then it's probably in hacking mode
+            button_n = "Disable"
+            self.hack_mode = True
+        else:
+            button_n = "Enable"
+            self.hack_mode = False
+
+        # hack mode selector
+        self.selector_h = QPushButton(f"{button_n} Hack Mode", self)
+        self.selector_h.resize(self.selector_h.sizeHint())
+        self.selector_h.move(self.size().width()//2-self.selector_h.width()//2, self.size().height()//2-self.select_path.height())
+        self.selector_h.setToolTip(f"{button_n} the Hacking Mode of USB Pico Ducky")
+        self.selector_h.show()
+
+        if self.hack_mode == True:
+            self.selector_h.clicked.connect(self.disable_h)
+        else:
+            self.selector_h.clicked.connect(self.enable_h)
+
     # enable hacking mode
     def enable_h(self, hack_mode:bool=True) -> None:
         # upload the files onto the microcontoller
@@ -53,6 +109,6 @@ class Setup(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication([])
-    w = Setup("/media/kibnakamoto/RPI-RP2")
+    w = Setup(screensize=app.primaryScreen().availableGeometry())
     w.show()
     app.exec_()

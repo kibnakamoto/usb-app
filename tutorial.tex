@@ -103,9 +103,11 @@ Even though the USB Rubber Ducky is more than double the price, the USB Rubber D
 This might seem too good to be true. but, there is one main difference,
 it's that only Duckyscript 1.0 is supported on a USB Pico Ducky while USB Rubber Ducky supports Duckyscript 3.0. This will not affect most users because Duckyscript 3.0 just provides extra keywords but the possibiltiies are just as endless without them.
 
-\subsection{How to use}
-
 \subsection{payloads}
+
+\textbf{Payloads} are a file written in duckyscript. Payloads basically have instructions given to the USB so that the USB knows what keystrokes to input.
+
+A hacking USB only supports one mode at a time, it can either execute a payload when connected to a device, or it can be in setup mode where you upload the payload (more details can be found in section \ref{upload_payloads}), 
 
 \subsection{Saving \& Editing}
 
@@ -119,13 +121,17 @@ it's that only Duckyscript 1.0 is supported on a USB Pico Ducky while USB Rubber
 
 \section{The USB}
 
-\subsection{Uploading Payloads}
+\subsection{Uploading Payloads}\label{upload_payloads}
 
 \subsection{Execute}
 
 \subsubsection{Run Duckyscript Program}
 
 \subsubsection{Run C/C++ Program}
+
+To run a C/C++/Python program. Please refer to section \ref{hack_mode_off} to setup the microcontroller.
+
+Since the USB Pico Ducky is a Raspberry Pi Pico MicroController, you can run a C/C++/Python program as you wish as long as the hacking mode is turned off. Please note that the IDE doesn't support these languages. Therefore use a different IDE or text editor of your choosing. The IDE only supports duckyscript.
 
 \section{Duckyscript Language}
 
@@ -140,9 +146,11 @@ it's that only Duckyscript 1.0 is supported on a USB Pico Ducky while USB Rubber
 
 \subsubsection{When to Reset USB}
 
-You can reset the USB at any time, all it takes is the click of a simple button in the Duckyscript IDE (on the toolbar). Resetting the USB turns hacking mode off. Section \ref{hack_mode_off} covers this area. You can also reset back to the USB Pico Ducky (hacking mode) as specified in more detail in section \ref{hack_mode_on}.
+Resetting the USB turns hacking mode off. More information can be found in section \ref{hack_mode_off}. You can also reset back to the USB Pico Ducky (hacking mode) as specified in more detail in section \ref{hack_mode_on}.
 
 \subsubsection{How to Reset USB}\label{how_to_reset}
+
+You can reset the USB at any time, all it takes is the click of a simple button in the Duckyscript IDE (on the toolbar). 
 
 \subsection{Hack Mode On}\label{hack_mode_on}
 
@@ -150,9 +158,12 @@ You can reset the USB at any time, all it takes is the click of a simple button 
 
 \subsection{Hack Mode Off}\label{hack_mode_off}
 
+When the USB Pico Ducky hack mode is turned off, you can use the microcontroller using C/C++/MicroPython (resources in section \ref{cc_lang}).
+
+
 \subsubsection{C/C++/MicroPython Language}\label{cc_lang}
 
-Here are some links on tutorials of these langauges for Raspberry Pi Pico
+Here are some helpful links on setting up C/C++/Python for a Raspberry Pi Pico
 
 \textbf{Windows Tutorials:}\\
 \indent\indent 1. \underline{\href{https://www.raspberrypi.com/news/raspberry-pi-pico-windows-installer/}{C Language}}
@@ -162,8 +173,6 @@ Here are some links on tutorials of these langauges for Raspberry Pi Pico
 \indent\indent 3. \underline{\href{https://how2electronics.com/raspberry-pi-pico-getting-started-tutorial-with-micropython/}{MicroPython Langauge}}\\
 
 \textbf{Mac/Linux Tutorials:}
-
-% TODO: indent bullet point items
 
 \indent\indent 1. C Language:
 \begin{description}
@@ -191,8 +200,8 @@ Here are some links on tutorials of these langauges for Raspberry Pi Pico
 \normalsize
 \begin{description}
 	\setlength{\itemindent}{3em}
-	\item[$\bullet$] \underline{\url{https://how2electronics.com/raspberry-pi-pico-getting-started-tutorial-with-micropython/}}
-	\item[$\bullet$] \underline{\url{https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html}}
+	\item[$\bullet$] \underline{\href{https://how2electronics.com/raspberry-pi-pico-getting-started-tutorial-with-micropython/}{MicroPython Tutorial}}
+	\item[$\bullet$] \underline{\href{https://www.raspberrypi.com/documentation/microcontrollers/c_sdk.html}{Raspberry Pi Pico Documentation for C/C++}}
 \end{description}
 
 \subsubsection{Upload}
