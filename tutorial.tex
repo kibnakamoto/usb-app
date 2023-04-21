@@ -10,9 +10,11 @@
 
 \title{
 	\Huge Hacking USB - USB Pico Ducky\\
+\includegraphics[width=75.5mm]{pictures/logo.png}
 	\ \\
 	\Large Documentation \& Guide
 }
+
 \author{Taha Canturk}
 \date{2023-04-18}
 
@@ -20,9 +22,6 @@
 \maketitle
 
 \newpage
-
-\begin{titlepage}
-\end{titlepage}
 
 \textbf{Disclaimer}
 
@@ -110,7 +109,7 @@ it's that only Duckyscript 1.0 is supported on a USB Pico Ducky while USB Rubber
 
 A hacking USB only supports one mode at a time, it can either execute a payload when connected to a device, or it can be in setup mode where you upload the payload (more details can be found in section \ref{upload_payloads}), 
 
-\subsection{Saving \& Editing}
+\subsection{Saving \& Editing}\label{save_edit}
 
 \subsection{Shortcuts}
 
@@ -124,13 +123,31 @@ A hacking USB only supports one mode at a time, it can either execute a payload 
 
 \subsection{Uploading Payloads}\label{upload_payloads}
 
+First, write the duckyscript program, then save it as specified in section \ref{save_edit}.
+
+To upload payloads onto the USB Pico Ducky, click the upload button \includegraphics[width=5.5mm]{pictures/white_bk/upload.png}, which is right beside the Operating System Selector popup on the toolbar.
+
+You can upload up to 2 files at a time. But only run one at a time.
+
+In duckyscript, it is not possible to write a program that uses multiple files and this is also not necesarry. You can add up to 2 payloads (e.g. payload.dd, payload1.dd) at a time. You can switch between the payloads using the white switch on the USB Pico Ducky
+
+This is useful for when you need different payloads for different OSs. For example, you might want to have a Mac version and a Windows version of a password brute-forcing payload. This is useful for when you aren't sure about the OS of the target computer. \textbf{Not even USB Rubber Ducky comes with this feature}
+
+\textbf{The valid payload names are: payload.dd, payload1.dd}
+
 \subsection{Execute}
+
+\subsubsection{Before Execution}
+
+Before Execution, first select the target device's OS, then language (in order). Currently Mac supports less languages then Windows does, therefore make sure to select device's OS first
 
 \subsubsection{Run Duckyscript Program}
 
-\subsubsection{Run C/C++ Program}
+To Execute a duckyscript program, insert the USB into a device while in attack mode. Turn on hack mode as specified in section \label{hack_mode_on}
 
-To run a C/C++/Python program. Please refer to section \ref{hack_mode_off} to setup the microcontroller.
+\subsubsection{Run C/C++/Python Program}
+
+To run a C/C++/Python (or any supported language) program. Please refer to section \ref{hack_mode_off} to setup the microcontroller.
 
 Since the USB Pico Ducky is a Raspberry Pi Pico MicroController, you can run a C/C++/Python program as you wish as long as the hacking mode is turned off. Please note that the IDE doesn't support these languages. Therefore use a different IDE or text editor of your choosing. The IDE only supports duckyscript.
 
