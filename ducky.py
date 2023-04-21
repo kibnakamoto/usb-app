@@ -500,7 +500,7 @@ class IDE(QMainWindow, QWidget):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", QFileDialog.DontUseNativeDialog)[0][0]
-        if not file.startswith(self.path): # if path is different, copy it to the path
+        if not file.split('/')[-1] == self.path: # if path is different, copy it to the path
             payloads_count = len(os.listdir(self.path+"/payloads"))-1
             if payloads_count == 0:
                 self.current_payload = "payload.dd"
@@ -513,6 +513,7 @@ class IDE(QMainWindow, QWidget):
                         QMessageBox.Ok)
         else:
             self.current_payload = file.split('/')[-1] # seperate path from filename
+
         # load the payload into codespace
         try:
             with open(self.path + "/payloads/" + self.current_payload, "r") as f:
