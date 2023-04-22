@@ -95,6 +95,8 @@ By downloading, installing and/or using the Program, You acknowledge that You ha
 
 \newpage
 
+\pagenumbering{roman}
+
 \section{App}
 
 \subsection{What is the USB Pico Ducky}
@@ -117,7 +119,7 @@ A hacking USB only supports one mode at a time, it can either execute a payload 
 
 \subsection{Shortcuts}
 
-\subsection{Cosmetics}
+\subsection{Cosmetics}\label{cosmetics}
 
 \normalsize
 \textit{The custom colors you can pick are for}
@@ -156,12 +158,26 @@ $ \\\begin{bmatrix} 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \end{bmatrix}\\\\
 
 \subsubsection{Existing Themes}
 
+There are 2 already existing themes by default, Light and dark theme. You can access them by $\\View$(left \includegraphics[width=5.5mm]{pictures/white_bk/view.png} button) $\rightarrow Themes \rightarrow White/Black$
+\large
+\ \\
+\textbf{OR}
+\ \\
+\normalsize
+Or press \colorbox{lightgray}{CTRL+ALT+B} for \textbf{DARK} Theme\\
+and press \colorbox{lightgray}{CTRL+ALT+W} for \textbf{LIGHT} Theme
+
 \subsubsection{Custom Themes}
 
 To select a custom theme, you can use the shortcut \colorbox{lightgray}{CTRL+ALT+T} \medskip or you can press select it from the menu by hovering mouse on
 $\\View$(left \includegraphics[width=5.5mm]{pictures/white_bk/view.png} button) $\rightarrow Themes \rightarrow Custom$
 
-The custom colors are ordered as follows:
+The custom colors are picked for the colors mentioned in section \ref{cosmetics}.
+
+Here are the steps to make a \textbf{NEW} theme:\\
+1. Click on \colorbox{WhiteSmoke!70!Lavender}{Input Theme Name} Button on the top middle (the button on the right) and type in the new name. Click \colorbox{WhiteSmoke!70!Lavender}{Ok}.\\
+2. Click on the checkbox(es), select the ones you want to change to the same color, on the top menu, click the \colorbox{WhiteSmoke!70!Lavender}{RGB Color Picker} button on the middle. Now you can select the new color for the selected checkboxes.\\
+3. Now click the \colorbox{WhiteSmoke!70!Lavender}{Save} Button on the left to save.\\
 
 \section{The USB}
 
@@ -269,8 +285,6 @@ Here are some helpful links on setting up C/C++/Python for a Raspberry Pi Pico
 \subsubsection{Upload}
 
 The Duckyscript IDE doesn't have C/C++ support at this time. To use C/C++ on the USB Pico Ducky. First, reset the USB as mentioned in section \ref{how_to_reset}, then use a different IDE/texteditor to write a C/C++ program. You can reserach for more information in section \ref{cc_lang}.
-
-\pagenumbering{roman}
 
 \newpage
 
