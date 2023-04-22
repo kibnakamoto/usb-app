@@ -1,1 +1,3 @@
 Disclaimer: can I write that the USB is made for educational purposes (even though it's made for profit)?
+
+TODO: add language.py code library to the setup page

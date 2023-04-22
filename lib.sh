@@ -15,8 +15,16 @@ if [path basename "$PWD" = "usb-app"]; then
 	# download the circuitpython folder
 	firefox https://github.com/adafruit/Adafruit_CircuitPython_Bundle/releases/download/20230415/adafruit-circuitpython-bundle-8.x-mpy-20230415.zip
 	unzip ~/Downloads/adafruit-circuitpython-bundle-8.x-mpy-20230415.zip
+
+	# download the languages
+	firefox https://github.com/Neradoc/Circuitpython_Keyboard_Layouts/releases/download/20221209/circuitpython-keyboard-layouts-8.x-mpy-20221209.zip
+	unzip ~/Downloads/circuitpython-keyboard-layouts-8.x-mpy-20221209.zip 
 	
 	mv ~/Downloads/adafruit-circuitpython-bundle-8.x-mpy-20230415/ .
+
+	# copy all the language files to lib (not in a new folder)
+	mv ~/Downloads/circuitpython-keyboard-layouts-8.x-mpy-20221209/* ./add_to_pico/lib/
+	rm -rf ~/Downloads/circuitpython-keyboard-layouts-8.x-mpy-20221209/ # delete languages folder in downloads folder
 
 	# copy the required files into add_to_pico
 	cd adafruit-circuitpython-bundle-8.x-mpy-20230415/lib
