@@ -1,0 +1,343 @@
+{
+  "consumer_control_extended": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.2",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/consumer_control_extended",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "alt_codes": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.2",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/alt_codes",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_uk": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_uk",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_tr": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_tr",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_hu": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.5",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_hu",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_cz1": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_cz1",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_sw": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_sw",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_po": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_po",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_cz": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_cz",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_de": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_de",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_mac_fr": {
+    "package": false,
+    "pypi_name": "",
+    "version": "1.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_mac_fr",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_br": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_br",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_it": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_it",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_es": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.3",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_es",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_us_dvo": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.2",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_us_dvo",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_fr": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.6",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_fr",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keyboard_layout_win_da": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.4",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keyboard_layout_win_da",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_mac_fr": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_mac_fr",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_de": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.2",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_de",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_cz1": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_cz1",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_tr": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_tr",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_br": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_br",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_po": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_po",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_es": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_es",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_hu": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.2",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_hu",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_fr": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_fr",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_uk": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_uk",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_cz": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_cz",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_it": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_it",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_sw": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_sw",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  },
+  "keycode_win_da": {
+    "package": false,
+    "pypi_name": "",
+    "version": "0.0.1",
+    "repo": "https://github.com/Neradoc/Circuitpython_Keyboard_Layouts.git",
+    "path": "lib/keycode_win_da",
+    "dependencies": [],
+    "external_dependencies": [
+      "adafruit-circuitpython-hid"
+    ]
+  }
+}
