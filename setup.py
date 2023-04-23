@@ -11,10 +11,11 @@ from time import sleep
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QPushButton
 from PyQt5.QtGui import QColor, QPalette
 
+# Modes: disable/enable
 # disable: press the button on the usb while plugging the usb in. After the USB shows up as a storage device. Execute the disable_h()
 # enable: nothing
 
-#TODO: add to tutorial: usb rbuber ducky has 12mb storage while this usb has 256mb
+# TODO: add add_to_pico/root/choices to choices
 
 # Setup the Microcontoller for hacking (hacking usb) or default mode (Normal MicroController)
 class Setup(QMainWindow):
@@ -61,7 +62,7 @@ class Setup(QMainWindow):
         else:
             self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "C:This PC/Computer/")
 
-        if os.path.exists(self.pico_path+"/root/duckyinpython.py"): # if root/duckyinpython.py exists, then it's probably in hacking mode
+        if os.path.exists(self.pico_path+"/duckyinpython.py"): # if root/duckyinpython.py exists, then it's probably in hacking mode
             button_n = "Disable"
             self.hack_mode = True
         else:

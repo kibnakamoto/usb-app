@@ -9,6 +9,7 @@ import sys
 import os
 import shutil
 import json
+from pathlib import Path
 from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QDir
 from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QTextEdit,  \
                             QHBoxLayout, QSizePolicy, QWidget, QMessageBox, \
@@ -433,12 +434,82 @@ class IDE(QMainWindow, QWidget):
             self.languages.addItem(lang)
         self.languages.setToolTip("select target device Keyboard Language")
         self.languages.currentIndexChanged.connect(self.selected_lang)
+        
+        # save the new configuration
+
+        # save initial folder location based on OS
+        if sys.platform == "darwin":
+            initial_folder = "/volumes/"
+        elif sys.platform == "linux":
+            initial_folder = "/media/"
+        else:
+            initial_folder = "C:This PC/Computer/"
+
+        # ask for folder if the path isn't defined
+        if self.setup_w.pico_path == "" or self.settings.settings["last pico path"] == "":
+            if os.listdir(str(Path(self.setup_window.pico_path).parent)) != 0: # if a device is plugged in
+                self.setup_window.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+        try:
+            # update choices file in pico
+            with open(f"{self.setup_window.pico_path}/choices" "w") as f:
+                f.write(f"{self.target_os}|{self.target_lang}")
+        except FileNotFoundError:
+            # pico path is wrong. Possibly not plugged in, if it is plugged in, ask for the path
+            if os.listdir(str(Path(self.setup_window.pico_path).parent)) != 0: # if a device is plugged in
+                self.setup_window.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+
+            # update choices file in pico
+            with open(f"{self.setup_window.pico_path}/choices" "w") as f:
+                f.write(f"{self.target_os}|{self.target_lang}")
+        self.settings.settings["last pico path"] = self.setup_window.pico_path
+
+        # save the last pico path immediately
+        tmp_settings = Settings()
+        tmp_settings.settings["last pico path"] = self.setup_window.pico_path
+        with open("settings.json", "w") as f:
+            json.dump(tmp_settings.settings, f, indent=4)
+        del tmp_settings
 
     # if language is selected
     def selected_lang(self, index):
         self.target_lang = self.languages.itemText(index)
         self.settings.target_language = self.target_lang
         self.settings.settings["last language"] = self.target_lang
+
+        # save the new configuration
+
+        # save initial folder location based on OS
+        if sys.platform == "darwin":
+            initial_folder = "/volumes/"
+        elif sys.platform == "linux":
+            initial_folder = "/media/"
+        else:
+            initial_folder = "C:This PC/Computer/"
+
+        # ask for folder if the path isn't defined
+        if self.setup_w.pico_path == "" or self.settings.settings["last pico path"] == "":
+            if os.listdir(str(Path(self.setup_window.pico_path).parent)) != 0: # if a device is plugged in
+                self.setup_window.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+        try:
+            # update choices file in pico
+            with open(f"{self.setup_window.pico_path}/choices" "w") as f:
+                f.write(f"{self.target_os}|{self.target_lang}")
+        except FileNotFoundError:
+            # pico path is wrong. Possibly not plugged in, if it is plugged in, ask for the path
+            if os.listdir(str(Path(self.setup_window.pico_path).parent)) != 0: # if a device is plugged in
+                self.setup_window.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+
+            # update choices file in pico
+            with open(f"{self.setup_window.pico_path}/choices" "w") as f:
+                f.write(f"{self.target_os}|{self.target_lang}")
+        self.settings.settings["last pico path"] = self.setup_window.pico_path
+
+        # save the last pico path immediately
+        tmp_settings = Settings()
+        tmp_settings.settings["last pico path"] = self.setup_window.pico_path
+        with open("settings.json", "w") as f:
+            json.dump(tmp_settings.settings, f, indent=4)
+        del tmp_settings
 
     def __line_widget_line_count_changed(self):
         if self.line:

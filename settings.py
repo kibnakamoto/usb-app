@@ -19,6 +19,7 @@ class Settings:
         self.cf = self.settings["current file"]
         self.theme = self.settings["last color"]
         self.target_os = self.settings["last os"]
+        self.pico_path = self.settings["last pico path"]
         self.target_language = self.settings["last language"]
         self.all_themes = list(self.settings["colors"][0].keys()) # name of all themes
 
@@ -95,6 +96,7 @@ class Settings:
         if settings:
             self.settings = settings
             self.settings['current file'] = self.cf
+            self.pico_path = self.settings["last pico path"]
         else:
             self.settings["colors"][0][self.theme][0]["background"] = self.bg
             self.settings["colors"][0][self.theme][0]["comment"] = self.comment
@@ -112,5 +114,6 @@ class Settings:
             self.settings["colors"][0][self.theme][0]["color sidebar"] = self.color_sidebar
             self.settings["current file"] = self.cf
             self.settings["last color"] = self.theme
+            self.pico_path = self.settings["last pico path"]
         with open("settings.json", "w") as f:
             json.dump(self.settings, f, indent=4) # upload modified settings into settings.json
