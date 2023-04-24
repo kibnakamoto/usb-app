@@ -1,5 +1,3 @@
-import ducky
-
 # raise error when language is not supported
 class LanguageNotFoundError(ModuleNotFoundError):
     pass
@@ -7,19 +5,25 @@ class LanguageNotFoundError(ModuleNotFoundError):
 LANGUAGES_MAC = ("us", "fr")
 LANGUAGES_WIN = ('us', 'cz', 'cz1', 'da', 'de', 'es', 'fr', 'hu', 'it', 'po', 'sw', 'tr', 'uk', 'br')
 
-try:
+if not os.path.exists("choices") # if code.py doesn't exists, it's not being executed in microcontroller therefore unnecesarry to print warning
     with open("choices", "r") as f:
         class Target:
             def __init__(self):
                 TARGET = f.read().split("|")
                 self.OS = TARGET[0]
                 self.LANG = TARGET[1]
-except FileNotFoundError:
-    print("no choices selected\ndefault OS: \"win\"\ndefault LANGUAGE: \"us\"")
+else:
+    if not os.path.exists("code.py"): # if code.py doesn't exists, it's not being executed in microcontroller therefore unnecesarry to print warning
+        print("no choices selected\ndefault OS: \"win\"\ndefault LANGUAGE: \"us\"")
+    else:
+        # generate choices because it's in the microcontroller and doesn't exist
+        with open("choices", "w") as f:
+            choices.write("win|us")
     class Target:
         def __init__(self):
             self.OS = "win"
             self.LANG = "us"
+
 TARGET = Target()
 
 def set_lang(target_os:str, keyboard_lang:str) -> None:
