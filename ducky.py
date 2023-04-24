@@ -338,6 +338,7 @@ class IDE(QMainWindow, QWidget):
 
         # initialize files
         self.current_payload = self.settings.settings['current file']
+        self.pico_path = self.settings.settings["last pico path"]
         self.path = os.path.dirname(os.path.realpath(__file__))
         self.saved = True # wheter the file user is editing is saved
         self.historySaveLimit = 5 # Ask user how many files of history do they want saved
@@ -415,7 +416,7 @@ class IDE(QMainWindow, QWidget):
 
     # setup window
     def setup_w(self) -> None:
-        self.setup_window = setup.Setup(screensize=self.screensize)
+        self.setup_window = setup.Setup(screensize=self.screensize, parent=self)
         self.setup_window.show()
 
     # if os selected
@@ -446,26 +447,35 @@ class IDE(QMainWindow, QWidget):
             initial_folder = "C:This PC/Computer/"
 
         # ask for folder if the path isn't defined
-        if self.setup_w.pico_path == "" or self.settings.settings["last pico path"] == "":
-            if os.listdir(str(Path(self.setup_window.pico_path).parent)) != 0: # if a device is plugged in
-                self.setup_window.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+        if self.pico_path == "" or self.settings.settings["last pico path"] == "":
+            if os.listdir(str(Path(self.pico_path).parent)) != 0: # if a device is plugged in
+                self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
         try:
-            # update choices file in pico
-            with open(f"{self.setup_window.pico_path}/choices" "w") as f:
-                f.write(f"{self.target_os}|{self.target_lang}")
+            if os.path.exists("{self.pico_path}/code.py"):
+                open(f"{self.pico_path}/choices", "x")
+
+            if os.path.exists("{self.pico_path}/choices"):
+                with open(f"{self.pico_path}/choices", "w") as f:
+                    f.write(f"{self.target_os}|{self.target_lang}")
+                raise FileNotFoundError
         except FileNotFoundError:
             # pico path is wrong. Possibly not plugged in, if it is plugged in, ask for the path
-            if os.listdir(str(Path(self.setup_window.pico_path).parent)) != 0: # if a device is plugged in
-                self.setup_window.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+            if os.listdir(str(Path(self.pico_path).parent)) != 0: # if a device is plugged in
+                self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
 
-            # update choices file in pico
-            with open(f"{self.setup_window.pico_path}/choices" "w") as f:
-                f.write(f"{self.target_os}|{self.target_lang}")
-        self.settings.settings["last pico path"] = self.setup_window.pico_path
+            if os.path.exists("{self.pico_path}/code.py"):
+                open(f"{self.pico_path}/choices", "x")
+
+            if os.path.exists("{self.pico_path}/choices"):
+                # update choices file in pico
+                with open(f"{self.pico_path}/choices", "w") as f:
+                    f.write(f"{self.target_os}|{self.target_lang}")
+
+        self.settings.settings["last pico path"] = self.pico_path
 
         # save the last pico path immediately
         tmp_settings = Settings()
-        tmp_settings.settings["last pico path"] = self.setup_window.pico_path
+        tmp_settings.settings["last pico path"] = self.pico_path
         with open("settings.json", "w") as f:
             json.dump(tmp_settings.settings, f, indent=4)
         del tmp_settings
@@ -487,26 +497,48 @@ class IDE(QMainWindow, QWidget):
             initial_folder = "C:This PC/Computer/"
 
         # ask for folder if the path isn't defined
-        if self.setup_w.pico_path == "" or self.settings.settings["last pico path"] == "":
-            if os.listdir(str(Path(self.setup_window.pico_path).parent)) != 0: # if a device is plugged in
-                self.setup_window.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+        if self.pico_path == "" or self.settings.settings["last pico path"] == "":
+            if os.listdir(str(Path(self.pico_path).parent)) != 0: # if a device is plugged in
+                self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
         try:
-            # update choices file in pico
-            with open(f"{self.setup_window.pico_path}/choices" "w") as f:
-                f.write(f"{self.target_os}|{self.target_lang}")
+            if os.path.exists("{self.pico_path}/code.py"):
+                open(f"{self.pico_path}/choices", "x")
+
+            if os.path.exists("{self.pico_path}/choices"):
+                with open(f"{self.pico_path}/choices", "w") as f:
+                    f.write(f"{self.target_os}|{self.target_lang}")
+            else:
+                # TODO: Why does this rerun? Debug
+                message_box = QMessageBox(QMessageBox.Information,
+                                          "Pico Path",
+                                          "Pico Path isn't Correct, please reenter",
+                                          QMessageBox.Ok)
+                message_box.exec_()
+                raise FileNotFoundError
         except FileNotFoundError:
             # pico path is wrong. Possibly not plugged in, if it is plugged in, ask for the path
-            if os.listdir(str(Path(self.setup_window.pico_path).parent)) != 0: # if a device is plugged in
-                self.setup_window.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+            if os.listdir(str(Path(self.pico_path).parent)) != 0: # if a device is plugged in
+                self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
 
-            # update choices file in pico
-            with open(f"{self.setup_window.pico_path}/choices" "w") as f:
-                f.write(f"{self.target_os}|{self.target_lang}")
-        self.settings.settings["last pico path"] = self.setup_window.pico_path
+            if os.path.exists("{self.pico_path}/code.py"):
+                open(f"{self.pico_path}/choices", "x")
+
+            if os.path.exists("{self.pico_path}/choices"):
+                # update choices file in pico
+                with open(f"{self.pico_path}/choices", "w") as f:
+                    f.write(f"{self.target_os}|{self.target_lang}")
+            else:
+                message_box = QMessageBox(QMessageBox.Information,
+                                          "Pico Path",
+                                          "Pico Path isn't Correct, please reenter",
+                                          QMessageBox.Ok)
+                message_box.exec_()
+
+        self.settings.settings["last pico path"] = self.pico_path
 
         # save the last pico path immediately
         tmp_settings = Settings()
-        tmp_settings.settings["last pico path"] = self.setup_window.pico_path
+        tmp_settings.settings["last pico path"] = self.pico_path
         with open("settings.json", "w") as f:
             json.dump(tmp_settings.settings, f, indent=4)
         del tmp_settings

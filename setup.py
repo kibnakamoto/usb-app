@@ -7,25 +7,27 @@ Date: Apr 16, 2023
 import os
 import sys
 import shutil
+import json
 from time import sleep
 from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QPushButton
 from PyQt5.QtGui import QColor, QPalette
+
+import settings
 
 # Modes: disable/enable
 # disable: press the button on the usb while plugging the usb in. After the USB shows up as a storage device. Execute the disable_h()
 # enable: nothing
 
-# TODO: add add_to_pico/root/choices to choices
-
 # Setup the Microcontoller for hacking (hacking usb) or default mode (Normal MicroController)
 class Setup(QMainWindow):
     """ Default Class Initializer """
-    def __init__(self, bg_rgb:tuple=(0x00,0x00,0x00), screensize=None):
+    def __init__(self, bg_rgb:tuple=(0x00,0x00,0x00), screensize=None, parent=None):
         super().__init__()
         self.setWindowTitle("Setup USB Pico Ducky")
         self.hack_mode = True
         self.path = os.path.dirname(os.path.realpath(__file__)) # get path of the application folder
         self.add_path = self.path + "/add_to_pico/"
+        self.parent=parent # IDE
 
         self.screensize = screensize
         self.bg_rgb = bg_rgb
@@ -42,8 +44,6 @@ class Setup(QMainWindow):
         self.select_path.move(self.screensize.width()//2-self.select_path.width()//2, self.screensize.height()//2)
         self.select_path.clicked.connect(self.path_selector)
         self.select_path.setToolTip("Select the path of USB Pico Ducky")
-
-        # "/media/kibnakamoto/RPI-RP2"
 
     # resize window if moved
     def resizeEvent(self, event):
@@ -68,6 +68,12 @@ class Setup(QMainWindow):
         else:
             button_n = "Enable"
             self.hack_mode = False
+
+        self.parent.pico_path = self.pico_path
+        new_settings = settings.Settings()
+        new_settings.settings["last pico path"] = self.pico_path
+        with open("settings.json", "w") as f:
+            json.dump(new_settings.settings, f, indent=4)
 
         # hack mode selector
         self.selector_h = QPushButton(f"{button_n} Hack Mode", self)
