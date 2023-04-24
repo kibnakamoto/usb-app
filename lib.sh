@@ -3,6 +3,8 @@
 # Github: Kibnakamoto
 # Date: Apr 16, 2023
 
+# This isn't enough by itself. The newer downloads are still required so the names of the downloaded folders would need to change
+
 # make sure the path is already usb-app. This will make sure commands won't run accidents
 if [path basename "$PWD" = "usb-app"]; then
 
