@@ -1,3 +1,5 @@
+import os
+
 # raise error when language is not supported
 class LanguageNotFoundError(ModuleNotFoundError):
     pass
@@ -5,10 +7,10 @@ class LanguageNotFoundError(ModuleNotFoundError):
 LANGUAGES_MAC = ("us", "fr")
 LANGUAGES_WIN = ('us', 'cz', 'cz1', 'da', 'de', 'es', 'fr', 'hu', 'it', 'po', 'sw', 'tr', 'uk', 'br')
 
-if not os.path.exists("choices") # if code.py doesn't exists, it's not being executed in microcontroller therefore unnecesarry to print warning
-    with open("choices", "r") as f:
-        class Target:
-            def __init__(self):
+if os.path.exists("choices"): # if choices file exists
+    class Target:
+        def __init__(self):
+            with open("choices", "r") as f:
                 TARGET = f.read().split("|")
                 self.OS = TARGET[0]
                 self.LANG = TARGET[1]
@@ -18,7 +20,7 @@ else:
     else:
         # generate choices because it's in the microcontroller and doesn't exist
         with open("choices", "w") as f:
-            choices.write("win|us")
+            f.write("win|us")
     class Target:
         def __init__(self):
             self.OS = "win"
