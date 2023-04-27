@@ -39,6 +39,10 @@ DUCKYSCRIPT_CHARS = ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L",
 DUCKYSCRIPT_UNCOMMON = ("APP", "MENU", "BREAK", "PAUSE", "DELETE", "END", "HOME", "INSERT", "NUMLOCK",
                         "PAGEUP", "PAGEDOWN", "PRINTSCREEN", "SCROLLLOCK")
 
+# catched errors. Not used for raising errors but fullfils the goto statement's purpose in python
+class CatchedError(Exception):
+    pass
+
 class Setup(QMainWindow):
     """ Default Class Initializer """
     def __init__(self):
@@ -430,76 +434,63 @@ class IDE(QMainWindow, QWidget):
             self.keyboard_languages = language.LANGUAGES_WIN[:]
 
         # reset languages and put the ones for the newly chosen OS
+        self.languages.blockSignals(True)
         self.languages.clear()
         for lang in self.keyboard_languages:
             self.languages.addItem(lang)
-        self.languages.setToolTip("select target device Keyboard Language")
-        self.languages.currentIndexChanged.connect(self.selected_lang)
-        
-        # save the new configuration
-
-        # save initial folder location based on OS
-        if sys.platform == "darwin":
-            initial_folder = "/volumes/"
-        elif sys.platform == "linux":
-            initial_folder = "/media/"
-        else:
-            initial_folder = "C:This PC/Computer/"
+        self.languages.blockSignals(False)
+        # self.selected_lang(self.languages.findText(self.target_lang))
 
     # if language is selected
     def selected_lang(self, index):
-        self.target_lang = self.languages.itemText(index)
-        self.settings.target_language = self.target_lang
-        self.settings.settings["last language"] = self.target_lang
+        tmp_item = self.languages.itemText(index)
+        try:
+            # check if pico ducky
+            # save initial folder location based on OS
+            if sys.platform == "darwin":
+                initial_folder = "/volumes/"
+            elif sys.platform == "linux":
+                initial_folder = "/media/"
+            else:
+                initial_folder = "C:This PC/Computer/"
 
-        # save the new configuration
+            if os.path.exists("{self.pico_path}/duckyinpython.py"): # if pico ducky selected
+                open(f"{self.pico_path}/choices", "x")
+            else:
+                raise CatchedError
 
-        # save initial folder location based on OS
-        if sys.platform == "darwin":
-            initial_folder = "/volumes/"
-        elif sys.platform == "linux":
-            initial_folder = "/media/"
-        else:
-            initial_folder = "C:This PC/Computer/"
-
-        # ask for folder if the path isn't defined
-        if self.pico_path == "" or self.settings.settings["last pico path"] == "":
-            if os.listdir(str(Path(self.pico_path).parent)) != 0: # if a device is plugged in
-                message_box = QMessageBox(QMessageBox.Information,
-                                          "Pico Path",
-                                          "Pico Path isn't provided, please select the USB Pico Ducky",
-                                          QMessageBox.Ok)
-                self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
-        if os.path.exists("{self.pico_path}/code.py"):
-            open(f"{self.pico_path}/choices", "x")
-
-        if os.path.exists("{self.pico_path}/choices"):
             with open(f"{self.pico_path}/choices", "w") as f:
                 f.write(f"{self.target_os}|{self.target_lang}")
-        else:
-            self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
-            if os.path.exists("{self.pico_path}/code.py"):
-                open(f"{self.pico_path}/choices", "x")
 
-            if os.path.exists("{self.pico_path}/choices"):
+            self.settings.settings["last pico path"] = self.pico_path
+        except CatchedError: # not ducky
+            message_box = QMessageBox(QMessageBox.Information,
+                                      "Target Info Selector",
+                                      "The USB Pico Ducky is not found, make sure the device is plugged in and the path is correct",
+                                      QMessageBox.Ok)
+
+            message_box.exec_()
+            self.languages.blockSignals(True)
+            self.languages.setCurrentText(self.target_lang)
+            self.select_os.setCurrentText(self.target_os)
+            self.languages.blockSignals(False)
+            self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', initial_folder)
+            if os.path.exists("{self.pico_path}/duckyinpython.py"): # if pico ducky selected
                 with open(f"{self.pico_path}/choices", "w") as f:
                     f.write(f"{self.target_os}|{self.target_lang}")
-            else:
-                message_box = QMessageBox(QMessageBox.Information,
-                                          "Pico Path",
-                                          "Pico Path isn't Correct, please retry again",
-                                          QMessageBox.Ok)
-                message_box.exec_()
+        else:
+            # save the new configuration
 
+            # save the last pico path immediately
+            tmp_settings = Settings()
+            tmp_settings.settings["last pico path"] = self.pico_path
+            with open("settings.json", "w") as f:
+                json.dump(tmp_settings.settings, f, indent=4)
+            del tmp_settings
 
-        self.settings.settings["last pico path"] = self.pico_path
-
-        # save the last pico path immediately
-        tmp_settings = Settings()
-        tmp_settings.settings["last pico path"] = self.pico_path
-        with open("settings.json", "w") as f:
-            json.dump(tmp_settings.settings, f, indent=4)
-        del tmp_settings
+            self.target_lang = tmp_item
+            self.settings.target_language = self.target_lang
+            self.settings.settings["last language"] = self.target_lang
 
     def __line_widget_line_count_changed(self):
         if self.line:
