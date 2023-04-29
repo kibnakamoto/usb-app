@@ -28,7 +28,7 @@ SUPPORTED_OSS = ("windows", "mac") # currently
 
 # Initialize Duckyscript keywords to color code the ones written to the textbox
 DUCKYSCRIPT_COMMENT = ("REM")
-DUCKYSCRIPT_STARTING_KEYWORDS = ("DELAY", "STRING", "PRINT", "DEFAULT_DELAY", "DEFAULTDELAY", "LED")
+DUCKYSCRIPT_STARTING_KEYWORDS = ("DELAY", "STRING", "PRINT", "DEFAULT_DELAY", "DEFAULTDELAY", "LED", "REPEAT", "IMPORT")
 DUCKYSCRIPT_F_KEYS = ("F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11", "F12")
 DUCKYSCRIPT_SHORTCUT_KEYS = ("ALT", "CTRL", "CONTROL", "SHIFT", "SPACE", "ENTER", "BACKSPACE", "TAB",
                              "CAPSLOCK", "ESC", "ESCAPE")
