@@ -166,7 +166,7 @@ Here is what they are and what they do:
 2. \textbf{Comment}: Colors of comment. Line after \colorbox{lightgray}{REM}
 $ \\\begin{bmatrix} REM \end{bmatrix}\\\\$
 3. \textbf{Starting keywords}: keywords that generally start a line of duckyscript code
-$ \\\begin{bmatrix} DELAY & STRING & PRINT & IMPORT & DEFAULT\_DELAY & DEFAULTDELAY & LED \end{bmatrix}\\\\$
+$ \\\begin{bmatrix} DELAY & STRING & PRINT & DEFAULT\_DELAY & DEFAULTDELAY & LED \end{bmatrix}\\\\$
 4. \textbf{Fkeys}: F-keys
 $ \\\begin{bmatrix} F1 & F2 & F3 & F4 & F5 & F6 & F7 & F8 & F9 & F10 & F11 & F12 \end{bmatrix}\\\\$
 5. \textbf{Shortcut keys}: starting keys for shortcuts
@@ -249,11 +249,11 @@ Since the USB Pico Ducky is a Raspberry Pi Pico MicroController, you can run a C
 
 \section{Duckyscript Language}
 
-\subsection{Tutorial}
+Duckyscript language is a language used in hacking USBs. Hacking USBs pretend to be Perhipheral devices such as keyboards. Duckyscript is a simple language that is used in certain microcontrollers to mimic keyboards.
 
-\subsection{Keywords}
+\subsection{Keywords}\label{all_keywords}
 
-all the keywords:
+All the keywords:
 
 REM: Comment, comments are a line of code that describe what the code is about to do. They are ignored by the computer and are only for humans to view
 DELAY: Waits for a specfied amount of miliseconds. This is useful because some commands take time to execute and you should use DELAY to wait for it to get executed
@@ -261,7 +261,6 @@ STRING: Enter a text, if you were to input something into a powershell/terminal/
 
 Here are some keyboard letters supported by All languages
 PRINT
-IMPORT
 DEFAULT\_DELAY
 DEFAULTDELAY
 LED
@@ -301,6 +300,17 @@ PAGEUP
 PAGEDOWN
 PRINTSCREEN
 SCROLLLOCK
+
+\subsection{Tutorial}
+
+As you can see on section \ref{all_keywords}, all these keywords have to be capital. If you type it correctly, the keyword will change color on the IDE (only if it's used at the beginning of a line), this way you can now that you typed it correctly.
+
+as you can see most of these keywords can be found on the keyboard. This is because everything else is just keyboard buttons and the function of these keyboard buttons depend on the OS (Operating System), the type and brand of the device. 
+
+DEFAULT\_DELAY
+DEFAULTDELAY
+LED
+GUI
 
 \section{Setup}
 
