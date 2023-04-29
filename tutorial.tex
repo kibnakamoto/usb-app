@@ -3,7 +3,8 @@
 \usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage[svgnames]{xcolor}
-\usepackage{amsmath, xparse}
+\usepackage{amsmath}
+\usepackage{pifont}
 
 \hypersetup{
 	linktoc=all,
@@ -117,7 +118,42 @@ A hacking USB only supports one mode at a time, it can either execute a payload 
 
 \subsection{Saving \& Editing}\label{save_edit}
 
+There are 3 methods of saving the program you wrote:
+\\\textbf{1.} You can save anytime by using the \colorbox{lightgray}{CTRL+S} shortcut. 
+\\\textbf{2.} Go to top left corner View/Edit button on the top toolbar: $View$ or $Edit$ $\rightarrow Save$
+\\\textbf{3.} Click the Save (\includegraphics[width=5.5mm]{pictures/black_bk/save.png}) Button on the editor toolbar (right below the Edit/View menu)
+
+\ \\
+\\\textbf{1.} To edit the code, first select a file (.dd) on the side filebar on the left side. If you want to, select the file from a different directory using the load button (\includegraphics[width=5.5mm]{pictures/black_bk/load.png})
+\\\textbf{2.} If you successfully selected the duckyscript file, you will be able to view the file contents in the codebox (the place where you type in the code). Now modify/type/paste in the duckyscript 1.0 code of your choice and save it using the steps specified above.
+\\\textbf{3.} Once saved, you can upload it onto the USB Pico Ducky but first, make sure that the USB Pico Ducky is selected then make sure that you selected the target device's Language and OS (Operating System) on the editor toolbar (default: windows|us), if the device isn't plugged in, you may not modify the selected target device's language and OS (Operating System). If it's your first time using or if you changed the name of the USB Pico Ducky, you will need to re-select the path of the USB Pico Ducky (e.g. /computer/Devices/USB Pico Ducky).
+\\\textbf{4.} Now you can click the upload button (\includegraphics[width=5.5mm]{pictures/black_bk/upload.png}) while USB Pico Ducky is still plugged in to upload the payload to the microcontroller. More information about uploading payloads can be found in section \ref{upload_payloads}
+
 \subsection{Shortcuts}
+
+There are 9 shortcuts.
+
+Here is what they are and what they do:
+
+\begin{itemize}
+	\setlength{\itemindent}{1em}
+	\item[$\bullet$] Text Editor Commands
+	\setlength{\itemindent}{3em}
+		\item[\ding{118}] CTRL+SHIFT+W: Select a white theme
+		\item[\ding{118}] CTRL+SHIFT+B: Select a black theme
+		\item[\ding{118}] CTRL+SHIFT+T: Select a custom theme
+
+	\setlength{\itemindent}{1em}
+	\item[$\bullet$] Text Editor Commands
+	\setlength{\itemindent}{3em}
+		\item[\ding{118}] CTRL+C: copy selected text
+		\item[\ding{118}] CTRL+V: paste copied text
+		\item[\ding{118}] CTRL+X: cut copied text
+		\item[\ding{118}] CTRL+Q: exit, if the code is modified, will ask to save
+		\item[\ding{118}] CTRL+S: save the modified code
+		\item[\ding{118}] CTRL+S: save the modified code
+\end{itemize}
+
 
 \subsection{Cosmetics}\label{cosmetics}
 
@@ -175,9 +211,9 @@ $\\View$(left \includegraphics[width=5.5mm]{pictures/white_bk/view.png} button) 
 The custom colors are picked for the colors mentioned in section \ref{cosmetics}.
 
 Here are the steps to make a \textbf{NEW} theme:\\
-1. Click on \colorbox{WhiteSmoke!70!Lavender}{Input Theme Name} Button on the top middle (the button on the right) and type in the new name. Click \colorbox{WhiteSmoke!70!Lavender}{Ok}.\\
-2. Click on the checkbox(es), select the ones you want to change to the same color, on the top menu, click the \colorbox{WhiteSmoke!70!Lavender}{RGB Color Picker} button on the middle. Now you can select the new color for the selected checkboxes.\\
-3. Now click the \colorbox{WhiteSmoke!70!Lavender}{Save} Button on the left to save.\\
+\textbf{1.} Click on \colorbox{WhiteSmoke!70!Lavender}{Input Theme Name} Button on the top middle (the button on the right) and type in the new name. Click \colorbox{WhiteSmoke!70!Lavender}{Ok}.\\
+\textbf{2.} Click on the checkbox(es), select the ones you want to change to the same color, on the top menu, click the \colorbox{WhiteSmoke!70!Lavender}{RGB Color Picker} button on the middle. Now you can select the new color for the selected checkboxes.\\
+\textbf{3.} Now click the \colorbox{WhiteSmoke!70!Lavender}{Save} Button on the left to save.\\
 
 \section{The USB}
 
