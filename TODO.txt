@@ -1,3 +1,3 @@
 Disclaimer: can I write that the USB is made for educational purposes (even though it's made for profit)?
 
-TODO: the keyword names are wrong. Change them to the following found in https://github.com/adafruit/Adafruit_CircuitPython_HID/tree/main/adafruit_hid
+TODO: add color coding to non-starting keywords as well. But make sure to categorize them differently. This is so that CTRL C looks like CTRL C. and that C wouldn't be a textt character

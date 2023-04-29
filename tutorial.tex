@@ -5,11 +5,51 @@
 \usepackage[svgnames]{xcolor}
 \usepackage{amsmath}
 \usepackage{pifont}
+\usepackage{listings}
+\usepackage{booktabs}
+
+\definecolor{bgColor}{rgb}{0.95,0.95,0.92}
+
+\lstdefinestyle{DuckyCode}{
+    backgroundcolor=\color{bgColor},
+    commentstyle=\color{green},
+    keywordstyle=\color{blue},
+    numberstyle=\tiny\color{magenta},
+    stringstyle=\color{purple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=true,
+    tabsize=4
+}
 
 \hypersetup{
 	linktoc=all,
 	hidelinks=true
 }
+
+\lstdefinelanguage{Ducky}{
+	keywords={STRING, DELAY, IMPORT, LED, REPEAT, PRINT, DEFAULT\_DELAY, DEFAULTDELAY}
+	otherkeywords={!,!=,~,$,*,\&,\%/\%,\%*\%,\%\%,<-,<<-,\_,/},
+	comment=[l]{REM},
+}
+
+\lstset{style=DuckyCode,language=Ducky}
+
+%\lstset{
+%	language=Ducky,
+%    basicstyle=\small\ttfamily,
+%    otherkeywords={0,1,2,3,4,5,6,7,8,9},
+%    morekeywords={TRUE,FALSE},
+%    keywordstyle=\color{blue},
+%    commentstyle=\color{DarkGreen},
+%}
 
 \title{
 	\Huge Hacking USB - USB Pico Ducky\\
@@ -166,7 +206,8 @@ Here is what they are and what they do:
 2. \textbf{Comment}: Colors of comment. Line after \colorbox{lightgray}{REM}
 $ \\\begin{bmatrix} REM \end{bmatrix}\\\\$
 3. \textbf{Starting keywords}: keywords that generally start a line of duckyscript code
-$ \\\begin{bmatrix} DELAY & STRING & PRINT & DEFAULT\_DELAY & DEFAULTDELAY & LED & REPEAT & IMPORT \end{bmatrix}\\\\$
+$ \\\begin{bmatrix} DELAY & STRING & PRINT & DEFAULT\_DELAY & DEFAULTDELAY
+					\\LED & REPEAT & IMPORT \end{bmatrix}\\\\$
 4. \textbf{Fkeys}: F-keys
 $ \\\begin{bmatrix} F1 & F2 & F3 & F4 & F5 & F6 & F7 & F8 & F9 & F10 & F11 & F12 \end{bmatrix}\\\\$
 5. \textbf{Shortcut keys}: starting keys for shortcuts
@@ -260,99 +301,64 @@ DELAY: Waits for a specfied amount of miliseconds. This is useful because some c
 STRING: Enter a text, if you were to input something into a powershell/terminal/any textbox, you would type it after this keyword.
 
 Here are some keyboard letters supported by All languages
-REM
-DELAY
-STRING
-REPEAT
-PRINT
-IMPORT
-DEFAULT_DELAY
-DEFAULTDELAY
-LED
-F1
-F2
-F3
-F4
-F5
-F6
-F7
-F8
-F9
-F10
-F11
-F12
-ALT
-CTRL
-CONTROL
-SHIFT
-SPACE
-ENTER
-BACKSPACE
-TAB
-CAPSLOCK
-ESC
-ESCAPE
-BREAK
-UP
-UPARROW
-DOWN
-DOWNARROW
-LEFT
-LEFTARROW
-RIGHT
-RIGHTARROW
-WINDOWS
-GUI
-A
-B
-C
-D
-E
-F
-G
-H
-I
-J
-K
-L
-M
-N
-O
-P
-Q
-R
-S
-T
-U
-V
-W
-X
-Y
-Z
-APP
-MENU
-BREAK
-PAUSE
-DELETE
-END
-HOME
-INSERT
-NUMLOCK
-PAGEUP
-PAGEDOWN
-PRINTSCREEN
-SCROLLLOCK
+\scriptsize
+$\\\begin{bmatrix} 
+REM & DELAY & STRING & PRINT & DEFAULT\_DELAY
+\\DEFAULTDELAY & LED & REPEAT & IMPORT & ENTER
+\\F1-F12 & ALT & CTRL & CONTROL & SHIFT & SPACE
+\\BACKSPACE & ESC & ESCAPE & UP & UPARROW & DOWN
+\\DOWNARROW & LEFT & LEFTARROW & RIGHT & RIGHTARROW
+\\WINDOWS & GUI & A-Z & APP & MENU
+\\DELETE & END & HOME & INSERT & NUMLOCK & PAGEUP
+\\PAGEDOWN & PRINTSCREEN & SCROLLLOCK & BREAK & PAUSE
+\end{bmatrix}\\\\$
+\normalsize
 
 \subsection{Tutorial}
 
 As you can see on section \ref{all_keywords}, all these keywords have to be capital. If you type it correctly, the keyword will change color on the IDE (only if it's used at the beginning of a line), this way you can now that you typed it correctly.
 
-as you can see most of these keywords can be found on the keyboard. This is because everything else is just keyboard buttons and the function of these keyboard buttons depend on the OS (Operating System), the type and brand of the device. 
+as you can see most of these keywords can be found on the keyboard. This is because everything else is just keyboard keys and the function of these keys depend on the OS (Operating System), the type and brand of the device. 
 
-DEFAULT\_DELAY
-DEFAULTDELAY
-LED
-GUI
+Here are the duckyscript commands that aren't keyboard keys:
+\\1. \textbf{REM}: stands for 'REMOVE', it's used for commenting code, here is an example:
+\\2. \textbf{DELAY}: 
+\\3. \textbf{STRING}: 
+\\4. \textbf{REPEAT}: 
+\\5. \textbf{PRINT}: 
+\\6. \textbf{IMPORT}: 
+\\7. \textbf{DEFAULTDELAY \& DEFAULT\_DELAY}: 
+\\8. \textbf{LED}: 
+
+Keyboard keys are used for typing, and shortcuts.
+
+Payload examples can be found in section \ref{duckyscript_examples}.
+
+\subsection{Examples}\label{duckyscript_examples}
+
+\subsubsection{Comment}
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM this is a comment
+\end{lstlisting}
+\end{small}
+\caption{Comment Example}
+\end{figure}
+
+\subsubsection{Delay}
+
+\subsubsection{STRING}
+
+\subsubsection{REPEAT}
+
+\subsubsection{PRINT}
+
+\subsubsection{IMPORT}
+
+\subsubsection{DEFAULTDELAY \& DEFAULT\_DELAY}
+
+\subsubsection{LED}
 
 \section{Setup}
 
