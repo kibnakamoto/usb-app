@@ -439,7 +439,7 @@ class IDE(QMainWindow, QWidget):
         for lang in self.keyboard_languages:
             self.languages.addItem(lang)
         self.languages.blockSignals(False)
-        # self.selected_lang(self.languages.findText(self.target_lang))
+        self.selected_lang(self.languages.findText(self.target_lang))
 
     # if language is selected
     def selected_lang(self, index):
