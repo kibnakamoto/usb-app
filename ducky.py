@@ -96,20 +96,24 @@ class SyntaxHighlighter(QSyntaxHighlighter):
                     self.keyword_format.setForeground(QColor(self.colors[fi][0], self.colors[fi][1],
                                                              self.colors[fi][2]))
                     self.keyword_format.setFontWeight(QFont.Bold)
-                    wordi = 0
+                    wordi = 0 # index of words
                     for t in words:
-                        if t == pattern and t == words[0]:
-                            index = expression.indexIn(t)
-                            while index >= 0:
-                                length = expression.matchedLength()
-                                self.setFormat(index, length, self.keyword_format)
-                                index = expression.indexIn(text, index + length)
+                        if t in DUCKYSCRIPT_STARTING_KEYWORDS and t == pattern and t == words[0] and wordi==0: # if it is a starting keyword, then only color code first word 
+                            index = 0
+                            length = expression.matchedLength()
+                            self.setFormat(index, length, self.keyword_format)
+                        elif t == pattern: # if words contains the pattern no matter where t is located in the line
+                            # if first word of line is a starting keyword, don't color code it. E.g.: STRING (color code) HELLO (don't color code)
+                            if not words[0] in DUCKYSCRIPT_STARTING_KEYWORDS and not t in DUCKYSCRIPT_STARTING_KEYWORDS:
+                                index = expression.indexIn(t)+len(''.join(i for i in words[0:words.index(t)]))+len(words[0:words.index(t)])
+                                while index >= 0:
+                                    length = expression.matchedLength()
+                                    self.setFormat(index, length, self.keyword_format)
+                                    index = expression.indexIn(text, index + length)
                         else:
-                            lengths = 0 # previous lengths
-                            for i in range(wordi):
-                                lengths += len(words[i])
+                            lengths = len(''.join(i for i in words[0:words.index(t)]))+len(words[0:words.index(t)])
                             num = QRegExp("\\b\\d+\\b")
-                            indexn = num.indexIn(t)+lengths+1
+                            indexn = num.indexIn(t)+lengths
                             if wordi == 0:
                                 indexn -= 1
                             while indexn >= 0:
