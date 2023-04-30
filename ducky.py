@@ -353,13 +353,35 @@ class IDE(QMainWindow, QWidget):
         self.saved = True # wheter the file user is editing is saved
         self.historySaveLimit = 5 # Ask user how many files of history do they want saved
 
-        # load the last payload from payloads
+        # load the last payload from payloads, if it doesn't exist, try the previous one
+
         try:
             with open(self.path + "/payloads/" + self.current_payload) as f:
                 self.codespace.setText(f.read())
                 self.change_count = 0
-        except FileNotFoundError as e:
-            print(f"error: Payload not found, please create {self.current_payload} or load existing payload\nFileNotFoundError: {e}")
+        except FileNotFoundError as e: # if current payload doesn't exist
+            all_payloads = os.listdir(self.path+"/payloads")
+            all_payloads.remove('history')
+            all_payloads = sorted(all_payloads, reverse=True)
+            for payload in all_payloads:
+                try:
+                    with open(self.path + "/payloads/" + payload) as f:
+                        self.codespace.setText(f.read())
+                        self.change_count = 0
+                except FileNotFoundError as e:
+                    if payload != all_payloads[-1]: # if iteration is done
+                        print(f"error: Payload not found, please create {self.current_payload} or load existing payload\nFileNotFoundError: {e}")
+                else:
+                    self.current_payload = payload
+
+                    # save the current payload preference to settings
+                    tmp_settings = Settings()
+                    tmp_settings.settings["current file"] = self.current_payload
+                    self.settings.settings["current file"] = self.current_payload # set it to current settings as well
+                    with open("settings.json", "w") as f:
+                        json.dump(tmp_settings.settings, f, indent=4)
+                    del tmp_settings
+                    break
 
         # set layout
         self.layout = QHBoxLayout()
@@ -490,6 +512,7 @@ class IDE(QMainWindow, QWidget):
             # save the last pico path immediately
             tmp_settings = Settings()
             tmp_settings.settings["last pico path"] = self.pico_path
+            self.settings.settings["last pico path"] = self.pico_path
             with open("settings.json", "w") as f:
                 json.dump(tmp_settings.settings, f, indent=4)
             del tmp_settings
@@ -580,39 +603,75 @@ class IDE(QMainWindow, QWidget):
             print("payload not found")
 
     # delete the selected payload
-    # TODO: debug
     def delete_payload(self):
         options = QFileDialog.Options() # file selector options
         options |= QFileDialog.DontUseNativeDialog
-        options |= QFileDialog.setDirectory(f"{self.path}/payloads/")
         file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", options)[0][0] # file selector
-        payloads_count = len(os.listdir(self.path+"/payloads"))-1
-        if isdigit(file[[-4]]): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
-            found = int(file[-4])
-            if found == payloads_count: # if file # number is the largest, delete the file and select the previous one 
-                os.remove(file)
-            else:
-                # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
-                pass
-            while found!=0:
-                try:
-                    self.current_payload = f"payload{found}.dd"
-                    with open(self.path + "/payloads/" + self.current_payload, "r") as f:
-                        self.codespace.setText(f.read())
-                        self.change_count = 0
-                        self.saved = True
-                except FileNotFoundError:
-                    found-=1
-                    continue
-                else:
-                    break
-            #if self.current_payload
-        # os.remove(self.current_payload)
-        if payloads_count == 0:
-            self.current_payload = "payload.dd"
+        if os.path.dirname(file) == self.path+"/payloads": # if path of the file is payloads
+            verify = QMessageBox.question(None, 'Delete file', f"Are you sure you want to delete the file selected?, you might not be able to recover it.", QMessageBox.No|QMessageBox.Yes)
+            if verify == QMessageBox.Yes:
+                files = os.listdir(self.path+"/payloads")
+                files.remove("history")
+                payloads_count = len(files) # subtract one because of history folder
+                if file[-4].isdigit(): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
+                    found = int(file[-4])
+                    if found == payloads_count-1: # if file # number is the largest, delete the file and select the previous one 
+                        os.remove(file) # remove file and don't change anything else
+                    else:
+                        # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
+                        for i in range(found, payloads_count):
+                            payload = f"{self.path}/payloads/payload{i}.dd"
+                            if i-1 == 0:
+                                newpayload = f"{self.path}/payloads/payload.dd"
+                            else:
+                                newpayload = f"{self.path}/payloads/payload{i-1}.dd"
+                            if payload == self.current_payload:
+                                self.current_payload = newpayload
+                            os.rename(payload, newpayload)
+                else: # if payload.dd
+                    if payloads_count == 1: # if no other files
+                        message_box = QMessageBox(QMessageBox.Information,
+                                                  "Delete file",
+                                                  f"There are no other files other than {file.split('/')[-1]}, therefore you cannot delete it",
+                                                  QMessageBox.Ok)
+                        message_box.exec_()
+                    else:
+                        os.remove(file)
+
+                        # update codespace
+                        with open(self.path + "/payloads/" + self.current_payload) as f:
+                            self.codespace.setText(f.read())
+                            self.change_count = 0
+
+                        # move file names to one previous one (e.g. payload1.dd becomes payload.dd)
+                        for i in range(len(files), 0, -1):
+                            i = i-1 # now will iterate without starting from i=len to i=1
+                            payload = f"payload{i}.dd"
+                            if i-1 == 0:
+                                newpayload = f"payload.dd"
+                            else:
+                                newpayload = f"payload{i-1}.dd"
+                            os.rename(payload, newpayload)
+                        
+                if not os.path.exists(self.current_payload): # if file doesn't exist
+                    if payloads_count == 0:
+                        self.current_payload = "payload.dd"
+                    else:
+                        self.current_payload = f"payload{payloads_count}.dd"
+                
+                tmp_settings = Settings()
+                tmp_settings.settings["current file"] = self.current_payload
+                self.settings.settings["current file"] = self.current_payload # set it to current settings as well
+                with open("settings.json", "w") as f:
+                    json.dump(tmp_settings.settings, f, indent=4)
+                del tmp_settings
+
         else:
-            self.current_payload = f"payload{payloads_count}.dd"
-        
+            message_box = QMessageBox(QMessageBox.Information,
+                                      "Delete file",
+                                      f"The file you picked isn't in payloads, please pick a file in payloads to delete it",
+                                      QMessageBox.Ok)
+            message_box.exec_()
 
     def if_typed(self):
         if self.codespace.document().isModified(): # only if plaintext of codespace is modified
