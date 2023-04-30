@@ -48,6 +48,25 @@ class Setup(QMainWindow):
     def __init__(self):
         super().__init__()
 
+def trace_calls(frame, event, arg):
+    if event != 'call':
+        return
+    co = frame.f_code
+    func_name = co.co_name
+    if func_name == 'write':
+        # Ignore write() calls from print statements
+        return
+    func_line_no = frame.f_lineno
+    func_filename = co.co_filename
+    caller = frame.f_back
+    caller_line_no = caller.f_lineno
+    caller_filename = caller.f_code.co_filename
+    if func_name == "if_typed":
+        print ('Call to %s on line %s of %s from line %s of %s' % \
+            (func_name, func_line_no, func_filename,
+             caller_line_no, caller_filename))
+    return
+
 # COLORS for (COMMENT, starting_keywords, fkeys, shortcut_keys, arrows, windows, chars, uncommon, numbers, text, textbubble, background, sidebar background, sidebar text)
 s = Settings()
 s.set_theme("white")
@@ -575,13 +594,15 @@ class IDE(QMainWindow, QWidget):
             with open(self.path + "/payloads/" + self.current_payload, "r") as f:
                 self.codespace.setText(f.read())
                 self.change_count = 0
+                self.saved = True
         except FileNotFoundError:
             print("payload not found")
 
     def if_typed(self):
-        if self.change_count != 0:
-            self.saved = False
-        self.change_count+=1
+        if self.codespace.document().isModified():
+            if self.change_count != 0:
+                self.saved = False
+            self.change_count+=1
 
     # adjust an integer to the height of the application
     def adjh(self, num:int) -> int:
@@ -688,7 +709,7 @@ class IDE(QMainWindow, QWidget):
 
     # CTRL+Q
     def quitter(self):
-        if not self.saved:
+        if not self.saved or self.change_count != 0:
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
                 sys.exit(0)
@@ -757,7 +778,7 @@ class IDE(QMainWindow, QWidget):
         self.color.show()
 
     def closeEvent(self, event) -> None:
-        if not self.saved: # warn user if not saved
+        if not self.saved or self.change_count != 0: # warn user if not saved
             __exit = QMessageBox.question(None, 'Quit', "Are you sure you want to exit without saving?", QMessageBox.No|QMessageBox.Save|QMessageBox.Yes)
             if __exit == QMessageBox.Yes:
                 with open("settings.json", "w") as f:
@@ -865,6 +886,9 @@ class IDE(QMainWindow, QWidget):
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = IDE(screensize=app.primaryScreen().availableGeometry(), app=app)
-    
+
     window.show()
-    sys.exit(app.exec())
+    from watchpoints import watch
+    watch(window.change_count)
+   # sys.settrace(trace_calls)
+    sys.exit(app.exec_())
