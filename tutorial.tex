@@ -335,13 +335,21 @@ Here are the duckyscript commands that aren't keyboard keys:
 \\7. \textbf{DEFAULTDELAY \& DEFAULT\_DELAY}:  DEFAULTDELAY specifies how long (in milliseconds) to wait between each line of command. If not specified, DEFAULTDELAY is 18ms.
 \\8. \textbf{LED}: change the state of the LED (on/off)
 
-Keyboard keys are used for typing, and shortcuts.
+Here are some keys that you might find confusing:
+\\1.WINDOWS \& GUI: The windows button
+\\2. UP \& UPARROW: The up arrow key
+\\3. DOWN \& DOWNARROW: The down arrow key
+\\4. RIGHT \& RIGHTARROW: The right arrow key
+\\5. LEFT \& LEFTARROW: The left arrow key
+\\6. All the rest of the keywords can be found on a keyboard
+
+Keyboard keys are used for typing and shortcuts that are OS (Operating System) dependant. For example, F-keys (e.g. F1 key) won't work on a phone because there is no such thing as F1 button on a phone, also the function of keys change depending on the OS (Operating System).
 
 Payload examples can be found in section \ref{duckyscript_examples}.
 
 \subsection{Examples}\label{duckyscript_examples}
 
-\subsubsection{Comment}
+\subsubsection{Comment (REM)}
 
 \begin{figure}[htb]
 \begin{small}
@@ -352,7 +360,7 @@ REM this is a comment
 \caption{Comment Example}
 \end{figure}
 
-\subsubsection{Delay}
+\subsubsection{DELAY}
 
 \begin{figure}[htb]
 \begin{small}
@@ -365,6 +373,8 @@ REM in the code above, windows takes the L (like always, nearly all viruses and 
 \end{small}
 \caption{Delay Example}
 \end{figure}
+
+\newpage
 
 \subsubsection{STRING}
 
@@ -399,6 +409,8 @@ REPEAT 10
 \caption{REPEAT Example}
 \end{figure}
 
+\newpage
+
 \subsubsection{PRINT}
 
 \begin{figure}[htb]
@@ -416,6 +428,8 @@ PRINT Successfully opened 10 tabs
 \end{small}
 \caption{PRINT Example}
 \end{figure}
+
+\newpage
 
 \subsubsection{IMPORT}\label{ducky_import}
 For example, there are 2 files, payload.dd and payload2.dd (there can be as many as you wish)
@@ -450,6 +464,7 @@ CTRL SHIFT W
 \caption{payload2.dd}
 \end{figure}
 
+\newpage
 
 \subsubsection{DEFAULTDELAY \& DEFAULT\_DELAY}
 
