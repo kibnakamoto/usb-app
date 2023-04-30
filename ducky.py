@@ -48,25 +48,6 @@ class Setup(QMainWindow):
     def __init__(self):
         super().__init__()
 
-def trace_calls(frame, event, arg):
-    if event != 'call':
-        return
-    co = frame.f_code
-    func_name = co.co_name
-    if func_name == 'write':
-        # Ignore write() calls from print statements
-        return
-    func_line_no = frame.f_lineno
-    func_filename = co.co_filename
-    caller = frame.f_back
-    caller_line_no = caller.f_lineno
-    caller_filename = caller.f_code.co_filename
-    if func_name == "if_typed":
-        print ('Call to %s on line %s of %s from line %s of %s' % \
-            (func_name, func_line_no, func_filename,
-             caller_line_no, caller_filename))
-    return
-
 # COLORS for (COMMENT, starting_keywords, fkeys, shortcut_keys, arrows, windows, chars, uncommon, numbers, text, textbubble, background, sidebar background, sidebar text)
 s = Settings()
 s.set_theme("white")
@@ -575,7 +556,7 @@ class IDE(QMainWindow, QWidget):
         options = QFileDialog.Options()
         options |= QFileDialog.DontUseNativeDialog
         file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", QFileDialog.DontUseNativeDialog)[0][0]
-        if not file.split('/')[-1] == self.path: # if path is different, copy it to the path
+        if os.path.dirname(file) != self.path+"/payloads": # if path is different, copy it to the path
             payloads_count = len(os.listdir(self.path+"/payloads"))-1
             if payloads_count == 0:
                 self.current_payload = "payload.dd"
@@ -599,7 +580,7 @@ class IDE(QMainWindow, QWidget):
             print("payload not found")
 
     def if_typed(self):
-        if self.codespace.document().isModified():
+        if self.codespace.document().isModified(): # only if plaintext of codespace is modified
             if self.change_count != 0:
                 self.saved = False
             self.change_count+=1
@@ -698,14 +679,7 @@ class IDE(QMainWindow, QWidget):
     # CTRL+X
     def cutter(self):
         # copy
-        clipboard = self.app.clipboard()
-        selected_text = self.codespace.textCursor().selectedText()
-        clipboard.setText(selected_text)
-
-        # delete selected text
-        text_cursor = self.codespace.textCursor()
-        text_cursor.select(QTextCursor.Document)
-        text_cursor.removeSelectedText()
+        self.codespace.cut()
 
     # CTRL+Q
     def quitter(self):
@@ -888,7 +862,4 @@ if __name__ == '__main__':
     window = IDE(screensize=app.primaryScreen().availableGeometry(), app=app)
 
     window.show()
-    from watchpoints import watch
-    watch(window.change_count)
-   # sys.settrace(trace_calls)
     sys.exit(app.exec_())
