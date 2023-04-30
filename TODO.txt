@@ -1,5 +1,4 @@
 Disclaimer: can I write that the USB is made for educational purposes (even though it's made for profit)?
 
-TODO: add color coding to non-starting keywords as well. But make sure to categorize them differently. This is so that CTRL C looks like CTRL C. and that C wouldn't be a textt character
 TODO: make a delete button for deleting unwanted files
 

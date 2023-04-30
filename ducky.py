@@ -114,8 +114,6 @@ class SyntaxHighlighter(QSyntaxHighlighter):
                             lengths = len(''.join(i for i in words[0:words.index(t)]))+len(words[0:words.index(t)])
                             num = QRegExp("\\b\\d+\\b")
                             indexn = num.indexIn(t)+lengths
-                            if wordi == 0:
-                                indexn -= 1
                             while indexn >= 0:
                                 length = num.matchedLength()
                                 self.setFormat(indexn, length, self.num_format)
@@ -293,6 +291,7 @@ class IDE(QMainWindow, QWidget):
         edit_menu = main_menu.addMenu(QIcon(self.view_theme[0]), 'Edit')
         save_act = QAction('&Save', self)
         load_act = QAction('&Load', self)
+        delete_act = QAction('&delete file', self)
         
         copy_act.setShortcut("Ctrl+C")
         paste_act.setShortcut("Ctrl+V")
@@ -306,6 +305,7 @@ class IDE(QMainWindow, QWidget):
         quit_act.triggered.connect(self.quitter)
         save_act.triggered.connect(self.save)
         load_act.triggered.connect(self.load_payload)
+        delete_act.triggered.connect(self.delete_payload)
 
         view_menu.addAction(copy_act)
         view_menu.addAction(paste_act)
@@ -315,6 +315,8 @@ class IDE(QMainWindow, QWidget):
 
         edit_menu.addAction(save_act)
         edit_menu.addAction(load_act)
+        edit_menu.addAction(delete_act)
+        
         # theme shortcuts
         themeb_act = QAction("&Black", self)
         themew_act = QAction("&White", self)
@@ -553,8 +555,6 @@ class IDE(QMainWindow, QWidget):
 
     # load payload from any directory, the default directory is payloads
     def load_payload(self):
-        options = QFileDialog.Options()
-        options |= QFileDialog.DontUseNativeDialog
         file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", QFileDialog.DontUseNativeDialog)[0][0]
         if os.path.dirname(file) != self.path+"/payloads": # if path is different, copy it to the path
             payloads_count = len(os.listdir(self.path+"/payloads"))-1
@@ -578,6 +578,41 @@ class IDE(QMainWindow, QWidget):
                 self.saved = True
         except FileNotFoundError:
             print("payload not found")
+
+    # delete the selected payload
+    # TODO: debug
+    def delete_payload(self):
+        options = QFileDialog.Options() # file selector options
+        options |= QFileDialog.DontUseNativeDialog
+        options |= QFileDialog.setDirectory(f"{self.path}/payloads/")
+        file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", options)[0][0] # file selector
+        payloads_count = len(os.listdir(self.path+"/payloads"))-1
+        if isdigit(file[[-4]]): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
+            found = int(file[-4])
+            if found == payloads_count: # if file # number is the largest, delete the file and select the previous one 
+                os.remove(file)
+            else:
+                # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
+                pass
+            while found!=0:
+                try:
+                    self.current_payload = f"payload{found}.dd"
+                    with open(self.path + "/payloads/" + self.current_payload, "r") as f:
+                        self.codespace.setText(f.read())
+                        self.change_count = 0
+                        self.saved = True
+                except FileNotFoundError:
+                    found-=1
+                    continue
+                else:
+                    break
+            #if self.current_payload
+        # os.remove(self.current_payload)
+        if payloads_count == 0:
+            self.current_payload = "payload.dd"
+        else:
+            self.current_payload = f"payload{payloads_count}.dd"
+        
 
     def if_typed(self):
         if self.codespace.document().isModified(): # only if plaintext of codespace is modified
