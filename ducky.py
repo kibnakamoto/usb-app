@@ -99,7 +99,7 @@ class SyntaxHighlighter(QSyntaxHighlighter):
                     wordi = 0 # index of words
                     for t in words:
                         if t in DUCKYSCRIPT_STARTING_KEYWORDS and t == pattern and t == words[0] and wordi==0: # if it is a starting keyword, then only color code first word 
-                            index = 0
+                            index = expression.indexIn(t)
                             length = expression.matchedLength()
                             self.setFormat(index, length, self.keyword_format)
                         elif t == pattern: # if words contains the pattern no matter where t is located in the line
