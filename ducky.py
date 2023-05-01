@@ -618,14 +618,16 @@ class IDE(QMainWindow, QWidget):
                     if found == payloads_count-1: # if file # number is the largest, delete the file and select the previous one 
                         os.remove(file) # remove file and don't change anything else
                     else:
+                        os.remove(file)
+                        open(file, "x").close()
                         # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
-                        for i in range(found, payloads_count):
+                        for i in range(found+1, payloads_count):
                             payload = f"{self.path}/payloads/payload{i}.dd"
                             if i-1 == 0:
                                 newpayload = f"{self.path}/payloads/payload.dd"
                             else:
                                 newpayload = f"{self.path}/payloads/payload{i-1}.dd"
-                            if payload == self.current_payload:
+                            if payload == self.current_payload: # change current payload if payload is updated
                                 self.current_payload = newpayload
                             os.rename(payload, newpayload)
                 else: # if payload.dd
