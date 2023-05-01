@@ -615,8 +615,9 @@ class IDE(QMainWindow, QWidget):
                     files = os.listdir(self.path+"/payloads")
                     files.remove("history")
                     payloads_count = len(files) # subtract one because of history folder
-                    if file.split('/')[-1][:-3].split("payload")[1].isdigit(): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
-                        found = int(file.split('/')[-1][:-3].split("payload")[1])
+                    tmp = file.split('/')[-1][:-3].split("payload")[1]
+                    if tmp.isdigit(): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
+                        found = int(tmp)
                         if found == payloads_count-1: # if file # number is the largest, delete the file and select the previous one 
                             os.remove(file) # remove file and don't change anything else
                         else:
