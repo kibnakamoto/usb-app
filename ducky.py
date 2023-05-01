@@ -606,54 +606,58 @@ class IDE(QMainWindow, QWidget):
     def delete_payload(self):
         options = QFileDialog.Options() # file selector options
         options |= QFileDialog.DontUseNativeDialog
-        file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", options)[0][0] # file selector
+        selected_files = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", options)[0] # file selector
+        file = selected_files[0]
+        print(selected_files)
         if os.path.dirname(file) == self.path+"/payloads": # if path of the file is payloads
-            verify = QMessageBox.question(None, 'Delete file', f"Are you sure you want to delete the file selected?, you might not be able to recover it.", QMessageBox.No|QMessageBox.Yes)
+            verify = QMessageBox.question(None, 'Delete file(s)', f"Are you sure you want to delete the file(s) selected?, you might not be able to recover it.", QMessageBox.No|QMessageBox.Yes)
             if verify == QMessageBox.Yes:
-                files = os.listdir(self.path+"/payloads")
-                files.remove("history")
-                payloads_count = len(files) # subtract one because of history folder
-                if file[-4].isdigit(): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
-                    found = int(file[-4])
-                    if found == payloads_count-1: # if file # number is the largest, delete the file and select the previous one 
-                        os.remove(file) # remove file and don't change anything else
-                    else:
-                        os.remove(file)
-                        open(file, "x").close()
-                        # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
-                        for i in range(found+1, payloads_count):
-                            payload = f"{self.path}/payloads/payload{i}.dd"
-                            if i-1 == 0:
-                                newpayload = f"{self.path}/payloads/payload.dd"
-                            else:
-                                newpayload = f"{self.path}/payloads/payload{i-1}.dd"
-                            if payload == self.current_payload: # change current payload if payload is updated
-                                self.current_payload = newpayload
-                            os.rename(payload, newpayload)
-                else: # if payload.dd
-                    if payloads_count == 1: # if no other files
-                        message_box = QMessageBox(QMessageBox.Information,
-                                                  "Delete file",
-                                                  f"There are no other files other than {file.split('/')[-1]}, therefore you cannot delete it",
-                                                  QMessageBox.Ok)
-                        message_box.exec_()
-                    else:
-                        os.remove(file)
+                for file in selected_files:
+                    files = os.listdir(self.path+"/payloads")
+                    files.remove("history")
+                    payloads_count = len(files) # subtract one because of history folder
+                    if file.split('/')[-1][:-3].split("payload")[1].isdigit(): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
+                        found = int(file.split('/')[-1][:-3].split("payload")[1])
+                        if found == payloads_count-1: # if file # number is the largest, delete the file and select the previous one 
+                            os.remove(file) # remove file and don't change anything else
+                        else:
+                            os.remove(file)
+                            open(file, "x").close()
+                            # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
+                            for i in range(found+1, payloads_count):
+                                payload = f"{self.path}/payloads/payload{i}.dd"
+                                if i-1 == 0:
+                                    newpayload = f"{self.path}/payloads/payload.dd"
+                                else:
+                                    newpayload = f"{self.path}/payloads/payload{i-1}.dd"
+                                if payload == self.current_payload: # change current payload if payload is updated
+                                    self.current_payload = newpayload
+                                os.rename(payload, newpayload)
+                    else: # if payload.dd
+                        if payloads_count == 1: # if no other files
+                            message_box = QMessageBox(QMessageBox.Information,
+                                                      "Delete file",
+                                                      f"There are no other files other than {file.split('/')[-1]}, therefore you cannot delete it",
+                                                      QMessageBox.Ok)
+                            message_box.exec_()
+                        else:
+                            os.remove(file)
 
-                        # update codespace
-                        with open(self.path + "/payloads/" + self.current_payload) as f:
-                            self.codespace.setText(f.read())
-                            self.change_count = 0
+                            # update codespace
+                            if not self.saved or self.change_count == 0: # save if not saved
+                                self.save()
+                            with open(self.path + "/payloads/" + self.current_payload, "r") as f:
+                                self.codespace.setText(f.read())
+                                self.change_count = 0
 
-                        # move file names to one previous one (e.g. payload1.dd becomes payload.dd)
-                        for i in range(len(files), 0, -1):
-                            i = i-1 # now will iterate without starting from i=len to i=1
-                            payload = f"payload{i}.dd"
-                            if i-1 == 0:
-                                newpayload = f"payload.dd"
-                            else:
-                                newpayload = f"payload{i-1}.dd"
-                            os.rename(payload, newpayload)
+                            # move file names to one previous one (e.g. payload1.dd becomes payload.dd)
+                            for i in range(1, len(files)):
+                                payload = f"{self.path}/payloads/payload{i}.dd"
+                                if i-1 == 0:
+                                    newpayload = f"{self.path}/payloads/payload.dd"
+                                else:
+                                    newpayload = f"{self.path}/payloads/payload{i-1}.dd"
+                                os.rename(payload, newpayload)
                         
                 if not os.path.exists(self.current_payload): # if file doesn't exist
                     if payloads_count == 0:
@@ -874,10 +878,21 @@ class IDE(QMainWindow, QWidget):
     def add_file(self):
         payloads_count = len(os.listdir(self.path+"/payloads"))-1
         if payloads_count == 0:
-            self.current_payload = "payload.dd"
+            payload = "payload.dd"
         else:
-            self.current_payload = f"payload{payloads_count}.dd"
-        open(self.path+"/payloads/"+self.current_payload, "x").close()
+            payload = f"payload{payloads_count}.dd"
+        try:
+            open(self.path+"/payloads/"+payload, "x").close() # if order of payload# is incremental
+        except FileExistsError: # e.g. if payload3.dd exists but payload2.dd doesn't
+            try:
+                open(self.path+"/payloads/payload.dd", "x").close() # if order of payload# is incremental
+            except FileExistsError:
+                for i in range(1, payloads_count):
+                    try:
+                        open(self.path+f"/payloads/payload{i}.dd", "x").close() # if order of payload# is incremental
+                    except FileExistsError:
+                        pass
+            
 
     # locally download payload(#).dd
     def download_file(self):
