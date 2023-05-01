@@ -608,7 +608,6 @@ class IDE(QMainWindow, QWidget):
         options |= QFileDialog.DontUseNativeDialog
         selected_files = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", options)[0] # file selector
         file = selected_files[0]
-        print(selected_files)
         if os.path.dirname(file) == self.path+"/payloads": # if path of the file is payloads
             verify = QMessageBox.question(None, 'Delete file(s)', f"Are you sure you want to delete the file(s) selected?, you might not be able to recover it.", QMessageBox.No|QMessageBox.Yes)
             if verify == QMessageBox.Yes:
