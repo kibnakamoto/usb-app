@@ -156,7 +156,31 @@ it's that only Duckyscript 1.0 is supported on a USB Pico Ducky while USB Rubber
 
 \textbf{Payloads} are a file written in duckyscript. Payloads basically have instructions given to the USB so that the USB knows what keystrokes to input.
 
-A USB Rubber Ducky only supports one mode at a time while the USB Pico Ducky supports as many as you wish, you can use the $IMPORT$ keyword as specified in section \ref{ducky_import}, note that this only executes a different payload in the current payload. it can either execute a payload when connected to a device, or it can be in setup mode where you upload the payload(s) (more details can be found in section \ref{upload_payloads}), 
+A USB Rubber Ducky only supports one mode at a time while the USB Pico Ducky supports as many as you wish, you can use the $IMPORT$ keyword as specified in section \ref{ducky_import}, note that this only executes a different payload in the current payload. it can either execute a payload when connected to a device, or it can be in setup mode where you upload the payload(s) (more details can be found in section \ref{upload_payloads}).
+
+Note: The history of files are saved in the history folder. you can recover folders by clicking $Edit$(\includegraphics[width=5.5mm]{pictures/black_bk/save.png}) $ \rightarrow load$, then selecting the file that has the payload name + \_\#.dd. The \# number is the version number. The latest saved value in history will be the largest number.
+
+The history is basically the previous version of the file you just changed. It can save the history of up to 5 files per payload.
+\ \\
+Meaning for payload1.dd: payload1\_0.dd, payload1\_1.dd, payload1\_2.dd, payload1\_3.dd, payload1\_4.dd, payload1\_5.dd \textbf{$\textbf{(}$}5 versions will be saved in history, if you save more than 5 times, the history won't be saved, so don't forget to delete the files in history if you want to be able to recover all your changes. Better yet, use github or another method to backup your files and save your changes$\textbf{)}$
+
+For example:
+
+payload.dd $\rightarrow$ payload\_0.dd (first change)
+
+payload.dd $\rightarrow$ payload\_\#.dd where \# is the newest number (max 5) for the payload name (latest saved changes)
+
+Another Example for further clarification:
+\ \\
+payload5.dd $\rightarrow$ payload5\_0.dd (first change saved in history)
+\ \\
+If there are 5 changes saved in history:
+
+payload5.dd $\rightarrow$ payload5\_5.dd  latest saved changes in history)
+
+\subsubsection{deleting payloads}
+
+To delete payloads, click $Edit$(\includegraphics[width=5.5mm]{pictures/black_bk/save.png}) $ \rightarrow delete$ $file$ on the toolbar at the top. Then select the file(s) you want to delete, then press Open at the button below on the file(s) selector.
 
 \subsection{Saving \& Editing}\label{save_edit}
 
