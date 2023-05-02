@@ -10,6 +10,7 @@ import os
 import shutil
 import json
 from pathlib import Path
+import send2trash
 from PyQt5.QtCore import QSize, Qt, QRect, QRegExp, QDir
 from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatusBar, QTextEdit,  \
                             QHBoxLayout, QSizePolicy, QWidget, QMessageBox, \
@@ -619,9 +620,9 @@ class IDE(QMainWindow, QWidget):
                     if tmp.isdigit(): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
                         found = int(tmp)
                         if found == payloads_count-1: # if file # number is the largest, delete the file and select the previous one 
-                            os.remove(file) # remove file and don't change anything else
+                            send2trash.send2trash(file) # remove file and don't change anything else
                         else:
-                            os.remove(file)
+                            send2trash.send2trash(file)
                             open(file, "x").close()
                             # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
                             for i in range(found+1, payloads_count):
@@ -641,7 +642,7 @@ class IDE(QMainWindow, QWidget):
                                                       QMessageBox.Ok)
                             message_box.exec_()
                         else:
-                            os.remove(file)
+                            send2trash.send2trash(file)
 
                             # update codespace
                             if not self.saved or self.change_count == 0: # save if not saved

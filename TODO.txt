@@ -1,5 +1,2 @@
-Disclaimer: can I write that the USB is made for educational purposes (even though it's made for profit)?
-
-TODO: add delete from IDE to tutorial, add that if payload.dd can only be deleted if there are other payloads, and that if you delete payload.dd, the next files will decrease in their number (e.g. payload1.dd becomes payload.dd)
-TODO: add history recovery tutorial and make a button to recover whatever filename is typed in a box
-
+TODO: add a video tutorial
+TODO: add 
