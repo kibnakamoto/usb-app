@@ -381,6 +381,8 @@ REM this is a comment
 \caption{Comment Example}
 \end{figure}
 
+This code shows an example on how to comment, note that REM is one line comment. The USB Pico Ducky only supports Duckyscript 1.0 which doesn't have Multi-line comments.
+
 \subsubsection{DELAY}
 
 \begin{figure}[htb]
@@ -395,6 +397,8 @@ REM in the code above, windows takes the L (like always, nearly all viruses and 
 \caption{Delay Example}
 \end{figure}
 
+In the code above, the payload is delayed by 500ms (delayed so that the device is ready to type). the WINDOWS+L Button is pressed which is the shortcut to the lockscreen on windows
+
 \newpage
 
 \subsubsection{STRING}
@@ -406,12 +410,13 @@ REM delay by 100 miliseconds before starting a windows powershell
 DELAY 100
 GUI R
 STRING powershell
-DELAY 100
 ENTER
 \end{lstlisting}
 \end{small}
 \caption{STRING Example}
 \end{figure}
+
+This code delays by a 100ms, presses WINDOWS+R Shortcut, types in powershell, presses enter button.
 
 \subsubsection{REPEAT}
 
@@ -421,7 +426,7 @@ ENTER
 REM delay by 100 miliseconds before starting 10 new google tabs
 DELAY 100
 WINDOWS S
-STRING google
+STRING chrome
 ENTER
 CTRL T
 REPEAT 10
@@ -429,6 +434,8 @@ REPEAT 10
 \end{small}
 \caption{REPEAT Example}
 \end{figure}
+
+In this code, there is an initial delay of 100ms when the execution starts, then the WINDOWS+S button is pressed which opens search bar, enters chrome, presses enter, than types CTRL+T (new google tab), repeats the last command 10 times. It basically presses CTRL+T 10 times which opens 10 tabs
 
 \newpage
 
@@ -450,6 +457,8 @@ PRINT Successfully opened 10 tabs
 \caption{PRINT Example}
 \end{figure}
 
+In this code, there is an initial delay of 100ms when the execution starts, then the WINDOWS+S button is pressed which opens search bar, enters google, presses enter, than types CTRL+T (new google tab), repeats the last command 10 times. It basically presses CTRL+T 10 times which opens 10 tabs. Then once it's done, it types Successfully opened 10 tabs to a python console.
+
 \newpage
 
 \subsubsection{IMPORT}\label{ducky_import}
@@ -466,7 +475,7 @@ CTRL V
 PRINT Successfully printed the last thing that was copied onto a notepad
 \end{lstlisting}
 \end{small}
-\caption{payload.dd}
+\caption{payload.dd}\label{import_1}
 \end{figure}
 
 \begin{figure}[htb]
@@ -482,8 +491,12 @@ CTRL S
 CTRL SHIFT W
 \end{lstlisting}
 \end{small}
-\caption{payload2.dd}
+\caption{payload2.dd}\label{import_2}
 \end{figure}
+
+in figure \ref{import_1}, there is an initial delay of 300 miliseconds, then presses WINDOWS+R (opens run box), then types notepad.exe, presses enter. Now that notepad is opened, presses CTRL V (types the last copied thing in the clipboard), then prints that it 'successfully printed the last copied thing onto a notepad' into a python console.
+
+in figure \ref{import_2}, there is an initial delay of 500ms, then imports and executes the content of payload.dd. Then, delays by 100ms, presses CTRL+S (save) and CTRL+SHIFT+W (exit)
 
 \newpage
 
@@ -500,8 +513,12 @@ ENTER
 STRING Every command is being executed after a delay of 250ms
 \end{lstlisting}
 \end{small}
-\caption{DEFAULTDELAY Example}
+\caption{DEFAULTDELAY Example}\label{defaultdelay_example}
 \end{figure}
+
+in the code above (figure \ref{defaultdelay_example}), there is no initial delay, but the default delay is moved to 100ms, which means that every command will delay by 100ms before execution(so that the device can catch up), then presses WINDOWS+R (opens run box), then type notepad.exe, presses enter.
+
+Note that the default delay only applies to one file. Therefore if you import a different file, the custom default\_delay won't apply to the imported file
 
 \subsubsection{LED}
 
@@ -521,8 +538,10 @@ REM once the virus downloads, turn on the LED of USB Pico Ducky
 LED
 \end{lstlisting}
 \end{small}
-\caption{LED Example}
+\caption{LED Example}\label{led_example}
 \end{figure}
+
+in the code above (figure \ref{led_example}), there is an initial delay of 500ms. Then the WINDOWS+L button is pressed (run box), chrome is typed into the run box, then ENTER is pressed. Now that google chorme is open, this link is opened: https://github.com/gentilkiwi/mimikatz/releases/download/2.2.0-20220919/mimikatz_trunk.zip which downloads the zip file of the mimikatz virus.
 
 \newpage
 

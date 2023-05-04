@@ -1,2 +1,3 @@
 TODO: add a video tutorial
-TODO: add 
+TODO: test delete payload
+TODO: add pictures to document

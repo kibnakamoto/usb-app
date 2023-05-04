@@ -17,6 +17,8 @@ from PyQt5.QtWidgets import QMainWindow, QApplication, QToolBar, QAction, QStatu
                             QDockWidget, QFileDialog, QFileSystemModel, QTreeView, QComboBox
 from PyQt5.QtGui import QIcon, QColor, QTextCharFormat, QFont, QSyntaxHighlighter, \
                         QPalette, QTextCursor
+from PyQt5.QtGui import QKeySequence, QPixmap, QPainter
+from PyQt5.QtCore import QBuffer, QByteArray
 from pyqt_line_number_widget import LineNumberWidget
 
 import language
@@ -243,6 +245,13 @@ class IDE(QMainWindow, QWidget):
         self.target_os = "windows"
         self.target_lang = "us"
 
+        if sys.platform == "darwin":
+            self.download_dir = f'/Users/{os.getlogin()}/Downloads/'
+        elif sys.platform == "linux":
+            self.download_dir = f"/home/{os.getlogin()}/Downloads/"
+        else:
+            self.download_dir = f'C:/Users/{os.getlogin()}/Downloads/'
+
         # Operating System Selector
         self.select_os = QComboBox()
         for OS in SUPPORTED_OSS: # Supported Operating Systems
@@ -447,6 +456,50 @@ class IDE(QMainWindow, QWidget):
         toolbar.addWidget(self.languages)
         toolbar.addAction(self.setup)
 
+
+        # Create a "Screenshot" action with a shortcut
+        screenshot_action = QAction("Screenshot", self)
+        screenshot_action.setShortcut("print")
+        screenshot_action.triggered.connect(self.take_screenshot)
+
+        # Add the action to the File menu
+        view_menu.addAction(screenshot_action)
+
+    def take_screenshot(self):
+        # Get the main window's geometry and take a screenshot
+        main_window_rect = self.geometry()
+        screenshot = QApplication.primaryScreen().grabWindow(QApplication.desktop().winId(),
+                                                             main_window_rect.left(),
+                                                             main_window_rect.top(),
+                                                             main_window_rect.width(),
+                                                             main_window_rect.height())
+        pixmap = QPixmap(screenshot)
+        painter = QPainter(pixmap)
+        painter.fillRect(pixmap.rect(), QColor(0, 0, 0, 100))
+        painter.end()
+        buffer = QBuffer()
+        buffer.open(QBuffer.ReadWrite)
+        pixmap.save(buffer, "PNG")
+        screenshot_data = buffer.data()
+        num = 0
+        if os.path.exists(self.download_dir+"/ducky_screenshot.png"):
+            while True:
+                if not os.path.exists(self.download_dir+f"/ducky_screenshot{num}.png"):
+                    break
+                num+=1
+            with open(f"{self.download_dir}/ducky_screenshot{num}.png", "wb") as f:
+                 f.write(screenshot_data)
+        else:
+            with open(f"{self.download_dir}/ducky_screenshot.png", "wb") as f:
+                f.write(screenshot_data)
+
+        message_box = QMessageBox(QMessageBox.Information,
+                                  "Screenshot",
+                                  "Screenshot taken",
+                                  QMessageBox.Ok)
+
+        message_box.exec_()
+        
     # setup window
     def setup_w(self) -> None:
         self.setup_window = setup.Setup(screensize=self.screensize, parent=self)
@@ -579,106 +632,114 @@ class IDE(QMainWindow, QWidget):
 
     # load payload from any directory, the default directory is payloads
     def load_payload(self):
-        file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", QFileDialog.DontUseNativeDialog)[0][0]
-        if os.path.dirname(file) != self.path+"/payloads": # if path is different, copy it to the path
-            payloads_count = len(os.listdir(self.path+"/payloads"))-1
-            if payloads_count == 0:
-                self.current_payload = "payload.dd"
-            else:
-                self.current_payload = f"payload{payloads_count}.dd"
-            shutil.copy(f'{file}', f'payloads/{self.current_payload}') # copy file to Downloads folder
-            QMessageBox(QMessageBox.Information,
-                        "Sucessfully Copied file",
-                        f"{file} is saved as {self.current_payload}",
-                        QMessageBox.Ok)
-        else:
-            self.current_payload = file.split('/')[-1] # seperate path from filename
-
-        # load the payload into codespace
         try:
-            with open(self.path + "/payloads/" + self.current_payload, "r") as f:
-                self.codespace.setText(f.read())
-                self.change_count = 0
-                self.saved = True
-        except FileNotFoundError:
-            print("payload not found")
+            file = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", QFileDialog.DontUseNativeDialog)[0][0]
+        except IndexError:
+            pass
+        else:
+            if os.path.dirname(file) != self.path+"/payloads": # if path is different, copy it to the path
+                payloads_count = len(os.listdir(self.path+"/payloads"))-1
+                if payloads_count == 0:
+                    self.current_payload = "payload.dd"
+                else:
+                    self.current_payload = f"payload{payloads_count}.dd"
+                shutil.copy(f'{file}', f'payloads/{self.current_payload}') # copy file to Downloads folder
+                QMessageBox(QMessageBox.Information,
+                            "Sucessfully Copied file",
+                            f"{file} is saved as {self.current_payload}",
+                            QMessageBox.Ok)
+            else:
+                self.current_payload = file.split('/')[-1] # seperate path from filename
+
+            # load the payload into codespace
+            try:
+                with open(self.path + "/payloads/" + self.current_payload, "r") as f:
+                    self.codespace.setText(f.read())
+                    self.change_count = 0
+                    self.saved = True
+            except FileNotFoundError:
+                print("payload not found")
 
     # delete the selected payload
     def delete_payload(self):
         options = QFileDialog.Options() # file selector options
         options |= QFileDialog.DontUseNativeDialog
-        selected_files = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", options)[0] # file selector
-        file = selected_files[0]
-        if os.path.dirname(file) == self.path+"/payloads": # if path of the file is payloads
-            verify = QMessageBox.question(None, 'Delete file(s)', f"Are you sure you want to delete the file(s) selected?, you might not be able to recover it.", QMessageBox.No|QMessageBox.Yes)
-            if verify == QMessageBox.Yes:
-                for file in selected_files:
-                    files = os.listdir(self.path+"/payloads")
-                    files.remove("history")
-                    payloads_count = len(files) # subtract one because of history folder
-                    tmp = file.split('/')[-1][:-3].split("payload")[1]
-                    if tmp.isdigit(): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
-                        found = int(tmp)
-                        if found == payloads_count-1: # if file # number is the largest, delete the file and select the previous one 
-                            send2trash.send2trash(file) # remove file and don't change anything else
-                        else:
-                            send2trash.send2trash(file)
-                            open(file, "x").close()
-                            # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
-                            for i in range(found+1, payloads_count):
-                                payload = f"{self.path}/payloads/payload{i}.dd"
-                                if i-1 == 0:
-                                    newpayload = f"{self.path}/payloads/payload.dd"
-                                else:
-                                    newpayload = f"{self.path}/payloads/payload{i-1}.dd"
-                                if payload == self.current_payload: # change current payload if payload is updated
-                                    self.current_payload = newpayload
-                                os.rename(payload, newpayload)
-                    else: # if payload.dd
-                        if payloads_count == 1: # if no other files
-                            message_box = QMessageBox(QMessageBox.Information,
-                                                      "Delete file",
-                                                      f"There are no other files other than {file.split('/')[-1]}, therefore you cannot delete it",
-                                                      QMessageBox.Ok)
-                            message_box.exec_()
-                        else:
-                            send2trash.send2trash(file)
-
-                            # update codespace
-                            if not self.saved or self.change_count == 0: # save if not saved
-                                self.save()
-                            with open(self.path + "/payloads/" + self.current_payload, "r") as f:
-                                self.codespace.setText(f.read())
-                                self.change_count = 0
-
-                            # move file names to one previous one (e.g. payload1.dd becomes payload.dd)
-                            for i in range(1, len(files)):
-                                payload = f"{self.path}/payloads/payload{i}.dd"
-                                if i-1 == 0:
-                                    newpayload = f"{self.path}/payloads/payload.dd"
-                                else:
-                                    newpayload = f"{self.path}/payloads/payload{i-1}.dd"
-                                os.rename(payload, newpayload)
-                        
-                if not os.path.exists(self.current_payload): # if file doesn't exist
-                    if payloads_count == 0:
-                        self.current_payload = "payload.dd"
-                    else:
-                        self.current_payload = f"payload{payloads_count}.dd"
-                
-                tmp_settings = Settings()
-                tmp_settings.settings["current file"] = self.current_payload
-                self.settings.settings["current file"] = self.current_payload # set it to current settings as well
-                with open("settings.json", "w") as f:
-                    json.dump(tmp_settings.settings, f, indent=4)
-                del tmp_settings
-
+        try:
+            selected_files = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", options)[0] # file selector
+            file = selected_files[0]
+        except IndexError: # if canceled
+            pass
         else:
-            message_box = QMessageBox(QMessageBox.Information,
-                                      "Delete file",
-                                      f"The file you picked isn't in payloads, please pick a file in payloads to delete it",
-                                      QMessageBox.Ok)
-            message_box.exec_()
+            if os.path.dirname(file) == self.path+"/payloads": # if path of the file is payloads
+                verify = QMessageBox.question(None, 'Delete file(s)', f"Are you sure you want to delete the file(s) selected?, you might not be able to recover it.", QMessageBox.No|QMessageBox.Yes)
+                if verify == QMessageBox.Yes:
+                    for file in selected_files:
+                        files = os.listdir(self.path+"/payloads")
+                        files.remove("history")
+                        payloads_count = len(files) # subtract one because of history folder
+                        tmp = file.split('/')[-1][:-3].split("payload")[1]
+                        if tmp.isdigit(): # if not payload.dd, there would be a number, if so, then try to move all payload#.dd files 1 number below
+                            found = int(tmp)
+                            if found == payloads_count-1: # if file # number is the largest, delete the file and select the previous one 
+                                send2trash.send2trash(file) # remove file and don't change anything else
+                            else:
+                                send2trash.send2trash(file)
+                                open(file, "x").close()
+                                # move file names to one previous one if they are bigger than file number (e.g. if file 2 deleted, file 3 becomes 2 and so on)
+                                for i in range(found+1, payloads_count):
+                                    payload = f"{self.path}/payloads/payload{i}.dd"
+                                    if i-1 == 0:
+                                        newpayload = f"{self.path}/payloads/payload.dd"
+                                    else:
+                                        newpayload = f"{self.path}/payloads/payload{i-1}.dd"
+                                    if payload == self.current_payload: # change current payload if payload is updated
+                                        self.current_payload = newpayload
+                                    os.rename(payload, newpayload)
+                        else: # if payload.dd
+                            if payloads_count == 1: # if no other files
+                                message_box = QMessageBox(QMessageBox.Information,
+                                                          "Delete file",
+                                                          f"There are no other files other than {file.split('/')[-1]}, therefore you cannot delete it",
+                                                          QMessageBox.Ok)
+                                message_box.exec_()
+                            else:
+                                send2trash.send2trash(file)
+
+                                # update codespace
+                                if not self.saved or self.change_count == 0: # save if not saved
+                                    self.save()
+                                with open(self.path + "/payloads/" + self.current_payload, "r") as f:
+                                    self.codespace.setText(f.read())
+                                    self.change_count = 0
+
+                                # move file names to one previous one (e.g. payload1.dd becomes payload.dd)
+                                for i in range(1, len(files)):
+                                    payload = f"{self.path}/payloads/payload{i}.dd"
+                                    if i-1 == 0:
+                                        newpayload = f"{self.path}/payloads/payload.dd"
+                                    else:
+                                        newpayload = f"{self.path}/payloads/payload{i-1}.dd"
+                                    os.rename(payload, newpayload)
+                            
+                    if not os.path.exists(self.current_payload): # if file doesn't exist
+                        if payloads_count == 0:
+                            self.current_payload = "payload.dd"
+                        else:
+                            self.current_payload = f"payload{payloads_count}.dd"
+                    
+                    tmp_settings = Settings()
+                    tmp_settings.settings["current file"] = self.current_payload
+                    self.settings.settings["current file"] = self.current_payload # set it to current settings as well
+                    with open("settings.json", "w") as f:
+                        json.dump(tmp_settings.settings, f, indent=4)
+                    del tmp_settings
+
+            else:
+                message_box = QMessageBox(QMessageBox.Information,
+                                          "Delete file",
+                                          f"The file you picked isn't in payloads, please pick a file in payloads to delete it",
+                                          QMessageBox.Ok)
+                message_box.exec_()
 
     def if_typed(self):
         if self.codespace.document().isModified(): # only if plaintext of codespace is modified
