@@ -8,8 +8,8 @@
 \usepackage{listings}
 \usepackage{booktabs}
 \usepackage[utf8]{inputenc}
-\usepackage{multirow}
 \usepackage{rotating}
+\usepackage{makecell}
 
 \definecolor{bgColor}{rgb}{0.95,0.95,0.92}
 \definecolor{cgreen}{RGB}{8, 110, 16}
@@ -223,9 +223,17 @@ Here is what they are and what they do:
 
 \subsection{Cosmetics}\label{cosmetics}
 
-\begin{tabular}{||c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|l|c|r|p{6cm}||}
-    \cline{1-3}
+\begin{center}
+\begin{tabular}{||c|c|c|c||}
 	\multicolumn{2}{|c|}{Background} & Background of the IDE \\
+	\cline{1-3}
+	\multicolumn{2}{|c|}{Text} & Non-keyword text\\
+	\cline{1-3}
+	\multicolumn{2}{|c|}{Textbubble} & \thead{Background of\\text coding box\\(the background of\\the IDE code box)}\\
+	\cline{1-3}
+	\multicolumn{2}{c|}{Background sidebar} & \thead{Background color of \\ the file picking sidebar}\\
+	\cline{1-3}
+	\multicolumn{2}{|c|}{Color sidebar} & \thead{Color of the \\text of sidebar}\\
 	\hline
 	\multicolumn{2}{|c|}{Comment} & Colors of comment & REM\\
 	\hline
@@ -281,48 +289,10 @@ Here is what they are and what they do:
 			0 & 1 & 2 & 3 & 4\\
 			5 & 6 & 7 & 8 & 9\\
   		\end{tabular}
-	}
-
-
+	}\\
 \end{tabular}
-
+\end{center}
 \newpage
-
-\normalsize
-\textit{The custom colors you can pick are for}
-\setcounter{MaxMatrixCols}{29} 
-\small
-\ \\
-1. \textbf{Background}: Background of the IDE\\
-2. \textbf{Comment}: Colors of comment. Line after \colorbox{lightgray}{REM}
-$ \\\begin{bmatrix} REM \end{bmatrix}\\\\$
-3. \textbf{Starting keywords}: keywords that generally start a line of duckyscript code
-$ \\\begin{bmatrix} DELAY & STRING & PRINT & DEFAULT\_DELAY & DEFAULTDELAY
-					\\LED & REPEAT & IMPORT \end{bmatrix}\\\\$
-4. \textbf{Fkeys}: F-keys
-$ \\\begin{bmatrix} F1 & F2 & F3 & F4 & F5 & F6 & F7 & F8 & F9 & F10 & F11 & F12 \end{bmatrix}\\\\$
-5. \textbf{Shortcut keys}: starting keys for shortcuts
-$ \\\begin{bmatrix} ALT & CTRL & CONTROL & SHIFT & SPACE & ENTER & BACKSPACE
-  \\TAB & CAPSLOCK & ESC & ESCAPE \end{bmatrix}\\\\$
-6. \textbf{Arrows}: Arrowkeys
-$ \\\begin{bmatrix} UP & UPARROW & DOWN & DOWNARROW & LEFT & LEFTARROW
-  \\RIGHT & RIGHTARROW \end{bmatrix}\\\\$
-7. \textbf{Windows}: Windows Button keywords
-$ \\\begin{bmatrix} WINDOWS & GUI \end{bmatrix}\\\\$
-8. \textbf{Chars}: Colors of single characters
-$ \\\begin{bmatrix} A & B & C & D & E & F & G & H & I & J & K & L & M & N & O & P & Q & R & S & T & U & V & W & X & Y & Z \end{bmatrix}\\\\$
-9. \textbf{Uncommon}: Uncommon keywords
-$ \\\begin{bmatrix} APP & MENU & BREAK & PAUSE & DELETE & END
-  \\ HOME & INSERT & NUMLOCK & PAGEUP & PAGEDOWN
-  \\ PRINTSCREEN & SCROLLLOCK \end{bmatrix}\\\\$
-10. \textbf{Numbers}: Base 10 numbers (numbers from 0-9)
-$ \\\begin{bmatrix} 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 \end{bmatrix}\\\\$
-11. \textbf{Text}: Non-keyword text\\
-12. \textbf{Textbubble}: Background of text coding box (the background of the IDE code box)\\
-13. \textbf{Background sidebar}: Background color of the file picking sidebar\\
-14. \textbf{Color sidebar}: Color of the text of sidebar\\
-
-\normalsize
 
 \subsubsection{Existing Themes}
 
