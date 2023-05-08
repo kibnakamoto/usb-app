@@ -223,51 +223,58 @@ Here is what they are and what they do:
 
 \subsection{Cosmetics}\label{cosmetics}
 
+\definecolor{LightRed}{RGB}{255,33,33}
+
+\newcolumntype{g}{>{\columncolor{LightGreen}}c}
+\newcolumntype{b}{>{\columncolor{LightBlue}}c}
+\newcolumntype{y}{>{\columncolor{LightGrey}}c}
+\newcolumntype{r}{>{\columncolor{red!50}}c}
+
 \begin{center}
-\begin{tabular}{||c|c|c|c||}
-	\multicolumn{2}{|c|}{Background} & Background of the IDE \\
+\begin{tabular}{||b|b|g|r||}
+	\multicolumn{2}{|b|}{Background} & Background of the IDE \\
 	\cline{1-3}
-	\multicolumn{2}{|c|}{Text} & Non-keyword text\\
+	\multicolumn{2}{|b|}{Text} & Non-keyword text\\
 	\cline{1-3}
-	\multicolumn{2}{|c|}{Textbubble} & \thead{Background of\\text coding box\\(the background of\\the IDE code box)}\\
+	\multicolumn{2}{|b|}{Textbubble} & \thead{Background of\\text coding box\\(the background of\\the IDE code box)}\\
 	\cline{1-3}
-	\multicolumn{2}{c|}{Background sidebar} & \thead{Background color of \\ the file picking sidebar}\\
+	\multicolumn{2}{|b|}{Background sidebar} & \thead{Background color of \\ the file picking sidebar}\\
 	\cline{1-3}
-	\multicolumn{2}{|c|}{Color sidebar} & \thead{Color of the \\text of sidebar}\\
+	\multicolumn{2}{|b|}{Color sidebar} & \thead{Color of the \\text of sidebar}\\
 	\hline
-	\multicolumn{2}{|c|}{Comment} & Colors of comment & REM\\
+	\multicolumn{2}{|y|}{Comment} & Colors of comment & REM\\
 	\hline
-	\multicolumn{2}{|c|}{Starting Keywords} & Colors of Starting Keywords & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
+	\multicolumn{2}{|y|}{Starting Keywords} & Colors of Starting Keywords & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
 		\begin{tabular}{c|c|c|c|c|c|c|c}
 		DELAY & STRING & PRINT \\ DEFAULT\_DELAY & DEFAULTDELAY & LED \\ REPEAT & IMPORT\\
   		\end{tabular}
 	}\\
 	\hline
-	\multicolumn{2}{|c|}{F-Keys} & Colors of F-Keys & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.8}{
+	\multicolumn{2}{|y|}{F-Keys} & Colors of F-Keys & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.8}{
 		\begin{tabular}{c|c|c|c|c|c c|c|c|c|c|c}
 		F1 & F2 & F3 & F4 & F5 & F6 \\ F7 & F8 & F9 & F10 & F11 & F12\\
   		\end{tabular}
 	}\\
 	\hline
-	\multicolumn{2}{|c|}{Shortcut keys} & Starting keys for shortcuts & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
+	\multicolumn{2}{|y|}{Shortcut keys} & Starting keys for shortcuts & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
 		\begin{tabular}{c|c|c|c c|c|c|c|c|c|c|c}
 		ALT & CTRL & CONTROL & SHIFT \\ SPACE & ENTER & BACKSPACE & TAB \\ CAPSLOCK & ESC & ESCAPE\\
   		\end{tabular}
 	}\\
 	\hline
-	\multicolumn{2}{|c|}{Arrows} & Arrowkeys & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
+	\multicolumn{2}{|y|}{Arrows} & Arrowkeys & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
 		\begin{tabular}{c|c|c|c c|c|c|c}
 			UP & UPARROW & DOWN & DOWNARROW \\ LEFT & LEFTARROW & RIGHT & RIGHTARROW\\
   		\end{tabular}
 	}\\
 	\hline
-	\multicolumn{2}{|c|}{Windows} & Windows Button keywords & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
+	\multicolumn{2}{|y|}{Windows} & Windows Button keywords & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
 		\begin{tabular}{c|c}
 			WINDOWS & GUI\\
   		\end{tabular}
 	}\\
 	\hline
-	\multicolumn{2}{|c|}{Chars} & Colors of single characters & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.8}{
+	\multicolumn{2}{|y|}{Chars} & Colors of single characters & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.8}{
 		\begin{tabular}{c|c|c|c|c|c|c|c|c c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c|c}
 			A & B & C & D & E & F & G & H & I \\
 			J & K & L & M & N & O & P & Q & R \\
@@ -275,7 +282,7 @@ Here is what they are and what they do:
   		\end{tabular}
 	}\\
 	\hline
-	\multicolumn{2}{|c|}{Uncommon} & Uncommonly seen keywords & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.6}{
+	\multicolumn{2}{|y|}{Uncommon} & Uncommonly seen keywords & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.6}{
 		\begin{tabular}{c|c|c|c c|c|c|c|c|c|c|c|c}
 			APP & MENU & BREAK & PAUSE \\
 			DELETE & END & HOME & INSERT \\
@@ -284,7 +291,7 @@ Here is what they are and what they do:
   		\end{tabular}
 	}\\
 	\hline
-	\multicolumn{2}{|c|}{Numbers} & \small Base 10 numbers (0-9)\normalsize & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.8}{
+	\multicolumn{2}{|y|}{Numbers} & \small Base 10 numbers (0-9)\normalsize & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.8}{
 		\begin{tabular}{c|c|c|c|c c|c|c|c|c}
 			0 & 1 & 2 & 3 & 4\\
 			5 & 6 & 7 & 8 & 9\\
@@ -357,11 +364,7 @@ Duckyscript language is a language used in hacking USBs. Hacking USBs pretend to
 
 All the keywords:
 
-REM: Comment, comments are a line of code that describe what the code is about to do. They are ignored by the computer and are only for humans to view
-DELAY: Waits for a specfied amount of miliseconds. This is useful because some commands take time to execute and you should use DELAY to wait for it to get executed
-STRING: Enter a text, if you were to input something into a powershell/terminal/any textbox, you would type it after this keyword.
-
-Here are some keyboard letters supported by All languages
+Here are some keyboard keys supported by All languages
 \scriptsize
 $\\\begin{bmatrix} 
 REM & DELAY & STRING & PRINT & DEFAULT\_DELAY
@@ -375,7 +378,7 @@ REM & DELAY & STRING & PRINT & DEFAULT\_DELAY
 \end{bmatrix}\\\\$
 \normalsize
 
-Some of these keywords refer to the same thing, this website shows which keywords share the same meanings
+Some of these keywords are the same keyboard key, this website shows which keywords share the same meanings
 https://wiki.spacehuhn.com/wifiduck/usage/duckyscript/
 
 \subsection{Tutorial}
@@ -384,23 +387,46 @@ As you can see on section \ref{all_keywords}, all these keywords have to be capi
 
 as you can see most of these keywords can be found on the keyboard. This is because everything else is just keyboard keys and the function of these keys depend on the OS (Operating System), the type and brand of the device. 
 
-Here are the duckyscript commands that aren't keyboard keys:
-\\1. \textbf{REM}: stands for 'REMOVE', it's used for commenting code, here is an example:
-\\2. \textbf{DELAY}: a pause (in milliseconds). Used for when waiting for an interface to catch up with the USB Pico Ducky typing speed
-\\3. \textbf{STRING}: types whatever comes after the command
-\\4. \textbf{REPEAT}: repeats the previous command N times
-\\5. \textbf{PRINT}: prints whatever comes after to python console
-\\6. \textbf{IMPORT}: imports and executes another duckyscript file to execute (has to be in the same path/folder), this functionality doesn't exist in the USB Rubber Ducky but does exist in this USB Pico Ducky.
-\\7. \textbf{DEFAULTDELAY \& DEFAULT\_DELAY}:  DEFAULTDELAY specifies how long (in milliseconds) to wait between each line of command. If not specified, DEFAULTDELAY is 18ms.
-\\8. \textbf{LED}: change the state of the LED (on/off)
+\begin{center}
+ \setlength{\arrayrulewidth}{0.3mm}\begin{tabular}{|b|b|b|}
+	\cline{1-3}
+	\multicolumn{3}{|r|}{Here are the duckyscript commands that aren't keyboard keys}\\
+	\multicolumn{2}{|b|}{REM} & \thead{Stands for 'REMOVE', it's used for commenting code}\\
+	\hline
+	\multicolumn{2}{|b|}{DELAY} & \thead{A pause (in milliseconds). Used for when waiting for\\an interface to catch up with\\the USB Pico Ducky typing speed}\\
+	\hline
+	\multicolumn{2}{|b|}{STRING} & \thead{Types whatever comes after the command}\\
+	\hline
+	\multicolumn{2}{|b|}{REPEAT} & \thead{Repeats the previous command N times}\\
+	\hline
+	\multicolumn{2}{|b|}{PRINT} & \thead{Prints whatever comes after to python console}\\
+	\hline
+	\multicolumn{2}{|b|}{IMPORT} & \thead{Imports and executes another duckyscript file to execute\\(has to be in the same path/folder), this functionality doesn't exist in the\\USB Rubber Ducky but does exist in this USB Pico Ducky.}\\
+	\hline
+	\multicolumn{2}{|b|}{\thead{DEFAULTDELAY \\DEFAULT\_DELAY}} & \thead{Specifies how long (in milliseconds) to\\wait between each line of command. If not specified, DEFAULTDELAY is 18ms.}\\
+	\hline
+	\multicolumn{2}{|b|}{LED} & \thead{Change the state of the LED (on/off)}\\
+\end{tabular}
+\end{center}
 
-Here are some keys that you might find confusing:
-\\1.WINDOWS \& GUI: The windows button
-\\2. UP \& UPARROW: The up arrow key
-\\3. DOWN \& DOWNARROW: The down arrow key
-\\4. RIGHT \& RIGHTARROW: The right arrow key
-\\5. LEFT \& LEFTARROW: The left arrow key
-\\6. All the rest of the keywords can be found on a keyboard
+\begin{center}
+\begin{tabular}{|b|g|}
+	\multicolumn{2}{|r|}{Keys That Might Be Confusing}\\
+	\hline
+	WINDOWS \& GUI & The windows button\\
+	\hline
+	UP \& UPARROW & The up arrow key\\
+	\hline
+	DOWN \& DOWNARROW & The down arrow key\\
+	\hline
+	RIGHT \& RIGHTARROW & The right arrow key\\
+	\hline
+	LEFT \& LEFTARROW & The left arrow key\\
+	\hline
+\end{tabular}
+\end{center}
+
+All the rest of the keywords can be found on a keyboard\\
 
 Keyboard keys are used for typing and shortcuts that are OS (Operating System) dependant. For example, F-keys (e.g. F1 key) won't work on a phone because there is no such thing as F1 button on a phone, also the function of keys change depending on the OS (Operating System).
 
