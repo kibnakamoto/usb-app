@@ -93,7 +93,7 @@ class Setup(QMainWindow):
         self.hack_mode = hack_mode
 
         # copy the uf2.uf2 file to the microcontroller and wait for it to reboot
-        shutil.copy("{self.add_path}/uf2.uf2", self.pico_path) # copy file to pico
+        shutil.copy(f"{self.add_path}/uf2.uf2", self.pico_path) # copy file to pico
         sleep(2.0) # wait for the uf2 file to be uploaded and microcontroller to reboot
 
         # add all the lib files
@@ -112,7 +112,7 @@ class Setup(QMainWindow):
         self.hack_mode = hack_mode
 
         # while holding the button, plug the usb in and run this code
-        shutil.copy("{self.add_path}/flash_nuke.uf2", self.pico_path) # copy uf2 nuke to pico
+        shutil.copy(f"{self.add_path}/flash_nuke.uf2", self.pico_path) # copy uf2 nuke to pico
 
 if __name__ == '__main__':
     app = QApplication([])
