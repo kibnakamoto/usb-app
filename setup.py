@@ -9,7 +9,7 @@ import sys
 import shutil
 import json
 from time import sleep
-from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QPushButton
+from PyQt5.QtWidgets import QMainWindow, QApplication, QFileDialog, QPushButton, QMessageBox
 from PyQt5.QtGui import QColor, QPalette
 
 import settings
@@ -76,43 +76,112 @@ class Setup(QMainWindow):
             json.dump(new_settings.settings, f, indent=4)
 
         # hack mode selector
-        self.selector_h = QPushButton(f"{button_n} Hack Mode", self)
+        self.selector_h = QPushButton(f"Disable Hack Mode", self)
         self.selector_h.resize(self.selector_h.sizeHint())
         self.selector_h.move(self.size().width()//2-self.selector_h.width()//2, self.size().height()//2-self.select_path.height())
-        self.selector_h.setToolTip(f"{button_n} the Hacking Mode of USB Pico Ducky")
+        self.selector_h.setToolTip(f"Disable the Hacking Mode of USB Pico Ducky")
         self.selector_h.show()
+        self.selector_h.clicked.connect(self.disable_h)
 
-        if self.hack_mode == True:
-            self.selector_h.clicked.connect(self.disable_h)
-        else:
-            self.selector_h.clicked.connect(self.enable_h)
+        # hack mode selector
+        self.selector_e = QPushButton(f"Enable Hack Mode", self)
+        self.selector_e.resize(self.selector_e.sizeHint())
+        self.selector_e.move(self.size().width()//2-self.selector_h.width()//2, self.size().height()//2-self.select_path.height()-self.selector_h.height())
+        self.selector_e.setToolTip(f"Enable the Hacking Mode of USB Pico Ducky")
+        self.selector_e.show()
+        self.selector_e.clicked.connect(self.enable_h)
 
     # enable hacking mode
     def enable_h(self, hack_mode:bool=True) -> None:
+        message_box = QMessageBox(QMessageBox.Information,
+                                  "Enable Hack Mode",
+                                  "Enabling Hacking Mode, this might take a minute",
+                                  QMessageBox.Ok)
+        message_box.exec_()
         # upload the files onto the microcontoller
         self.hack_mode = hack_mode
 
+        # replace folder name in path
+        if not os.path.exists(self.pico_path):
+            self.pico_path = self.pico_path.replace(self.pico_path[self.pico_path.index(self.pico_path.split('/')[-1]):], "RPI-RP2")
+
         # copy the uf2.uf2 file to the microcontroller and wait for it to reboot
-        shutil.copy(f"{self.add_path}/uf2.uf2", self.pico_path) # copy file to pico
-        sleep(2.0) # wait for the uf2 file to be uploaded and microcontroller to reboot
+        try:
+            shutil.copy(f"{self.add_path}/uf2.uf2", self.pico_path) # copy file to pico
+        except PermissionError:
+            message_box = qmessagebox(qmessagebox.information,
+                                      "Enable hack mode",
+                                      "Device doesn't exist. Please make sure you selected the right device, if it still didn't work, try setting the device name to RPI-RP2",
+                                      qmessagebox.ok)
+            message_box.exec_()
+            
 
-        # add all the lib files
-        lib_files = os.listdir(f"{self.add_path}lib")
-        for file in lib_files:
-            shutil.copy(f"{self.add_path}{file}", self.pico_path+"/lib") # copy file to pico
+        self.pico_path = self.pico_path.replace(self.pico_path[self.pico_path.index(self.pico_path.split('/')[-1]):], "CIRCUITPY")
+        while True:
+            try:
+                # add all the lib files
+                lib_files = os.listdir(f"{self.add_path}lib")
+                for file in lib_files:
+                    if os.path.exists(self.pico_path + f"/{file}"):
+                        os.remove(self.pico_path + f"/{file}")
+                    elif os.path.exists(self.pico_path + f"/lib/{file}"):
+                        os.remove(self.pico_path + f"/{file}")
+                    try:
+                        shutil.copy(f"{self.add_path}lib/{file}", self.pico_path+"/lib/") # copy file to pico
+                    except IsADirectoryError: # IsADirectoryError: [Errno 21] Is a directory
+                        if os.path.exists(self.pico_path + f"/{file}"):
+                            shutil.rmtree(self.pico_path + f"/{file}")
+                        elif os.path.exists(self.pico_path + f"/lib/{file}"):
+                            shutil.rmtree(self.pico_path + f"/{file}")
+                        shutil.copytree(f"{self.add_path}lib/{file}", self.pico_path+f"/lib/{file}") # copy file to pico
 
-        # add all the root files
-        root_files = os.listdir(f"{self.add_path}root")
-        for file in root_files:
-            shutil.copy(f"{self.add_path}{file}", self.pico_path) # copy file to pico
+                # add all the root files
+                root_files = os.listdir(f"{self.add_path}root")
+                for file in root_files:
+                    if os.path.exists(self.pico_path + f"/{file}"):
+                        os.remove(self.pico_path + f"/{file}")
+                    shutil.copy(f"{self.add_path}root/{file}", self.pico_path+f"/{file}") # copy file to pico
+                break
+            except PermissionError: # No permission meaning shutil didn't load
+                if not os.path.exists(self.pico_path):
+                    self.pico_path = self.pico_path.replace(self.pico_path[self.pico_path.index(self.pico_path.split('/')[-1]):], "CIRCUITPY")
+                print("trying device", self.pico_path)
+                sleep(1)
+                continue
+        new_settings = settings.Settings()
+        new_settings.settings["last pico path"] = self.pico_path
+        with open("settings.json", "w") as f:
+            json.dump(new_settings.settings, f, indent=4)
+        del new_settings
+        message_box = QMessageBox(QMessageBox.Information,
+                                  "Enable hack mode",
+                                  "successfully enabled hacking mode",
+                                  QMessageBox.Ok)
+        message_box.exec_()
 
     # disable hacking mode
     def disable_h(self, hack_mode:bool=False) -> None:
         # remove the uploaded files from the microcontroller
         self.hack_mode = hack_mode
+        if not os.path.exists(self.pico_path):
+            self.pico_path = self.pico_path.replace(self.pico_path[self.pico_path.index(self.pico_path.split('/')[-1]):], "RPI-RP2")
 
         # while holding the button, plug the usb in and run this code
-        shutil.copy(f"{self.add_path}/flash_nuke.uf2", self.pico_path) # copy uf2 nuke to pico
+        try:
+            shutil.copy(f"{self.add_path}/flash_nuke.uf2", self.pico_path) # copy uf2 nuke to pico
+        except PermissionError:
+            message_box = QMessageBox(QMessageBox.Information,
+                                      "Disable Hack Mode",
+                                      "Path isn't correct, please make sure to Hold the White Button (Labeled as Bootsel) while plugging the device in, then make sure the name of the microcontroller is set to RPI-RP2",
+                                      QMessageBox.Ok)
+            message_box.exec_()
+        sleep(5)
+
+        message_box = QMessageBox(QMessageBox.Information,
+                    "Disable Hack Mode",
+                    "Sucessfully Disabled Hacking USB",
+                    QMessageBox.Ok)
+        message_box.exec_()
 
 if __name__ == '__main__':
     app = QApplication([])

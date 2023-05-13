@@ -1,9 +1,9 @@
 {
-    "current file": "payload1.dd",
-    "last color": "custom 1",
+    "current file": "payload.dd",
+    "last color": "black",
     "last language": "us",
     "last os": "windows",
-    "last pico path": "",
+    "last pico path": "/media/kibnakamoto/CIRCUITPY",
     "colors": [
         {
             "black": [
@@ -40,24 +40,6 @@
                     "textbubble": "ffffff",
                     "background sidebar": "f1f1f1",
                     "color sidebar": "050505"
-                }
-            ],
-            "custom 1": [
-                {
-                    "background": "050505",
-                    "comment": "5e9451",
-                    "starting keywords": "dc0b0b",
-                    "fkeys": "ff8000",
-                    "shortcut keys": "f8e45c",
-                    "arrows": "f8e45c",
-                    "windows": "f8e45c",
-                    "chars": "ff7f50",
-                    "uncommon": "2ec7c7",
-                    "numbers": "546b6b",
-                    "text": "202020",
-                    "textbubble": "ffffff",
-                    "background sidebar": "fafafa",
-                    "color sidebar": "f1f1f1"
                 }
             ]
         }
