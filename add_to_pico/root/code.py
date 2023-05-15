@@ -1,16 +1,11 @@
 # License : GPLv2.0
 # copyright (c) 2023  Dave Bailey
-# Author: Dave Bailey (dbisu, @daveisu), Taha Canturk
+# Author: Dave Bailey (dbisu, @daveisu)
 # Pico and Pico W board support
 
 
 import supervisor
 
-# import language
-from language import *
-
-# set the language by os
-set_lang(TARGET.OS, TARGET.LANG)
 
 import time
 import digitalio
