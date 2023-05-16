@@ -1,2 +1,1 @@
-python3 -OO -m py_compile ducky.py language.py, settings.py, setup.py
-
+pyinstaller --noconfirm --onedir --console --runtime-tmpdir . "/home/kibnakamoto/workspace/usb-app/ducky.py"
