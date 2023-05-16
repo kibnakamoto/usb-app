@@ -14,3 +14,7 @@ payloads/
 *.lot
 *.toc
 *.out
+
+# python build files/folders
+build/
+dist/
