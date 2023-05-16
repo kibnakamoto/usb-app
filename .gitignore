@@ -17,4 +17,4 @@ payloads/
 
 # python build files/folders
 build/
-dist/
+# dist/ # dist is wanted because it has exe
