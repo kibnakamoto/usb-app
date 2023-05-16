@@ -648,7 +648,7 @@ class IDE(QMainWindow, QWidget):
                 QMessageBox(QMessageBox.Information,
                             "Sucessfully Copied file",
                             f"{file} is saved as {self.current_payload}",
-                            QMessageBox.Ok)
+                            QMessageBox.Ok).exec_()
             else:
                 self.current_payload = file.split('/')[-1] # seperate path from filename
 
@@ -659,6 +659,10 @@ class IDE(QMainWindow, QWidget):
                     self.change_count = 0
                     self.saved = True
             except FileNotFoundError:
+                QMessageBox(QMessageBox.Information,
+                            "Payload Loader",
+                            f"payload not found",
+                            QMessageBox.Ok).exec_()
                 print("payload not found")
 
     # delete the selected payload
