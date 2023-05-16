@@ -489,7 +489,7 @@ class IDE(QMainWindow, QWidget):
                     break
                 num+=1
             with open(f"{self.download_dir}/ducky_screenshot{num}.png", "wb") as f:
-                 f.write(screenshot_data)
+                f.write(screenshot_data)
         else:
             with open(f"{self.download_dir}/ducky_screenshot.png", "wb") as f:
                 f.write(screenshot_data)
