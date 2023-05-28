@@ -670,6 +670,7 @@ class IDE(QMainWindow, QWidget):
         options |= QFileDialog.DontUseNativeDialog
         try:
             selected_files = QFileDialog.getOpenFileNames(self, "Select Files", f"{self.path}/payloads/", "All Files (*.dd)", "", options)[0] # file selector
+            selected_files = sorted(selected_files, reverse=True)
             file = selected_files[0]
         except IndexError: # if canceled
             pass
@@ -1018,9 +1019,20 @@ class IDE(QMainWindow, QWidget):
 
     # locally download payload(#).dd
     def download_file(self):
-        download_path = os.path.expanduser("~") + "/Downloads"
-        shutil.copy(f'payloads/{self.current_payload}', f'{download_path}/') # copy file to Downloads folder
-
+        try:
+            download_path = os.path.expanduser("~") + "/Downloads"
+            shutil.copy(f'payloads/{self.current_payload}', f'{download_path}/') # copy file to Downloads folder
+            message_box = QMessageBox(QMessageBox.Information,
+                                      "Download",
+                                      "Sucessfully downloaded file",
+                                      QMessageBox.Ok)
+            message_box.exec_()
+        except Exception as e:
+            message_box = QMessageBox(QMessageBox.Information,
+                                      "Download",
+                                      f"Failed to download file\nSend the following error message to the developer: {e}",
+                                      QMessageBox.Cancel)
+            message_box.exec_()
 
     # save the currently editing file
     def save(self):
