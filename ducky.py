@@ -1100,64 +1100,69 @@ class IDE(QMainWindow, QWidget):
 
     # upload payload(#).dd onto the microcontroller
     def upload(self):
-        message_box = QMessageBox(QMessageBox.Information,
-                                  "Payload Upload",
-                                  "Choose the Payload to Upload",
-                                  QMessageBox.Ok)
-        message_box.exec_()
-        files = QFileDialog.getOpenFileNames(self, "Select Payload to Upload", f"{self.path}/payloads/", "All Files (*.dd)", "", QFileDialog.DontUseNativeDialog)[0]
-        message_box = QMessageBox(QMessageBox.Information,
-                                  "Payload Upload",
-                                  "Please choose a filename, what should the name of the file be in the USB Pico Ducky, remember that if you have one file, use payload.dd, if you have two: (payload.dd, payload1.dd), otherwise, they won't work, please refer to the documentation for more information",
-                                  QMessageBox.Ok)
-        message_box.exec_()
-        dialog = QInputDialog(self)
-        palette = dialog.palette()
+        try:
+            message_box = QMessageBox.question(None,
+                                      "Payload Upload",
+                                      "Choose the Payload to Upload",
+                                      QMessageBox.Cancel|QMessageBox.Ok)
+            if message_box == QMessageBox.Cancel: # to avoid too many nested if statements, raise/catch error
+                raise CatchedError
+            files = QFileDialog.getOpenFileNames(self, "Select Payload to Upload", f"{self.path}/payloads/", "All Files (*.dd)", "", QFileDialog.DontUseNativeDialog)[0]
+            message_box = QMessageBox.question(None,
+                                      "Payload Upload",
+                                      "Please choose a filename, what should the name of the file be in the USB Pico Ducky, remember that if you have one file, use payload.dd, if you have two: (payload.dd, payload1.dd), otherwise, they won't work, please refer to the documentation for more information",
+                                      QMessageBox.Cancel|QMessageBox.Ok)
+            if message_box == QMessageBox.Cancel: # to avoid too many nested if statements, raise/catch error
+                raise CatchedError
+            dialog = QInputDialog(self)
+            palette = dialog.palette()
 
-        if self.settings.theme[0] == 'w': # white border of box means dark background
-            dialog.setStyleSheet("background: black; color: white;")
-            dialog.setStyleSheet("QLineEdit { color: white; background-color: black; } QPushButton { background-color: #202020; color: white; }")
-            palette.setColor(QPalette.Background, QColor(5, 5, 5))
-        else:
-            dialog.setStyleSheet("background: 5f5f5f;color: f5f5f5;")
-            dialog.setStyleSheet("QLineEdit { color: black; background-color: white; }")
-            palette.setColor(QPalette.Background, QColor(250,250,250))
-        dialog.setLabelText(f"Enter New File Name, Don't enter anything if you don't want to change the names.\nIf you have multiple files, seperate them using a single space bar inbetween\ne.g. payload.dd payload1.dd...")
-        dialog.setWindowTitle("Theme name Picker")
-        dialog.setInputMode(QInputDialog.TextInput)
-        dialog.setPalette(palette)
-        ok = dialog.exec_()
-        new_files = dialog.textValue()
-        if new_files == "":
-            new_files = []
-            for file in files:
-                new_files.append(file.split('/')[-1])
-        else:
-            new_files = new_files.split(" ")
-            if len(new_files) != files:
-                for i in range(len(new_files), len(files)):
-                    new_files.append(files[i].split('/')[-1])
-
-        for i in range(len(files)):
-            file = files[i]
-            new_file = new_files[i]
-            if os.path.exists(self.settings.pico_path):
-                shutil.copy(file, self.settings.pico_path + f"/{new_file}")
+            if self.settings.theme[0] == 'w': # white border of box means dark background
+                dialog.setStyleSheet("background: black; color: white;")
+                dialog.setStyleSheet("QLineEdit { color: white; background-color: black; } QPushButton { background-color: #202020; color: white; }")
+                palette.setColor(QPalette.Background, QColor(5, 5, 5))
             else:
-                if sys.platform == "darwin":
-                    self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "/volumes/")
-                elif sys.platform == "linux":
-                    self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "/media/")
-                else:
-                    self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "C:This PC/Computer/")
-                try:
+                dialog.setStyleSheet("background: 5f5f5f;color: f5f5f5;")
+                dialog.setStyleSheet("QLineEdit { color: black; background-color: white; }")
+                palette.setColor(QPalette.Background, QColor(250,250,250))
+            dialog.setLabelText("Enter New File Name, Don't enter anything if you don't want to change the names.\nIf you have multiple files, seperate them using a single space bar inbetween\ne.g. payload.dd payload1.dd...")
+            dialog.setWindowTitle("File Name Picker")
+            dialog.setInputMode(QInputDialog.TextInput)
+            dialog.setPalette(palette)
+            ok = dialog.exec_()
+            new_files = dialog.textValue()
+            if new_files == "":
+                new_files = []
+                for file in files:
+                    new_files.append(file.split('/')[-1])
+            else:
+                new_files = new_files.split(" ")
+                if len(new_files) != files:
+                    for i in range(len(new_files), len(files)):
+                        new_files.append(files[i].split('/')[-1])
+
+            for i in range(len(files)):
+                file = files[i]
+                new_file = new_files[i]
+                if os.path.exists(self.settings.pico_path):
                     shutil.copy(file, self.settings.pico_path + f"/{new_file}")
-                except (PermissionError, OSError):
-                    message_box = QMessageBox(QMessageBox.Information,
-                                              "Payload Upload",
-                                              "Upload failed, Are you sure you selected the USB Pico Ducky?",
-                                              QMessageBox.Cancel)
-                    message_box.exec_()
+                else:
+                    if sys.platform == "darwin":
+                        self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "/volumes/")
+                    elif sys.platform == "linux":
+                        self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "/media/")
+                    else:
+                        self.pico_path = QFileDialog.getExistingDirectory(self, 'Select USB Pico Ducky Folder', "C:This PC/Computer/")
+                    try:
+                        shutil.copy(file, self.settings.pico_path + f"/{new_file}")
+                    except (PermissionError, OSError):
+                        message_box = QMessageBox(QMessageBox.Information,
+                                                  "Payload Upload",
+                                                  "Upload failed, Are you sure you selected the USB Pico Ducky?",
+                                                  QMessageBox.Cancel)
+                        message_box.exec_()
+        except CatchedError:
+            pass
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
