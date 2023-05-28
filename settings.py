@@ -22,11 +22,38 @@ class Settings:
         self.pico_path = self.settings["last pico path"]
         self.target_language = self.settings["last language"]
         self.all_themes = list(self.settings["colors"][0].keys()) # name of all themes
+        if len(self.all_themes) != 0: # if any themes exist
+            if not self.theme in self.all_themes: # if selected theme doesn't exist
+                self.theme = self.all_themes[0]
+        else: # if no themes exist, assign the dark theme
+            properties = [
+                {
+                    "background": "050505",
+                    "comment": "32cd32",
+                    "starting keywords": "ff0000",
+                    "fkeys": "e0ffff",
+                    "shortcut keys": "d2691e",
+                    "arrows": "ff7800",
+                    "windows": "3e3eec",
+                    "chars": "ff6666",
+                    "uncommon": "85c1bb",
+                    "numbers": "d415d4",
+                    "text": "fafafa",
+                    "textbubble": "000000",
+               	    "background sidebar": "070707",
+                    "color sidebar": "f0f0f0"
+                }
+            ]
+            self.settings["colors"][0]["black"] = properties
+            self.set_theme("black")
+            self.save()
 
     # select theme (has to be already existing)
     def set_theme(self, name:str=None) -> None:
         if name:
             self.theme = name
+            self.settings["last color"] = self.theme
+        self.all_themes = list(self.settings["colors"][0].keys()) # name of all themes
         self.set_colors()
 
     # create new theme

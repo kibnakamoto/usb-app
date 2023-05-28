@@ -47,11 +47,6 @@ DUCKYSCRIPT_UNCOMMON = ("APP", "MENU", "BREAK", "PAUSE", "DELETE", "END", "HOME"
 class CatchedError(Exception):
     pass
 
-class Setup(QMainWindow):
-    """ Default Class Initializer """
-    def __init__(self):
-        super().__init__()
-
 # COLORS for (COMMENT, starting_keywords, fkeys, shortcut_keys, arrows, windows, chars, uncommon, numbers, text, textbubble, background, sidebar background, sidebar text)
 s = Settings()
 s.set_theme("white")
@@ -239,7 +234,7 @@ class IDE(QMainWindow, QWidget):
         ]
 
         self.settings = Settings()
-        self.settings.set_colors()
+        self.settings.set_theme()
         self.rgb = hextorgb(self.settings.bg)
 
         # target device os and language
@@ -869,29 +864,34 @@ class IDE(QMainWindow, QWidget):
         self.setPalette(pallete)
         self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text}")
         self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}") # filebar color
-        self.set_theme()
+        self.set_theme() # sets the icons and text color
         self.parse_line()
         code_palette = self.codespace.palette()
         code_palette.setColor(QPalette.Text, QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]))
         self.codespace.setPalette(code_palette)
+        self.settings.save()
 
     # set black theme
     def black_theme(self):
+        self.settings.theme = "black"
         self.settings.set_theme("black")
         self.rgb = hextorgb(self.settings.bg)
         pallete = QPalette()
         pallete.setColor(QPalette.Window, QColor(self.rgb[0], self.rgb[1], self.rgb[2]))
         self.setPalette(pallete)
-        self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};color: #{self.settings.text}")
+        self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble}; color: #{self.settings.text}")
         self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}") # filebar color
-        self.set_theme()
+        self.set_theme() # sets the icons and text color
         self.parse_line()
         code_palette = self.codespace.palette()
         code_palette.setColor(QPalette.Text, QColor(self.colors[-4][0], self.colors[-4][1], self.colors[-4][2]))
         self.codespace.setPalette(code_palette)
+        self.settings.save()
+
 
     # set white theme
     def white_theme(self):
+        self.settings.theme = "white"
         self.settings.set_theme("white")
         self.rgb = hextorgb(self.settings.bg) # background color
         pallete = QPalette()
@@ -907,16 +907,24 @@ class IDE(QMainWindow, QWidget):
 
         self.select_os.setStyleSheet("")
         self.languages.setStyleSheet("")
+        self.settings.save()
 
-    # set custom theme for background, and text
+    # set custom theme for background, and text, this function is called when CTRL+SHIFT+T
     def custom_theme(self) -> None:
         # colors to modify: self.rgb, self.colors, codespace background color, codespace pallet for text
+        self.settings.theme = "white"
         names =  ('comment', 'starting keywords', 'F-keys', "shortcut keys", "arrows", "windows", "chars",
                   "uncommon", "numbers", "text", "textbubble", "background", "background filebar", "filebar text")
         colors = list(self.colors)
         self.color = ColorWindow(colors, names, self.rgb, self.settings, self.screensize, self)
         self.color.color_set()
         self.color.show()
+        #self.settings.set_theme()
+        #self.settings.save()
+        #self.set_theme() # sets the icons and text color
+        #self.rgb = hextorgb(self.settings.bg)
+        #self.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble}; color: #{self.settings.text}")
+        #self.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}") # filebar color
 
     def closeEvent(self, event) -> None:
         if not self.saved or self.change_count != 0: # warn user if not saved

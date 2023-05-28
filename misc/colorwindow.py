@@ -9,7 +9,7 @@ import sys
 import os
 
 from PyQt5.QtWidgets import QMainWindow, QHBoxLayout, QWidget, QMessageBox, QColorDialog, \
-                            QPushButton, QCheckBox, QGridLayout, QFrame, QInputDialog, QLabel
+                            QPushButton, QCheckBox, QGridLayout, QFrame, QInputDialog, QLabel, QAction
 from PyQt5.QtGui import QColor, QPalette
 
 sys.path.append(os.path.abspath(".."))
@@ -202,9 +202,19 @@ class ColorWindow(QMainWindow):
 
     def saver(self) -> None:
         if not self.saved:
+
+            # add shortcut
+            if not(self.theme in self.settings.all_themes):
+                self.settings.all_themes.append(self.theme)
+                self.settings.theme = self.theme
+                theme_act = QAction(self.theme, self)
+                theme_act.triggered.connect(self.parent.load_theme)
+                self.parent.theme_menu.addAction(theme_act)
+                self.parent.iter_theme = self.theme
+
             colors = self.colors
-            self.settings.create_theme(colors[-1], colors[0], colors[1], colors[2], colors[3], colors[4], colors[5],
-                                       colors[6], colors[7], colors[8], colors[9], colors[10], colors[11], colors[12])
+            self.settings.create_theme(colors[-3], colors[0], colors[1], colors[2], colors[3], colors[4],
+                                       colors[5], colors[6], colors[7], colors[8], colors[9], colors[10], colors[12], colors[13])
             self.settings.set_colors()
             self.settings.save()
             self.saved = True
@@ -214,21 +224,22 @@ class ColorWindow(QMainWindow):
     
             # set background color
             pallete = QPalette()
-            tmp = hextorgb(colors[-3])
+            tmp = hextorgb(self.settings.bg)
             pallete.setColor(QPalette.Window, QColor(tmp[0], tmp[1], tmp[2]))
             self.parent.setPalette(pallete) # set background color
-            self.parent.codespace.setStyleSheet(f"background-color: #{colors[-4]};") # codespace color
-            self.parent.tree.setStyleSheet(f"background-color: #{colors[-2]};color: #{colors[-1]}") # filebar color
+            self.parent.codespace.setStyleSheet(f"background-color: #{self.settings.textbubble};") # codespace color
+            self.parent.tree.setStyleSheet(f"background-color: #{self.settings.bg_sidebar};color: #{self.settings.color_sidebar}") # filebar color
     
             # set text color
             code_palette = self.parent.codespace.palette()
-            tmp = hextorgb(colors[-5])
+            tmp = hextorgb(self.settings.text)
             code_palette.setColor(QPalette.Text, QColor(tmp[0], tmp[1], tmp[2]))
             self.parent.codespace.setPalette(code_palette)
-            self.parent.rgb = hextorgb(colors[-3])
+            self.parent.rgb = hextorgb(self.settings.bg)
             self.parent.colors = self.rgb()
             self.parent.set_theme() # sets icons and text color based on how dark the background is
             self.parent.parse_line()
+
             QMessageBox.question(None, 'Save Theme', "Saved Theme", QMessageBox.Ok)
 
     def input_theme_name(self) -> None:
