@@ -442,6 +442,10 @@ class IDE(QMainWindow, QWidget):
             act.triggered.connect(self.load_theme)
             self.theme_menu.addAction(act)
 
+        act = QAction("delete", self)
+        act.triggered.connect(self.deletes_theme)
+        self.theme_menu.addAction(act)
+
         # add setup button to toolbar
         self.setup = QAction(QIcon(self.setup_pic[0]), self.setup_pic[1], self)
         self.setup.triggered.connect(self.setup_w)
@@ -854,6 +858,49 @@ class IDE(QMainWindow, QWidget):
                 sys.exit(0)
         else:
             sys.exit(0)
+
+    def deletes_theme(self):
+        dialog = QInputDialog(self)
+        palette = dialog.palette()
+
+        if self.settings.theme == 'w': # white border of box means dark background
+            dialog.setStyleSheet("background: black; color: white;")
+            dialog.setStyleSheet("QLineEdit { color: white; background-color: black; } QPushButton { background-color: #202020; color: white; }")
+            palette.setColor(QPalette.Background, QColor(5, 5, 5))
+        else:
+            dialog.setStyleSheet("background: 5f5f5f;color: f5f5f5;")
+            dialog.setStyleSheet("QLineEdit { color: black; background-color: white; }")
+            palette.setColor(QPalette.Background, QColor(250,250,250))
+        tmp_text = str(tuple(self.settings.all_themes)).replace(", ", "\\,")
+        dialog.setLabelText(f"Enter Theme Name(s) to delete (themes: {tmp_text}), if removing multiple themes, seperate theme names using front slash plus a comma (\,) with no space")
+        dialog.setWindowTitle("Theme name Picker")
+        dialog.setInputMode(QInputDialog.TextInput)
+        dialog.setPalette(palette)
+        ok = dialog.exec_()
+        self.selected_to_dels = dialog.textValue()
+        if ok and self.selected_to_dels != "":
+            self.selected_to_dels = self.selected_to_dels.split("\\,")
+            for i in self.selected_to_dels:
+                self.selected_to_del = self.selected_to_dels[-1]
+                self.delete_theme()
+                del self.selected_to_dels[-1]
+
+    # delete a given theme
+    def delete_theme(self):
+        if self.selected_to_del in self.settings.all_themes:
+            self.settings.all_themes.remove(self.selected_to_del)
+            if self.settings.theme == self.selected_to_del:
+                # assign current theme to first theme of all_themes excluding self.selected_to_del
+                self.settings.theme = self.settings.all_themes[0]
+                self.iter_theme = self.settings.theme
+                self.load_theme()
+            del self.settings.settings["colors"][0][self.selected_to_del]
+        else:
+            QMessageBox(QMessageBox.Information,
+                        'Theme Deletion',
+                        "Selected Theme Doesn't exist, are you sure you seperated the list using \\,",
+                        QMessageBox.Ok).exec_()
+            
 
     # load themes
     def load_theme(self):
