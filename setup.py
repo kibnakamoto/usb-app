@@ -111,16 +111,20 @@ class Setup(QMainWindow):
         try:
             shutil.copy(f"{self.add_path}/uf2.uf2", self.pico_path) # copy file to pico
         except PermissionError:
-            message_box = qmessagebox(qmessagebox.information,
+            message_box = QMessageBox(QMessageBox.Information,
                                       "Enable hack mode",
                                       "Device doesn't exist. Please make sure you selected the right device, if it still didn't work, try setting the device name to RPI-RP2",
-                                      qmessagebox.ok)
+                                      QMessageBox.Ok)
             message_box.exec_()
             
 
+        possible_pico_names = ["CIRCUITPY", self.settings.pico_path.split("/")[-1]] # try both these names. Try one every iteration.
         self.pico_path = self.pico_path.replace(self.pico_path[self.pico_path.index(self.pico_path.split('/')[-1]):], "CIRCUITPY")
+        index = -1
         while True:
             try:
+                index+=1
+
                 # add all the lib files
                 lib_files = os.listdir(f"{self.add_path}lib")
                 for file in lib_files:
@@ -146,7 +150,7 @@ class Setup(QMainWindow):
                 break
             except PermissionError: # No permission meaning shutil didn't load
                 if not os.path.exists(self.pico_path):
-                    self.pico_path = self.pico_path.replace(self.pico_path[self.pico_path.index(self.pico_path.split('/')[-1]):], "CIRCUITPY")
+                    self.pico_path = self.pico_path.replace(self.pico_path[self.pico_path.index(self.pico_path.split('/')[-1]):], possible_pico_names[index%2])
                 print("trying device", self.pico_path)
                 sleep(1)
                 continue

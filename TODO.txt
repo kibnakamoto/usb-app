@@ -1,4 +1,3 @@
 TODO: add a video tutorial
 TODO: add pictures to document
 TODO: on the tutorial, add how to setup instructions based on how I made the physical device. also update sentences that suggest which switch does what
-TODO: possibly change the name of CIRCUITPY to self.settings.pico_path.split("/")[-1]
