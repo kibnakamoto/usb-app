@@ -14,6 +14,8 @@ from PyQt5.QtGui import QColor, QPalette
 
 import settings
 
+#TODO: possibly change the name of CIRCUITPY to self.settings.pico_path.split("/")[-1]
+
 # Modes: disable/enable
 # disable: press the button on the usb while plugging the usb in. After the USB shows up as a storage device. Execute the disable_h()
 # enable: nothing
