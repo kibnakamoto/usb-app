@@ -148,11 +148,6 @@ class IDE(QMainWindow, QWidget):
                     "add another duckyscript file",
                     self.add_file
                 ],
-                "compile": [
-                    "pictures/black_bk/compile.png",
-                    "generate binary of program",
-                    self.compile_duckyscript
-                ],
                 "download": [
                     "pictures/black_bk/download.png",
                     "download the file on your computer",
@@ -181,11 +176,6 @@ class IDE(QMainWindow, QWidget):
                     "add another duckyscript file",
                     self.add_file
                     ],
-                "compile": [
-                    "pictures/white_bk/compile.png",
-                    "generate binary of program",
-                    self.compile_duckyscript
-                ],
                 "download": [
                     "pictures/white_bk/download.png",
                     "download the file on your computer",
@@ -759,9 +749,6 @@ class IDE(QMainWindow, QWidget):
     # adjust an integer to the width of the application
     def adjw(self, num:int) -> int:
         return self.size().width()//num
-
-    def compile_duckyscript(self):
-        pass
 
     def set_theme(self):
         average = 0
