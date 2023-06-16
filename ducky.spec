@@ -5,7 +5,7 @@ block_cipher = None
 
 
 a = Analysis(
-    ['ducky.py'],
+    ['/home/kibnakamoto/workspace/usb-app/ducky.py'],
     pathex=[],
     binaries=[],
     datas=[],
