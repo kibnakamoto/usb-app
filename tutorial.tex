@@ -1,6 +1,5 @@
 \documentclass[a4paper,12pt]{article}
 
-\usepackage{hyperref}
 \usepackage{graphicx}
 \usepackage[svgnames, table]{xcolor}
 \usepackage{amsmath}
@@ -9,7 +8,7 @@
 \usepackage{booktabs}
 \usepackage[utf8]{inputenc}
 \usepackage{rotating}
-\usepackage{makecell}
+\usepackage{hyperref}
 
 \definecolor{bgColor}{rgb}{0.95,0.95,0.92}
 \definecolor{cgreen}{RGB}{8, 110, 16}
@@ -225,22 +224,26 @@ Here is what they are and what they do:
 
 \definecolor{LightRed}{RGB}{255,33,33}
 
-\newcolumntype{g}{>{\columncolor{LightGreen}}c}
-\newcolumntype{b}{>{\columncolor{LightBlue}}c}
+\newcolumntype{g}{>{\columncolor{LightGreen}}p{4cm}}
+\newcolumntype{b}{>{\columncolor{LightBlue}}p{4cm}}
 \newcolumntype{y}{>{\columncolor{LightGrey}}c}
-\newcolumntype{r}{>{\columncolor{red!50}}c}
+\newcolumntype{r}{>{\columncolor{red!50}}p{7.8cm}}
+\newcolumntype{h}{>{\columncolor{LightBlue}}c}
+\newcolumntype{t}{>{\columncolor{red!50}}c}
+\newcolumntype{l}{>{\columncolor{LightGreen}}c}
 
 \begin{center}
-\begin{tabular}{||b|b|g|r||}
+	%\begin{tabular}{||b|b|g|r||}
+	\begin{tabular}{||b|b|g|r||}
 	\multicolumn{2}{|b|}{Background} & Background of the IDE \\
 	\cline{1-3}
 	\multicolumn{2}{|b|}{Text} & Non-keyword text\\
 	\cline{1-3}
-	\multicolumn{2}{|b|}{Textbubble} & \thead{Background of\\text coding box\\(the background of\\the IDE code box)}\\
+	\multicolumn{2}{|b|}{Textbubble} & \thead{Background of text coding box (the background of the IDE code box)}\\
 	\cline{1-3}
-	\multicolumn{2}{|b|}{Background sidebar} & \thead{Background color of \\ the file picking sidebar}\\
+	\multicolumn{2}{|b|}{Background sidebar} & \thead{Background color of the file picking sidebar}\\
 	\cline{1-3}
-	\multicolumn{2}{|b|}{Color sidebar} & \thead{Color of the \\text of sidebar}\\
+	\multicolumn{2}{|b|}{Color sidebar} & \thead{Color of the text of sidebar}\\
 	\hline
 	\multicolumn{2}{|y|}{Comment} & Colors of comment & REM\\
 	\hline
@@ -379,6 +382,7 @@ REM & DELAY & STRING & PRINT & DEFAULT\_DELAY
 \normalsize
 
 Some of these keywords are the same keyboard key, this website shows which keywords share the same meanings
+
 https://wiki.spacehuhn.com/wifiduck/usage/duckyscript/
 
 \subsection{Tutorial}
@@ -388,31 +392,33 @@ As you can see on section \ref{all_keywords}, all these keywords have to be capi
 as you can see most of these keywords can be found on the keyboard. This is because everything else is just keyboard keys and the function of these keys depend on the OS (Operating System), the type and brand of the device. 
 
 \begin{center}
-\setlength{\arrayrulewidth}{0.3mm}\begin{tabular}{|b|b|}
+	\setlength{\arrayrulewidth}{0.3mm}\begin{tabular}{|h|p{8cm}|}
+%\begin{tabular}{|b|b|}
 	\cline{1-2}
-	\multicolumn{2}{|r|}{Here are the duckyscript commands that aren't keyboard keys}\\
+	\multicolumn{2}{|t|}{Here are the duckyscript commands that aren't keyboard keys}\\
 	\centering\setlength{\extrarowheight}{7pt}
 	REM & Stands for 'REMOVE', it's used for commenting code\\
 	\hline
-	DELAY & \thead{A pause (in milliseconds). Used for when waiting for\\ an interface to catch up with \\ the USB Pico Ducky typing speed}\\
+	DELAY & A pause (in milliseconds). Used for when waiting for an interface to catch up with the USB Pico Ducky typing speed\\
 	\hline
-	STRING & \thead{Types whatever comes after the command}\\
+	STRING & Types whatever comes after the command\\
 	\hline
-	REPEAT & \thead{Repeats the previous command N times}\\
+	REPEAT & Repeats the previous command N times\\
 	\hline
-	PRINT & \thead{Prints whatever comes after to python console}\\
+	PRINT & Prints whatever comes after to python console\\
 	\hline
-	IMPORT & \thead{Imports and executes another duckyscript file to execute\\(has to be in the same path/folder), this functionality doesn't exist in the\\USB Rubber Ducky but does exist in this USB Pico Ducky.}\\
+	IMPORT & Imports and executes another duckyscript file to execute (has to be in the same path/folder), this functionality doesn't exist in the USB Rubber Ducky but does exist in this USB Pico Ducky.\\
 	\hline
-	\thead{DEFAULTDELAY \\DEFAULT\_DELAY} & \thead{Specifies how long (in milliseconds) to\\wait between each line of command. If not specified, DEFAULTDELAY is 18ms.}\\
+	\thead{DEFAULTDELAY \\DEFAULT\_DELAY} & \thead{Specifies how long (in milliseconds) to wait between each line of command. If not specified, DEFAULTDELAY is 18ms.}\\
 	\hline
 	LED & \thead{Change the state of the LED (on/off)}\\
 \end{tabular}
 \end{center}
 
+\normalsize
 \begin{center}
-\begin{tabular}{|b|g|}
-	\multicolumn{2}{|r|}{Keys That Might Be Confusing}\\
+\begin{tabular}{|h|l|}
+	\multicolumn{2}{|t|}{Keys That Might Be Confusing}\\
 	\hline
 	WINDOWS \& GUI & The windows button\\
 	\hline
