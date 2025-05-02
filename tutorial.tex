@@ -9,6 +9,7 @@
 \usepackage[utf8]{inputenc}
 \usepackage{rotating}
 \usepackage{hyperref}
+\usepackage{makecell}
 
 \definecolor{bgColor}{rgb}{0.95,0.95,0.92}
 \definecolor{cgreen}{RGB}{8, 110, 16}
@@ -226,6 +227,7 @@ Here is what they are and what they do:
 
 \newcolumntype{g}{>{\columncolor{LightGreen}}p{4cm}}
 \newcolumntype{b}{>{\columncolor{LightBlue}}p{4cm}}
+\newcolumntype{k}{>{\columncolor{LightBlue}}c}
 \newcolumntype{y}{>{\columncolor{LightGrey}}c}
 \newcolumntype{r}{>{\columncolor{red!50}}p{7.8cm}}
 \newcolumntype{h}{>{\columncolor{LightBlue}}c}
@@ -233,19 +235,18 @@ Here is what they are and what they do:
 \newcolumntype{l}{>{\columncolor{LightGreen}}c}
 
 \begin{center}
-	%\begin{tabular}{||b|b|g|r||}
 	\begin{tabular}{||b|b|g|r||}
-	\multicolumn{2}{|b|}{Background} & Background of the IDE \\
+	\multicolumn{2}{|k|}{Background} & Background of the IDE \\
 	\cline{1-3}
-	\multicolumn{2}{|b|}{Text} & Non-keyword text\\
+	\multicolumn{2}{|k|}{Text} & Non-keyword text \\
 	\cline{1-3}
-	\multicolumn{2}{|b|}{Textbubble} & \thead{Background of text coding box (the background of the IDE code box)}\\
+	\multicolumn{2}{|k|}{Textbubble} & Background of text coding box (the background of the IDE code box) \\
 	\cline{1-3}
-	\multicolumn{2}{|b|}{Background sidebar} & \thead{Background color of the file picking sidebar}\\
+	\multicolumn{2}{|k|}{Background sidebar} & Background color of the file picking sidebar \\
 	\cline{1-3}
-	\multicolumn{2}{|b|}{Color sidebar} & \thead{Color of the text of sidebar}\\
+	\multicolumn{2}{|k|}{Color sidebar} & Color of the text of sidebar \\
 	\hline
-	\multicolumn{2}{|y|}{Comment} & Colors of comment & REM\\
+	\multicolumn{2}{|y|}{Comment} & Colors of comment & REM \\
 	\hline
 	\multicolumn{2}{|y|}{Starting Keywords} & Colors of Starting Keywords & \setlength{\arrayrulewidth}{0.5mm}\scalebox{0.7}{
 		\begin{tabular}{c|c|c|c|c|c|c|c}
@@ -409,9 +410,9 @@ as you can see most of these keywords can be found on the keyboard. This is beca
 	\hline
 	IMPORT & Imports and executes another duckyscript file to execute (has to be in the same path/folder), this functionality doesn't exist in the USB Rubber Ducky but does exist in this USB Pico Ducky.\\
 	\hline
-	\thead{DEFAULTDELAY \\DEFAULT\_DELAY} & \thead{Specifies how long (in milliseconds) to wait between each line of command. If not specified, DEFAULTDELAY is 18ms.}\\
+	\thead{DEFAULTDELAY \\DEFAULT\_DELAY} & Specifies how long (in milliseconds) to wait between each line of command. If not specified, DEFAULTDELAY is 18ms.\\
 	\hline
-	LED & \thead{Change the state of the LED (on/off)}\\
+	LED & Change the state of the LED (on/off)\\
 \end{tabular}
 \end{center}
 
